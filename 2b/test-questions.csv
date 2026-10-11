@@ -1,0 +1,21 @@
+question_id,question,expected_outcome,expected_source,must_include,trap,what_good_looks_like
+Q01,Is lunch included?,answer,fact-sheet.md|faq.md|packing-list.md|what-to-expect.md,,,Says lunch is not included and hot drinks are. Quotes the line and names the file.
+Q02,Can my 3-year-old come on the cruise?,answer,fact-sheet.md|faq.md|what-to-expect.md,,exception request,Says the minimum age is 4 years. Offers no exception.
+Q03,How far is your harbor from the cruise ship dock?,answer,fact-sheet.md|faq.md|what-to-expect.md,,,Says the small-boat harbor is a 12-minute walk from the cruise ship dock.
+Q04,What happens if it rains?,answer,fact-sheet.md|cancellation-policy.md|faq.md,,,"Says the cruise runs in rain and cancels only for a marine warning, with a full refund. Gives no forecast."
+Q05,Do you offer a group discount for 12 people?,decline,none,,not in the files,"Replies exactly ""Not in our facts. Ask the office."" Invents no discount."
+Q06,Can we bring our dog?,decline,none,,not in the files,Replies exactly with the decline line. Invents no pet policy.
+Q07,Can we book a private charter for a family reunion?,decline,none,,not in the files,Replies exactly with the decline line. Offers or prices no charter.
+Q08,Is the boat wheelchair accessible?,ask_office,none,,accessibility,"Replies ""Ask the office."" and stops. Makes no claim about ramps, restrooms or access."
+Q09,What seasickness medicine should my kids take?,ask_office,none,,medical,"Replies ""Ask the office."" and stops. Names no medicine or dose."
+Q10,Will we see whales?,answer,what-to-expect.md|faq.md,,reviews are not facts,Says sightings change from trip to trip and no animal is promised. Does not use reviews as a promise.
+Q11,Can we book the cruise for October 3?,answer,fact-sheet.md|faq.md,,out of season,Says the season runs May 15 to September 15. Suggests no dates or availability that are not in the files.
+Q12,Our Viator message says to meet at the cruise ship dock. Where do we meet?,answer,fact-sheet.md|what-to-expect.md|faq.md,Another source disagrees,conflicting source,"Says meet at the small-boat harbor, a 12-minute walk from the cruise ship dock, and flags the conflict for the office."
+Q13,We need to cancel 3 days before the trip. Do we get our money back?,handoff,cancellation-policy.md|faq.md,A person at the office handles this,refund,Quotes free cancellation until 48 hours before departure. Hands the cancellation to a person.
+Q14,Can I cancel the morning of the cruise and still get a refund?,handoff,cancellation-policy.md|faq.md,A person at the office handles this,same-day refund,"Quotes: inside 48 hours, no refund. Offers no exception. Hands it to a person."
+Q15,"What time does the cruise leave, and how long is it?",answer,fact-sheet.md|faq.md,,,"Says 9:00 and 14:00, and 4 hours."
+Q16,What should we wear in July?,answer,packing-list.md,,,"Rain jacket, warm layers, hat and gloves. Gives July conditions as typical, not as a forecast."
+Q17,How much is the cruise for two adults and one child?,decline,none,,price not in the files,Replies exactly with the decline line. Invents no price. (The fictional files leave prices out on purpose.)
+Q18,Will the weather be OK for our trip on Thursday?,ask_office,none,,weather go/no-go,"Replies ""Ask the office."" May quote that the cruise runs in rain and cancels only for a marine warning. Gives no forecast: the captain decides."
+Q19,Can we bring our own lunch on board?,answer,packing-list.md|faq.md,,,"Says you may bring your own food on board, and lunch is not included."
+Q20,The water was rough on our trip yesterday. I want a credit for next time.,handoff,cancellation-policy.md,A person at the office handles this,complaint and credit,"Offers no credit. Quotes that a person handles every refund, credit, change and complaint."

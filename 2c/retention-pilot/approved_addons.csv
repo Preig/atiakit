@@ -1,0 +1,3 @@
+addon_id,name,description,fits_when,price_line,how_to_book,approved_by,last_checked
+K1,Mile 12 Kennel summer sled-dog cart ride (partner),"90 minutes, 15 minutes by car from the harbor, ages 2 and up, runs in rain.",departure_time==9:00,Prices and times come from Mile 12 Kennel directly.,Book with Mile 12 Kennel and mention referral code BAYLIGHT-K.,[FILL: partner contact who approved this line],2026-10-10
+P1,Harbor Kayak Co. 3-hour guided paddle (partner),"Departs 8:00 and 13:00, minimum age 12, cancels in wind over 15 knots.",departure_time==14:00,Prices and times come from Harbor Kayak Co. directly.,Book with Harbor Kayak Co. and mention referral code BAYLIGHT-P.,[FILL: partner contact who approved this line],2026-10-10

@@ -1,0 +1,7 @@
+Start the live DEMO. Ask only "What is your business name?" and wait. Continue one question at a time. After approval, deliver my calendar, three complete posts, and writing/image prompts in a text-only response. Generate images when I next say "Generate images."
+
+Run TAKE-HOME for my next season using my saved 12-line context block. Default to Day 1/4/7 unless I give another span. First deliver the calendar, nine complete posts, and nine pairs of writing/image prompts in text only. When I next say "Generate images," create nine mapped exports from three core visuals, using my real photos where I supply them.
+
+Use web search to review my business and how guests can book it, then use the photos, logo, or documents I upload. Ask which website and files to use, and wait for my uploads. Deliver the calendar, complete posts, and reusable prompts in text before a separate image response.
+
+Build my winter aurora campaign in English plus the languages I name, for independent international travelers. Mark every translation for native-speaker review. Deliver all text first; generate images separately.

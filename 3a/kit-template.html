@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; frame-src 'none'">
+<title>3.a Trip kit template · ATIA AI Take-Home Kit</title>
+<meta name="description" content="A one-page Letter layout for an approved AI trip kit. Paste the approved text, check the preview, print or save as PDF. Keeps a DRAFT stamp until a person signs off.">
+<link rel="stylesheet" href="../assets/kit.css">
+<script src="../assets/kit.js" defer></script>
+<style>
+/* Trip kit template. Works on its own: if ../assets/kit.css is missing, the editor is plainer but everything works. */
+body{font-family:Arial,Helvetica,sans-serif}
+.tpl-grid{display:grid;gap:0 18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.tpl-grid>div{min-width:0}
+#t-text{min-height:260px;font:15px/1.5 Consolas,"Courier New",monospace}
+.privacy{font-size:14px;color:#8a2a2a;margin:4px 0 0}
+.chk{display:flex;gap:8px;align-items:flex-start;font-weight:normal;font-size:15px;margin:12px 0 0}
+.chk input{width:18px;height:18px;margin:3px 0 0;flex:none}
+.fit{font-size:14px;font-weight:bold;margin:8px 0}
+.fit.ok{color:#476a1e}.fit.bad{color:#c62828}
+.ownerq{background:#fff4dc;border-left:5px solid #d49a1a;padding:10px 16px;margin:12px 0;border-radius:4px;font-size:15px}
+.ownerq:empty{display:none}
+.ownerq ol{margin:6px 0 0;padding-left:22px}
+.pii{font-size:14px;font-weight:bold;color:#c62828;margin:6px 0 0}
+.pii:empty{display:none}
+.preview{position:relative;overflow:hidden;margin:0 0 22px}
+.preview-label{font-size:12px;font-weight:bold;letter-spacing:.1em;text-transform:uppercase;color:#176374;margin:0 0 8px}
+
+/* the printable sheet: Letter, 0.5 in margins */
+.sheet{width:8.5in;min-height:11in;padding:.5in;background:#fff;color:#222;box-shadow:0 1px 6px rgba(0,0,0,.25);transform-origin:0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet-inner{width:7.5in;font-size:11pt;line-height:1.38}
+.sh-head{border-top:6px solid #0d92b4;border-bottom:2px solid #5c8727;padding:8px 0 6px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.sh-biz{font-size:1.45em;font-weight:bold;color:#476a1e;line-height:1.15}
+.sh-title{font-size:.95em;font-weight:bold;letter-spacing:.12em;text-transform:uppercase;color:#176374}
+.sh-trip{font-size:1em;color:#333;margin-top:2px}
+.stamp{border:3px solid #c62828;color:#c62828;font-weight:bold;letter-spacing:.06em;text-align:center;padding:4px 8px;margin:0 0 10px;font-size:1em}
+.stamp[hidden]{display:none}
+.sh-body{column-count:2;column-gap:.32in;column-rule:1px solid #d9ddd6}
+.sh-body h3{font-size:1.02em;color:#476a1e;margin:.7em 0 .25em;text-transform:none;break-after:avoid;line-height:1.25}
+.sh-body h3:first-child{margin-top:0}
+.sh-body p{margin:0 0 .45em}
+.sh-body ul,.sh-body ol{margin:0 0 .5em;padding-left:1.25em}
+.sh-body li{margin:0 0 .2em}
+.sh-body strong{color:#176374}
+.sh-body mark.fill,.sh-foot mark.fill,.sh-head mark.fill{background:#fff3b0;color:#3a2a00;border:1px dashed #8a5a00;font-weight:bold;padding:0 2px}
+.sh-empty{color:#64748b;font-style:italic}
+.sh-foot{border-top:1px solid #adb9a2;margin-top:10px;padding-top:6px;font-size:.8em;color:#444}
+.sh-foot p{margin:0 0 .25em}
+@page{size:letter;margin:.5in}
+@media (max-width:640px){#t-text{min-height:200px}}
+@media print{
+  header.kit,footer.kit,.no-print,.band,.preview-label{display:none!important}
+  body{background:#fff}
+  main.kit{padding:0!important;max-width:none!important;margin:0}
+  .preview{height:auto!important;overflow:visible;margin:0}
+  .sheet{transform:none!important;width:7.5in;min-height:0;padding:0;box-shadow:none;margin:0}
+}
+</style>
+</head>
+<body data-page="3a-template">
+<div class="band" aria-hidden="true"></div>
+<header class="kit no-print">
+  <p class="crumbs"><a href="../">ATIA AI Take-Home Kit</a> › <a href="./">3.a The AI trip kit</a> › Kit template</p>
+  <p class="kicker"><span class="rung r1" aria-hidden="true"><i></i><i></i><i></i></span>Basic rung · Tool 3.a</p>
+  <h1>Trip kit template</h1>
+  <p class="lede">Paste the approved kit text, check the preview, then print and choose "Save as PDF". One Letter page. The DRAFT stamp stays until a staff member signs off and every [FILL] is answered.</p>
+  <nav class="tool-nav" data-toolnav="3a" aria-label="All tools"></nav>
+</header>
+
+<main class="kit">
+  <section class="card no-print" aria-labelledby="edit">
+    <h2 id="edit" style="margin-top:0">Fill the template</h2>
+    <p><strong>AI drafts. You approve.</strong> Use text that has been through "Check the draft" on the <a href="./#check">3.a page</a> and read by a person.</p>
+    <div class="tpl-grid">
+      <div><label for="t-biz">Business name</label><input type="text" id="t-biz" autocomplete="off"></div>
+      <div><label for="t-trip">Trip line <small>(dates and party size, no names)</small></label><input type="text" id="t-trip" autocomplete="off"></div>
+    </div>
+    <label for="t-text">Kit text <small>(the approved draft)</small></label>
+    <p class="privacy" id="t-text-note">No guest names, emails, phone numbers, card numbers or medical details. Add the guest's name in your email, not here.</p>
+    <textarea id="t-text" aria-describedby="t-text-note" spellcheck="true"></textarea>
+    <p class="pii" id="t-pii" aria-live="polite"></p>
+    <div class="tpl-grid">
+      <div><label for="t-contact">Contact line <small>(your business phone and email)</small></label><input type="text" id="t-contact" autocomplete="off"></div>
+      <div><label for="t-fine">Fine print</label><input type="text" id="t-fine" autocomplete="off"></div>
+    </div>
+    <fieldset>
+      <legend>Approval</legend>
+      <div class="tpl-grid">
+        <div><label for="t-by">Checked and approved by <small>(staff initials)</small></label><input type="text" id="t-by" autocomplete="off" maxlength="40"></div>
+        <div><label for="t-date">Date</label><input type="date" id="t-date"></div>
+      </div>
+      <label class="chk" for="t-ok"><input type="checkbox" id="t-ok"> I checked every fact, time and referral code against our fact sheet and partner list.</label>
+    </fieldset>
+    <p class="fit" id="t-fit" aria-live="polite"></p>
+    <div class="ownerq" id="t-owner" aria-live="polite"></div>
+    <div>
+      <div class="btns">
+        <button type="button" id="t-print">Print or save as PDF</button>
+        <button type="button" class="secondary" id="t-example">Load the fictional example</button>
+        <button type="button" class="secondary" id="t-save">Save the kit text (.txt)</button>
+        <button type="button" class="ghost" id="t-clear">Clear</button>
+      </div>
+      <p class="status" role="status" aria-live="polite" id="t-status"></p>
+    </div>
+    <p class="hint">In the print dialog choose "Save as PDF", paper size Letter, and turn on "Background graphics" to keep the colors. Everything stays in this browser.</p>
+  </section>
+
+  <p class="preview-label no-print" id="pv-label">Print preview</p>
+  <div class="preview" id="preview" role="region" aria-labelledby="pv-label">
+    <article class="sheet" id="sheet">
+      <div class="sheet-inner" id="sheet-inner">
+        <div class="stamp" id="sh-stamp">DRAFT - PENDING OWNER REVIEW</div>
+        <div class="sh-head">
+          <div><div class="sh-biz" id="sh-biz"></div><div class="sh-trip" id="sh-trip"></div></div>
+          <div class="sh-title">Your trip kit</div>
+        </div>
+        <div class="sh-body" id="sh-body"></div>
+        <div class="sh-foot">
+          <p id="sh-contact"></p>
+          <p id="sh-fine"></p>
+          <p id="sh-approved"></p>
+        </div>
+      </div>
+    </article>
+  </div>
+</main>
+
+<footer class="kit no-print">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates.</p>
+  <p><a href="../">All nine tools</a> · <a href="../Prompt-Kit-3x3.html">Printable prompt kit</a></p>
+</footer>
+
+<script id="sheet-core">
+/* Turns pasted kit text into the printable sheet. Pure functions, no network. */
+var KitSheet = (function () {
+  "use strict";
+  var MARKER = /^\W*DRAFT\s*[-:\u2013\u2014]?\s*PENDING\s+(?:OWNER|STAFF)\s+REVIEW\W*$/i;
+  var OWNERQ = /^(?:open\s+)?(?:questions?\s+(?:for|to)\s+(?:the\s+)?owner|owner\s+questions)\b/i;
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function inline(s) {
+    s = esc(s);
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/__([^_]+)__/g, "<strong>$1</strong>");
+    return s.replace(/\[(FILL[^\]]*)\]/gi, '<mark class="fill">[$1]</mark>');
+  }
+  function bare(t) { return t.replace(/^#{1,6}\s+/, "").replace(/^\*\*(.+)\*\*:?$/, "$1").replace(/^__(.+)__:?$/, "$1").replace(/\s*#+$/, "").trim(); }
+  function heading(t, prevBlank, nextLine, isFirst) {
+    var m;
+    if ((m = /^#{1,6}\s+(.+?)\s*#*$/.exec(t))) return m[1].replace(/\*\*/g, "");
+    if ((m = /^\*\*([^*]+)\*\*:?$/.exec(t))) return m[1];
+    if (/^[-*\u2022]|^\d{1,2}[.)]\s/.test(t) || /\[FILL/i.test(t)) return null;
+    if (t.length <= 60 && /:$/.test(t)) return t.slice(0, -1);
+    if (t.length <= 60 && prevBlank && (nextLine || isFirst) && !/[.!?,;:]$/.test(t)) return t;
+    return null;
+  }
+  function render(text) {
+    var lines = String(text || "").replace(/\r\n?/g, "\n").split("\n"), out = "", list = "", owner = [], inOwner = false, marker = false;
+    function close() { if (list) { out += "</" + list + ">"; list = ""; } }
+    for (var i = 0; i < lines.length; i++) {
+      var t = lines[i].trim(), prevBlank = i === 0 || !lines[i - 1].trim(), next = (lines[i + 1] || "").trim(), m;
+      if (MARKER.test(t)) { marker = true; continue; }
+      if (inOwner) { if (t) owner.push(t.replace(/^(?:[-*\u2022]|\d{1,2}[.)])\s*/, "")); continue; }
+      if (t && OWNERQ.test(bare(t))) { close(); inOwner = true; continue; }
+      if (!t) { close(); continue; }
+      var h = heading(t, prevBlank, next, out === "");
+      if (h !== null) { close(); out += "<h3>" + inline(h) + "</h3>"; continue; }
+      if ((m = /^[-*\u2022]\s+(.+)$/.exec(t))) { if (list !== "ul") { close(); out += "<ul>"; list = "ul"; } out += "<li>" + inline(m[1]) + "</li>"; continue; }
+      if ((m = /^\d{1,2}[.)]\s+(.+)$/.exec(t))) { if (list !== "ol") { close(); out += "<ol>"; list = "ol"; } out += "<li>" + inline(m[1]) + "</li>"; continue; }
+      close();
+      if ((m = /^(Day\s+\d+[^:]{0,40}:)\s*(.+)$/i.exec(t))) out += "<p><strong>" + inline(m[1]) + "</strong> " + inline(m[2]) + "</p>";
+      else out += "<p>" + inline(t) + "</p>";
+    }
+    close();
+    var printed = out.replace(/<[^>]+>/g, " ");
+    return {
+      html: out, owner: owner, marker: marker,
+      fills: (printed.match(/\[FILL[^\]]*\]/gi) || []).length,
+      words: (printed.match(/\S+/g) || []).length
+    };
+  }
+  function pii(text) {
+    var s = String(text || ""), hits = [];
+    if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(s)) hits.push("an email address");
+    if (/(?:\+?1[\s.-]?)?(?:\(\d{3}\)|\b\d{3})[\s.-]?\d{3}[\s.-]?\d{4}\b/.test(s)) hits.push("a phone number");
+    if (/\b(?:\d[ -]?){12,18}\d\b/.test(s)) hits.push("a long number (card or ID?)");
+    if (/\b(?:Dear|Hi|Hello)\s+(?!There\b|All\b|Everyone\b)[A-Z][a-z]+/.test(s)) hits.push("a greeting with a name");
+    return hits;
+  }
+  return { render: render, pii: pii, esc: esc, inline: inline };
+})();
+if (typeof module !== "undefined" && module.exports) module.exports = KitSheet;
+</script>
+<script>
+(function () {
+  "use strict";
+  if (typeof document === "undefined") return;
+  var SKEY = "atiakit:3a-template:state", HKEY = "atiakit:3a:handoff";
+  var EXAMPLE = {
+    biz: "Bay Light Day Cruises, Seward (fictional teaching business)",
+    trip: "July 14 to 16, 2027 · party of 4",
+    contact: "[FILL: your business phone and email]",
+    fine: "Partner times, prices and availability: confirm with each partner. Weather and sea conditions decide go or no-go on the day.",
+    text: [
+      "DRAFT - PENDING OWNER REVIEW",
+      "",
+      "## Day by day",
+      "Day 1, Wed July 14: Arrival day. Settle in. Open afternoon: Mile 12 Kennel's 90-minute sled-dog cart ride, 15 minutes by car from our harbor. Ages 2 and up, so the whole family can go, and it runs in rain. Departure times: [FILL: kennel departure times]. Referral code BAYLIGHT-K.",
+      "Day 2, Thu July 15: Your Bay Light cruise, 9:00 to 13:00. Meet at the small-boat harbor, a 12-minute walk from the cruise ship dock. Hot drinks are included; lunch is not, so bring food for the kids. After the cruise, the kennel ride also fits, starting no earlier than 13:45.",
+      "Day 3, Fri July 16: Departure day. Departure time: [FILL: guest departure time].",
+      "",
+      "## What to wear in July",
+      "Expect 50 to 65 F and rain on about half of days. Wear layers and bring a real rain jacket. The cruise cabin is heated and enclosed.",
+      "",
+      "## Weather plan B (operator confirms on the day)",
+      "- Cruise: runs in rain. It cancels only for a marine warning, with a full refund.",
+      "- Kennel ride: runs in rain.",
+      "",
+      "## Things first-time visitors get wrong",
+      "- Daylight: about 18 hours in July, so evenings stay bright.",
+      "- Wind: afternoon wind is common in the bay.",
+      "- The walk: the harbor is a 12-minute walk from the cruise ship dock.",
+      "",
+      "## Partner codes",
+      "- Mile 12 Kennel: BAYLIGHT-K",
+      "",
+      "## Questions for the owner",
+      "1. Mile 12 Kennel departure times?",
+      "2. Guest arrival and departure times?"
+    ].join("\n")
+  };
+  var FIELDS = { biz: "t-biz", trip: "t-trip", text: "t-text", contact: "t-contact", fine: "t-fine", by: "t-by", date: "t-date" };
+  function $(id) { return document.getElementById(id); }
+  function get(k) { try { return JSON.parse(window.localStorage.getItem(k) || "null"); } catch (e) { return null; } }
+  function put(k, v) { try { window.localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } }
+  function del(k) { try { window.localStorage.removeItem(k); } catch (e) { } }
+  function say(msg) { var b = $("t-status"); b.textContent = msg; clearTimeout(b._t); b._t = setTimeout(function () { b.textContent = ""; }, 8000); }
+  function today() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function state() { var s = {}; Object.keys(FIELDS).forEach(function (k) { s[k] = $(FIELDS[k]).value; }); s.ok = $("t-ok").checked; return s; }
+  function apply(s) { Object.keys(FIELDS).forEach(function (k) { if (s[k] !== undefined) $(FIELDS[k]).value = s[k]; }); if (s.ok !== undefined) $("t-ok").checked = !!s.ok; }
+
+  function fit() {
+    var inner = $("sheet-inner"), maxH = 10 * 96, size = 11;
+    inner.style.fontSize = size + "pt";
+    while (inner.offsetHeight > maxH && size > 7.5) { size -= 0.25; inner.style.fontSize = size + "pt"; }
+    var f = $("t-fit");
+    if (inner.offsetHeight > maxH) { f.className = "fit bad"; f.textContent = "Too long for one page, even at 7.5 pt. Shorten the text; aim for under 400 words."; }
+    else if (size < 9) { f.className = "fit ok"; f.textContent = "Fits one Letter page at " + size + " pt. That is small print; consider shortening."; }
+    else { f.className = "fit ok"; f.textContent = "Fits one Letter page at " + size + " pt."; }
+  }
+  function scale() {
+    var wrap = $("preview"), sheet = $("sheet");
+    sheet.style.transform = "";
+    var s = Math.min(1, wrap.clientWidth / sheet.offsetWidth);
+    if (s < 1) { sheet.style.transform = "scale(" + s + ")"; wrap.style.height = Math.ceil(sheet.offsetHeight * s) + "px"; }
+    else wrap.style.height = "";
+  }
+  function update() {
+    var s = state(), r = KitSheet.render(s.text);
+    put(SKEY, s);
+    $("sh-biz").innerHTML = KitSheet.inline(s.biz || "[FILL: business name]");
+    $("sh-trip").innerHTML = KitSheet.inline(s.trip || "");
+    $("sh-body").innerHTML = r.html || '<p class="sh-empty">Paste the approved kit text above.</p>';
+    $("sh-contact").innerHTML = s.contact ? KitSheet.inline("Questions: " + s.contact) : "";
+    $("sh-fine").textContent = s.fine || "";
+    var fills = r.fills + ((s.biz + " " + s.trip + " " + s.contact).match(/\[FILL[^\]]*\]/gi) || []).length;
+    var approved = s.ok && s.by.trim() && s.date;
+    var stamp = $("sh-stamp");
+    stamp.hidden = !!(approved && !fills && r.html);
+    stamp.textContent = "DRAFT - PENDING OWNER REVIEW" + (fills ? " · " + fills + " [FILL] open" : "");
+    $("sh-approved").textContent = approved ? "Prepared " + s.date + " · checked by " + s.by.trim() : "";
+    var ow = $("t-owner");
+    if (r.owner.length) {
+      ow.innerHTML = "<b>Owner questions, left off the printed page (" + r.owner.length + "):</b><ol>" + r.owner.map(function (q) { return "<li>" + KitSheet.esc(q) + "</li>"; }).join("") + "</ol>";
+    } else ow.innerHTML = "";
+    var hits = KitSheet.pii([s.text, s.trip, s.biz].join("\n"));
+    $("t-pii").textContent = hits.length ? "Check before printing: the text may contain " + hits.join(", ") + ". Guest details stay out of the kit." : "";
+    fit(); scale();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var saved = get(SKEY), hand = get(HKEY);
+    if (saved) apply(saved); else apply(EXAMPLE);
+    if (!$("t-fine").value && !saved) $("t-fine").value = EXAMPLE.fine;
+    if (hand && hand.text) {
+      apply({ text: hand.text, biz: hand.business || $("t-biz").value, trip: hand.trip || "", by: "", date: today(), ok: false });
+      if (!$("t-fine").value) $("t-fine").value = EXAMPLE.fine;
+      del(HKEY);
+      setTimeout(function () { say("Draft loaded from the trip kit page. Read it, answer every [FILL], then sign off."); }, 50);
+    }
+    if (!$("t-date").value) $("t-date").value = today();
+    document.querySelector("main").addEventListener("input", function (e) { if (e.target.closest(".no-print")) update(); });
+    $("t-ok").addEventListener("change", update);
+    $("t-print").addEventListener("click", function () {
+      update();
+      if (!$("sh-stamp").hidden) say("The DRAFT stamp will print. Sign off and answer every [FILL] to remove it.");
+      window.print();
+    });
+    $("t-example").addEventListener("click", function () { apply(EXAMPLE); $("t-by").value = ""; $("t-ok").checked = false; $("t-date").value = today(); update(); say("Fictional example loaded."); });
+    $("t-clear").addEventListener("click", function () {
+      apply({ biz: "", trip: "", text: "", contact: "", fine: EXAMPLE.fine, by: "", date: today(), ok: false });
+      update(); say("Cleared."); $("t-text").focus();
+    });
+    $("t-save").addEventListener("click", function () {
+      var blob = new Blob([$("t-text").value], { type: "text/plain;charset=utf-8" }), a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = "trip-kit.txt"; document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+      say("Saved trip-kit.txt to your downloads.");
+    });
+    var rt = null;
+    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(scale, 100); });
+    window.addEventListener("beforeprint", function () { $("sheet").style.transform = ""; });
+    window.addEventListener("afterprint", scale);
+    update();
+  });
+})();
+</script>
+</body>
+</html>

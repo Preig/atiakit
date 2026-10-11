@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; frame-src 'none'">
+<title>2.c Post-booking retention engine · ATIA AI Take-Home Kit</title>
+<meta name="description" content="Score open bookings with rules you can read, draft one approved message for the most exposed ones into an approval queue, and hold back a random group to see whether it worked. Includes a sample size calculator and a Python reference pilot.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='10' width='4' height='5' fill='%235c8727'/%3E%3Crect x='6' y='6' width='4' height='9' fill='%235c8727'/%3E%3Crect x='11' y='1' width='4' height='14' fill='%230d92b4'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/kit.css">
+<script src="../assets/kit.js" defer></script>
+<style>
+/* Page-specific styles for tool 2.c. Shared styles live in ../assets/kit.css. */
+.onpage{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;margin:10px 0 0;padding:0;list-style:none}
+.onpage a{color:var(--teal-d)}
+h4{font-size:16px;line-height:1.3;color:var(--teal-d);margin:1em 0 .3em}
+.tag{display:inline-block;font-size:12px;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:1px 7px;margin-right:6px;background:var(--green-t);color:var(--green-d);white-space:nowrap}
+.tag.legal{background:#fff;color:var(--red);border:1px solid var(--red)}
+.tag.contract{background:var(--amber-t);color:var(--amber)}
+.tag.policy{background:var(--teal-t);color:var(--teal-d)}
+.rules{padding-left:18px}
+.rules li{margin:10px 0}
+.stat{display:flex;gap:12px;align-items:baseline;margin:8px 0}
+.stat .score{font-size:34px;flex:none;width:3.3em;white-space:nowrap}
+.bars{list-style:none;padding:0;margin:10px 0}
+.bars li{margin:10px 0}
+.bars .row{display:flex;justify-content:space-between;gap:10px;font-size:15px}
+.bars .track{height:14px;background:#eef1ec;border-radius:3px;overflow:hidden;margin-top:4px}
+.bars .fill{display:block;height:100%;background:var(--teal)}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0}
+.tablewrap table{min-width:0}
+table.pointstab td:nth-child(2),table.pointstab th:nth-child(2){white-space:nowrap}
+.msg-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.msg{border:1px solid var(--line);border-top:4px solid var(--teal);border-radius:4px;padding:12px 16px;background:#fff;min-width:0}
+.msg.b{border-top-color:var(--green)}
+.msg.c{border-top-color:#d49a1a}
+.msg h3{margin-top:.2em}
+.msg p{font-size:15px}
+.msg details{margin:8px 0 0;padding:8px 12px}
+.msg pre{font:14px/1.5 Arial,Helvetica,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0 0;color:#222}
+.cmd{display:block;font:15px/1.5 Consolas,"Courier New",monospace;background:#1e293b;color:#f1f5f9;border-radius:4px;padding:10px 12px;margin:6px 0;overflow-x:auto;white-space:pre}
+.inline-fields{display:grid;gap:0 16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.inline-fields label{min-height:2.6em;display:flex;align-items:flex-end}
+.bignums{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));margin:14px 0}
+.bignums div{background:var(--teal-t);border-radius:4px;padding:12px 14px}
+.bignums b{display:block;font-size:30px;line-height:1.1;color:var(--teal-d)}
+.bignums span{font-size:14px;color:var(--slate)}
+.verdict{border-radius:4px;padding:12px 16px;margin:12px 0;background:var(--amber-t);border-left:5px solid #d49a1a}
+.verdict.ok{background:var(--green-t);border-left-color:var(--green)}
+.verdict.err{background:var(--red-t);border-left-color:var(--red)}
+.verdict p{margin:.3em 0}
+tr.mine td{background:var(--teal-t);font-weight:bold}
+.fit-q{margin:10px 0}
+.fit-q legend{color:var(--slate)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts label{display:inline-flex;align-items:center;gap:8px;margin:0;border:1px solid #b8beb4;border-radius:4px;padding:8px 12px;background:#fff;cursor:pointer;font-weight:normal;font-size:15px}
+.opts input{width:18px;height:18px;margin:0;flex:none}
+.privacy{font-size:14px;color:#8a2a2a;margin:4px 0 0}
+.files li{flex-wrap:wrap;gap:4px 12px}
+.files li a{white-space:nowrap}
+table.compact{min-width:0}
+table.compact th,table.compact td{padding:7px 8px}
+.yours{font-weight:normal;font-size:12px;color:var(--teal-d);display:block}
+@media(max-width:640px){.stat .score{font-size:26px}
+.bignums{grid-template-columns:repeat(3,1fr);gap:8px}.bignums div{padding:10px 8px}.bignums b{font-size:21px}.bignums span{font-size:13px;line-height:1.35;display:block;margin-top:4px}
+table.compact{font-size:13px}table.compact th,table.compact td{padding:6px 5px}}
+</style>
+</head>
+<body data-page="2c">
+<div class="band" aria-hidden="true"></div>
+<header class="kit">
+  <p class="crumbs"><a href="../">ATIA AI Take-Home Kit</a> › Pain 2 · Second-guessing</p>
+  <p class="kicker"><span class="rung r3" aria-hidden="true"><i></i><i></i><i></i></span>Advanced rung · Tool 2.c</p>
+  <h1>Post-booking retention engine</h1>
+  <p class="lede">A nightly job scores open bookings with rules you can read, drafts one approved message for the most exposed ones, and holds back a random group so you can see whether it worked. Nothing sends without a person.</p>
+  <ul class="meta">
+    <li><b>Time</b> 4 to 8 weeks with a developer</li><li><b>Cost</b> developer time, plus model API fees of about 1 to 5 cents a draft</li><li><b>Skill</b> developer or vendor</li><li><b>Pain 2</b> 43% of US travelers</li><li><b>Needs</b> 2.a, 2.b and a booking platform with an API</li><li><b>Measures</b> Number 4</li>
+  </ul>
+  <nav class="tool-nav" data-toolnav="2c" aria-label="All tools"></nav>
+  <ul class="onpage" aria-label="On this page">
+    <li><a href="#fit">Is it for you?</a></li><li><a href="#rules">Message rules</a></li><li><a href="#how">How it works</a></li><li><a href="#brief">Build brief</a></li><li><a href="#calc">Sample size</a></li><li><a href="#readres">Read a result</a></li><li><a href="#files">Download</a></li><li><a href="#safe">Before you use it</a></li>
+  </ul>
+</header>
+
+<main class="kit">
+  <div class="callout green">
+    <p><strong>AI drafts. You approve.</strong> The pilot writes every draft as DRAFT - PENDING OWNER REVIEW into a spreadsheet, and a person sends approved messages from the booking platform. The examples use <strong>Bay Light Day Cruises, Seward, a fictional teaching business</strong>. What you type on this page stays in this browser.</p>
+  </div>
+
+  <section class="card teal" aria-labelledby="why">
+    <h2 id="why">The pain it fixes</h2>
+    <div class="grid two">
+      <div>
+        <h3>For the traveler</h3>
+        <p class="stat"><span class="score">78%</span><span>keep planning after they book. Only 18% stop.</span></p>
+        <p class="stat"><span class="score">4 in 10</span><span>have changed a booked stay after seeing a better option, and 41% watch the price of a booking they already hold.</span></p>
+        <p>The booking never feels final. Doubt keeps working after the payment.</p>
+      </div>
+      <div>
+        <h3>For your business <small class="hint">(my read)</small></h3>
+        <p>Doubt shows up after the booking as changes and cancellations inside the free-cancellation window. A seat freed two days out is hard to resell. Chasing every flexible booking with discounts costs more than it saves.</p>
+        <p>The fix is not a price cut. It is a booking that feels safe to keep.</p>
+      </div>
+    </div>
+    <h3>What would raise confidence</h3>
+    <p>Asked what would make them more comfortable with AI-assisted booking, travelers chose:</p>
+    <ul class="bars">
+      <li><div class="row"><span>The ability to review and change before confirming</span><b>52%</b></div><div class="track" aria-hidden="true"><span class="fill" style="width:52%"></span></div></li>
+      <li><div class="row"><span>A track record</span><b>30%</b></div><div class="track" aria-hidden="true"><span class="fill" style="width:30%"></span></div></li>
+      <li><div class="row"><span>A human who can step in</span><b>20%</b></div><div class="track" aria-hidden="true"><span class="fill" style="width:20%"></span></div></li>
+    </ul>
+    <p><strong>So: confidence first, discount last.</strong> The same three wishes make a good post-booking message <small class="hint">(my read)</small>. Message A, the confidence note, says what to expect and how to review or change the booking, gives one checkable proof point, and names a person who can step in. A discount comes last, if at all, and only on terms the owner writes.</p>
+    <p class="hint">Source: Skift Research + McKinsey, <em>Winning Hearts in an Age of Infinite Travel Choices</em>, Sept 2026 · survey of 1,015 US travelers, data as of June 2026 · US travelers, not Alaska visitors. Confidence factors: Exhibit 9. "4 in 10" is the report's page 26 figure; its summary says "half", so treat it as 4 in 10 to half. Figures last verified 2026-10-10.</p>
+  </section>
+
+  <section class="card" aria-labelledby="fit">
+    <h2 id="fit">Is it for you?</h2>
+    <p><strong>Built for:</strong> operators with about <strong>1,500 or more bookings a season</strong> on a booking platform with an API (FareHarbor, Peek, Checkfront, Cloudbeds or similar), plus a developer or vendor. A multi-day tour company or a 20-room lodge fits. You also need 2.a (the honest picture) and 2.b (approved facts) done first, because message A is built from them.</p>
+    <p><strong>Smaller?</strong> The post-booking calendar from the session (five messages, one job each) gets most of the benefit with no code. The demo below still teaches the method.</p>
+    <form id="fit-form" autocomplete="off">
+      <fieldset class="fit-q">
+        <legend>Bookings per season</legend>
+        <div class="opts">
+          <label><input type="radio" name="vol" value="small"> Under 500</label>
+          <label><input type="radio" name="vol" value="mid"> 500 to 1,500</label>
+          <label><input type="radio" name="vol" value="big"> 1,500 or more</label>
+        </div>
+      </fieldset>
+      <fieldset class="fit-q">
+        <legend>Your booking platform</legend>
+        <div class="opts">
+          <label><input type="radio" name="api" value="yes"> Has an API or a full CSV export</label>
+          <label><input type="radio" name="api" value="unsure"> Not sure</label>
+          <label><input type="radio" name="api" value="no"> Neither</label>
+        </div>
+      </fieldset>
+      <fieldset class="fit-q">
+        <legend>Developer help</legend>
+        <div class="opts">
+          <label><input type="radio" name="dev" value="yes"> In house or a vendor</label>
+          <label><input type="radio" name="dev" value="maybe"> Could hire for a few weeks</label>
+          <label><input type="radio" name="dev" value="no"> No</label>
+        </div>
+      </fieldset>
+    </form>
+    <div class="verdict" id="fit-out" role="status" aria-live="polite"><p>Answer the three questions to see where to start.</p></div>
+  </section>
+
+  <section class="card" aria-labelledby="rules">
+    <h2 id="rules">Post-booking message rules</h2>
+    <p>Write these down before the first draft. The reference code builds them in.</p>
+    <ul class="rules">
+      <li><span class="tag policy">Policy choice</span> <strong>Nothing sends without a person.</strong> Drafts land in an approval queue as PENDING. The reference code has no sending function at all, and a test fails if anyone adds one.</li>
+      <li><span class="tag policy">Policy choice</span> <strong>No competitor price matching.</strong> Do not match rates and do not chase every cancellable booking. Pick the most exposed bookings by a rule you can read.</li>
+      <li><span class="tag">Recommendation</span> <strong>Confidence first, discount last.</strong> Every treatment booking gets message A. At most one follow-up: B (one add-on) or C (lock-in offer). C exists only if the owner writes its terms.</li>
+      <li><span class="tag">Recommendation</span> <strong>Approved facts only.</strong> Drafts use your fact sheet, your approved add-on list and your written terms. Anything missing stays as [FILL] for a person to supply. Asking the AI to check its own draft is not verification.</li>
+      <li><span class="tag policy">Policy choice</span> <span class="tag contract">Contractual</span> <strong>No guest personal data in the pilot.</strong> Only booking id, dates, rate type, channel, party size and add-ons. Names, emails, phones and payment data stay in the platform. Check your platform's API terms and the model provider's data terms.</li>
+      <li><span class="tag contract">Contractual</span> <strong>Promotions to OTA guests.</strong> B and C are promotional, so by default they go only to direct bookings. Check your OTA supplier agreement (for example Viator's) and any hotel-desk agreement before contacting their guests with offers.</li>
+      <li><span class="tag legal">Legal mandate</span> <strong>Commercial email and texts.</strong> Promotional email needs an honest subject line, your postal address, a working opt-out and, unless the guest agreed to receive it, a clear note that it is an ad. Opt-outs must be honored (CAN-SPAM Act, 15 U.S.C. 7701 to 7713; 16 CFR Part 316). Marketing texts sent with automated tools generally need prior express written consent (TCPA, 47 U.S.C. 227; 47 CFR 64.1200). Ask your platform how its messaging handles this. This is not legal advice.</li>
+      <li><span class="tag legal">Legal mandate</span> <strong>Lodging prices.</strong> A lodge offer that shows a price must show the total price, including mandatory fees (16 CFR Part 464, in effect since May 12, 2025). The rule covers short-term lodging, not tours.</li>
+      <li><span class="tag policy">Policy choice</span> <strong>Safety wording has an owner.</strong> Weather plan B, sea state, glacier and wildlife lines are drafted by AI and owned by your captain or operations lead. No promised sightings.</li>
+      <li><span class="tag">Recommendation</span> <strong>Holdout guests lose nothing.</strong> They still get every normal confirmation, safety and weather message. Only the pilot's extra messages are held back.</li>
+      <li><span class="tag">Recommendation</span> <strong>Stop rule.</strong> Pause the pilot if complaints or opt-outs rise, and decide before you start who makes that call.</li>
+    </ul>
+  </section>
+
+  <section class="card" aria-labelledby="how">
+    <h2 id="how">How it works</h2>
+    <ol class="steps">
+      <li><strong>Pull.</strong> Each night, export open bookings. The adapter keeps an allow-list of columns, drops everything else and logs the dropped column names, never their values.</li>
+      <li><strong>Score.</strong> A rule set you can read and change. Higher score means more likely to change or cancel inside the free-cancellation window. The top 10% are eligible.</li>
+      <li><strong>Assign.</strong> Eligible bookings go at random to treatment or holdout, 50/50 for a pilot. The draw is seeded, stored once and never redone.</li>
+      <li><strong>Draft.</strong> For treatment bookings only: message A, then at most one follow-up. Templates only (dry run), or a model API improves the wording. Local checks flag new numbers, banned phrases, promises and personal data.</li>
+      <li><strong>Approve and send.</strong> A person fills each [FILL], edits, approves, and sends from the booking platform.</li>
+      <li><strong>Report.</strong> Monthly in season: in-window changes and cancellations, treatment versus holdout, flexible and non-refundable separately, with 95% intervals and a "directional" label when the sample is small.</li>
+    </ol>
+    <h3>The starting score</h3>
+    <div class="tablewrap">
+      <table class="compact pointstab">
+        <thead><tr><th scope="col">Rule</th><th scope="col" class="num">Points</th><th scope="col">Why</th></tr></thead>
+        <tbody>
+          <tr><td>Booked more than 60 days before the trip</td><td class="num">+2</td><td>More time to find something else</td></tr>
+          <tr><td>Flexible (free-cancellation) rate</td><td class="num">+2</td><td>Leaving costs nothing</td></tr>
+          <tr><td>Booked through an online travel agency</td><td class="num">+1</td><td>One tap from other options</td></tr>
+          <tr><td>No add-ons on the booking</td><td class="num">+1</td><td>Less invested in the day</td></tr>
+          <tr><td>Price-alert flag (only if your platform has one)</td><td class="num">+1</td><td>Off by default</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">A starting guess to test, not a prediction model. The weights live in <code>rules.json</code>; change them, note who changed what and when <span class="tag policy">Policy choice</span></p>
+
+    <h3>Three messages, and nothing else</h3>
+    <div class="msg-grid">
+      <div class="msg">
+        <h3>A · Confidence note</h3>
+        <p>What to expect, the weather plan, how to review or change the booking, one checkable proof point and a named person. Goes to every treatment booking, on any channel.</p>
+        <details><summary>See the fictional draft</summary>
+<pre>DRAFT - PENDING OWNER REVIEW
+Subject: Your 4-hour wildlife and glacier cruise on Tuesday, July 14, 2026: what to expect
+
+Hello,
+
+Thank you for booking the 4-hour wildlife and glacier cruise on Tuesday, July 14, 2026 at 9:00. Here is what to expect, so there are no surprises.
+
+What to expect
+- Heated enclosed cabin and two restrooms on board.
+- Hot drinks are included. Lunch is not included.
+- Meeting point: the small-boat harbor, a 12-minute walk from the cruise ship dock.
+- Weather: The cruise runs in rain. It cancels only for a marine warning, with a full refund.
+
+If your plans change
+- Free cancellation until 48 hours before departure. Inside 48 hours, no refund.
+- To review or change your booking, reply to this message or call [FILL: contact person] at [FILL: contact phone]. A person on our team will help you.
+
+Our track record
+- [FILL: track record]
+
+See you at the harbor,
+The Bay Light Day Cruises team</pre>
+        </details>
+      </div>
+      <div class="msg b">
+        <h3>B · One add-on</h3>
+        <p>One option from your approved list that fits the day, clearly optional. Partners approve their own lines. Direct bookings only by default.</p>
+        <details><summary>See the fictional draft</summary>
+<pre>DRAFT - PENDING OWNER REVIEW
+Subject: One idea for your day in Seward on Tuesday, July 14, 2026
+
+Hello,
+
+You are booked on the 4-hour wildlife and glacier cruise on Tuesday, July 14, 2026 at 9:00. Guests often ask what else fits the same day, so here is one option we know well.
+
+Mile 12 Kennel summer sled-dog cart ride (partner)
+- 90 minutes, 15 minutes by car from the harbor, ages 2 and up, runs in rain.
+- Prices and times come from Mile 12 Kennel directly.
+- Book with Mile 12 Kennel and mention referral code BAYLIGHT-K.
+
+It is optional, and your cruise booking stays the same either way. Please check the age limits for your group.
+
+Questions? Reply to this message or call [FILL: contact person] at [FILL: contact phone].
+
+The Bay Light Day Cruises team
+[FILL: postal address and opt out]</pre>
+        </details>
+      </div>
+      <div class="msg c">
+        <h3>C · Lock-in offer</h3>
+        <p>An option to switch to non-refundable, only on terms the owner writes. Never a competitor price match. Off until you write the terms.</p>
+        <details><summary>See the fictional draft</summary>
+<pre>DRAFT - PENDING OWNER REVIEW
+Subject: An option for your Tuesday, July 14, 2026 cruise
+
+Hello,
+
+You are booked on a flexible rate for the 4-hour wildlife and glacier cruise on Tuesday, July 14, 2026 at 9:00. Nothing changes unless you choose to.
+
+If you would like to lock in your booking now, here is our offer:
+FICTIONAL EXAMPLE TERMS: switch to our non-refundable rate at least 30 days before your trip and we add a printed wildlife guide for each guest. (The owner writes the real terms.)
+
+If you do nothing, your current booking stays as it is. Free cancellation until 48 hours before departure. Inside 48 hours, no refund.
+
+Questions? Reply to this message or call [FILL: contact person] at [FILL: contact phone]. A person on our team will help you decide.
+
+The Bay Light Day Cruises team
+[FILL: postal address and opt out]</pre>
+        </details>
+      </div>
+    </div>
+    <p class="hint">Each [FILL] is a fact the fictional owner has not supplied yet. The pilot never guesses it.</p>
+    <p><strong>What the demo shows:</strong> in the fictional data, the most exposed bookings came through an online travel agency. So the pilot drafted only message A for them, and held B and C back for contractual reasons. For many operators, the confidence note is the whole lever.</p>
+  </section>
+
+  <section class="card" aria-labelledby="brief">
+    <h2 id="brief">Build brief</h2>
+    <p>Give this to a developer, a vendor, or a coding agent (Claude Code, OpenAI Codex or Gemini CLI). It is the Prompt Kit brief with three updates: a 50/50 holdout for the pilot, Wilson intervals in the report, and checks on every draft.</p>
+    <form data-builder="brief" autocomplete="off">
+      <p class="privacy">No guest names, emails, phone numbers or payment details in these boxes.</p>
+      <div class="inline-fields">
+        <div><label for="b-platform">Your booking platform</label><input type="text" id="b-platform" name="platform" placeholder="for example FareHarbor"></div>
+        <div><label for="b-holdout">Holdout share</label>
+          <select id="b-holdout" name="holdout"><option value="50" selected>50% (recommended for a pilot)</option><option value="20">20% (needs about 1.5x the bookings)</option></select></div>
+        <div><label for="b-queue">Where drafts wait for approval</label>
+          <select id="b-queue" name="queue"><option value="an approval queue (a CSV file or a Google Sheet)" selected>A CSV file or Google Sheet</option><option value="draft messages inside the booking platform, never scheduled">Drafts inside the booking platform</option></select></div>
+      </div>
+      <label for="b-terms">Lock-in terms for message C <small>(optional: leave empty and there is no message C)</small></label>
+      <textarea id="b-terms" name="terms" placeholder="Your exact terms, for example what a guest gets for switching to non-refundable, and by when."></textarea>
+      <div class="btns">
+        <button type="button" class="secondary" data-fill="brief" data-example="brief-demo">Load the fictional example</button>
+        <button type="button" class="ghost" data-reset="brief">Clear</button>
+      </div>
+    </form>
+    <div class="output">
+      <p class="label">Your build brief</p>
+      <pre id="out-brief" data-render="tpl-brief" data-builder-src="brief"></pre>
+    </div>
+    <div class="btns">
+      <button type="button" data-copy-src="out-brief" data-msg="Copied. Send it to your developer or vendor, or paste it into your coding agent.">Copy brief</button>
+      <button type="button" class="secondary" data-download="2c-build-brief.txt" data-from="out-brief">Save as .txt</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+    <template id="tpl-brief">Design and build a post-booking retention pilot on {{platform|[BOOKING PLATFORM]}}. Use the retention-pilot reference code at https://preig.github.io/atiakit/2c/ as the starting point and keep its safeguards.
+
+Data: nightly, pull open bookings through the platform API: booking id, booked date, trip date, departure time, rate type, channel, party size, add-ons, price-alert flag if available, booking value. Keep an allow-list of columns, drop everything else on load, and log the dropped column names, never their values. No guest names, emails, phones, addresses or payment data leave the platform.
+
+Scoring: a transparent rule set I can read and change in a plain file, for example +2 lead time over 60 days, +2 flexible rate, +1 OTA channel, +1 no add-ons. Mark the top 10 percent by score as eligible, with a fixed tie-break.
+
+Holdout: randomly assign {{holdout|50}} percent of eligible bookings to a holdout that receives no pilot messages. Normal confirmation, safety and weather messages continue for everyone. Use a seeded draw, store each assignment once, and never reassign.
+
+Drafting: for treatment bookings only, call a model API to draft one of three approved messages and nothing else: (A) a confidence note: what to expect, the weather plan B, how to review or change the booking, one checkable proof point, and a named person who can step in; (B) one relevant add-on from the approved list; (C) a lock-in offer to convert to non-refundable, only on the owner's lock-in terms below, quoted exactly. Every treatment booking gets A first; at most one follow-up. Send B and C only to direct bookings unless I confirm our channel agreements allow more. The model uses only the approved facts file; anything missing stays as [FILL]. Provider and model name come from settings, not code. Handle refusals and errors without stopping the run.
+
+Lock-in terms for message C (if none are supplied, do not draft message C):
+{{terms|[NO TERMS SUPPLIED: do not draft message C]}}
+
+Checks: before a draft enters the queue, flag any number not in the approved sources, banned phrases (price match, discount, guarantee), promised outcomes, and anything that looks like personal data. Every draft starts with DRAFT - PENDING OWNER REVIEW.
+
+Approval: write drafts to {{queue|an approval queue (a CSV file or a Google Sheet)}} with status PENDING. Nothing sends without a person. Build no sending code.
+
+Report monthly in season: in-window changes and cancellations, treatment versus holdout, as counts and rates with Wilson 95% intervals, flexible and non-refundable bookings shown separately, labeled directional when the sample is below the size a power calculation gives for our split.
+
+Do not match competitor prices and do not chase every cancellable booking. Use fictional data until I approve a live test. Mark the plan and every deliverable DRAFT - PENDING OWNER REVIEW.</template>
+    <details>
+      <summary>The original brief, as printed in the Prompt Kit</summary>
+      <p class="hint">Kept for reference. It holds back 20 percent; for a pilot, use 50/50 (see the sample size below).</p>
+      <div class="output"><pre id="out-brief-orig">Design and build a post-booking retention pilot on [BOOKING PLATFORM].
+
+Nightly: pull open bookings through the platform API (booking id, lead time, rate type, channel, party size, add-ons, price-alert flag if available). No guest names, emails or payment data leave the platform.
+
+Score exposure with a transparent rule set I can read and change, for example: +2 lead time over 60 days, +2 flexible rate, +1 OTA channel, +1 no add-ons. For the top 10 percent by score, call a model API to draft one of three approved messages and nothing else: (A) a confidence note stating what to expect and the weather plan B, (B) one relevant add-on from the approved list, (C) a lock-in offer to convert to non-refundable on terms I supply. The model must use only the approved facts file.
+
+Write drafts to an approval queue (a Google Sheet or email drafts). Nothing sends without a person. Randomly assign 20 percent of eligible bookings to a holdout that receives nothing, and store the assignment. Report monthly: in-window changes and cancellations, treatment versus holdout, as counts and rates, with flexible and non-refundable bookings shown separately. Do not match competitor prices and do not chase every cancellable booking.</pre></div>
+      <div class="btns"><button type="button" class="secondary" data-copy-src="out-brief-orig" data-msg="Copied. Send it to your developer or vendor, or paste it into your coding agent.">Copy the original</button></div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </details>
+    <script type="application/json" id="brief-demo">{"platform":"[our booking platform] (fictional example: Bay Light Day Cruises, Seward)","holdout":"50","queue":"an approval queue (a CSV file or a Google Sheet)","terms":"FICTIONAL EXAMPLE TERMS: switch to our non-refundable rate at least 30 days before your trip and we add a printed wildlife guide for each guest."}</script>
+  </section>
+
+  <section class="card teal" aria-labelledby="calc">
+    <h2 id="calc">Sample size: how many bookings a clear answer needs</h2>
+    <p>Before you build, check whether your season is big enough to prove anything. This is the same calculation as <code>python pilot.py power</code>: a two-proportion test, alpha 0.05 (two-sided), power 0.8.</p>
+    <form data-builder="calc" id="calc-form" autocomplete="off" novalidate>
+      <div class="inline-fields">
+        <div><label for="c-base">Rate without messages (holdout), %</label><input type="number" id="c-base" name="base" value="15" min="0.1" max="99" step="0.1" inputmode="decimal"></div>
+        <div><label for="c-target">Rate you hope for (treatment), %</label><input type="number" id="c-target" name="target" value="12" min="0.1" max="99" step="0.1" inputmode="decimal"></div>
+        <div><label for="c-hold">Holdout share, %</label><input type="number" id="c-hold" name="hold" value="50" min="5" max="95" step="5" inputmode="numeric"></div>
+      </div>
+      <p class="hint">"Rate" = in-window changes and cancellations divided by bookings (Number 4). Counts only, no guest details.</p>
+      <h3>Your season <small class="hint">(optional)</small></h3>
+      <div class="inline-fields">
+        <div><label for="c-book">Bookings per season</label><input type="number" id="c-book" name="bookings" value="1500" min="0" step="50" inputmode="numeric"></div>
+        <div><label for="c-elig">Share eligible (top by score), %</label><input type="number" id="c-elig" name="elig" value="10" min="1" max="100" step="1" inputmode="numeric"></div>
+        <div><label for="c-ops">Operators pooling the same design</label><input type="number" id="c-ops" name="ops" value="1" min="1" step="1" inputmode="numeric"></div>
+      </div>
+      <div class="btns">
+        <button type="button" class="secondary" data-preset="calc" data-example="calc-kit" data-msg="Kit example loaded: 15% to 12% with a 50/50 split.">Kit example: 15% to 12%, 50/50</button>
+        <button type="button" class="secondary" data-preset="calc" data-example="calc-8020" data-msg="Loaded the original brief's 80/20 split. Compare the total with 50/50.">The original brief: 80/20</button>
+        <button type="button" class="secondary" data-preset="calc" data-example="calc-pool" data-msg="Loaded 28 operators pooling the same design.">Pooled through ATIA</button>
+        <button type="button" class="ghost" data-preset="calc" data-example="calc-kit" data-msg="Reset to the starting example.">Reset</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </form>
+    <div id="calc-out">
+      <div class="bignums">
+        <div><b id="o-hold">2,036</b><span>bookings in the holdout</span></div>
+        <div><b id="o-treat">2,036</b><span>bookings in treatment</span></div>
+        <div><b id="o-total">4,072</b><span>eligible bookings in total</span></div>
+      </div>
+      <div class="tablewrap">
+        <table class="compact">
+          <caption class="visually-hidden">Bookings needed by split, treatment/holdout</caption>
+          <thead><tr><th scope="col">Split <span class="yours">treatment/&#8203;holdout</span></th><th scope="col" class="num">Holdout</th><th scope="col" class="num">Treatment</th><th scope="col" class="num">Total</th><th scope="col" class="num">vs 50/50</th></tr></thead>
+          <tbody id="o-table"><tr class="mine"><td>50/50<span class="yours">yours</span></td><td class="num">2,036</td><td class="num">2,036</td><td class="num">4,072</td><td class="num">1.00x</td></tr></tbody>
+        </table>
+      </div>
+      <div class="verdict" id="o-verdict"><p>Your season: 150 eligible bookings a season.</p></div>
+      <p class="hint" id="calc-status" role="status" aria-live="polite"></p>
+    </div>
+    <h3>What the numbers say</h3>
+    <ul class="rules">
+      <li><span class="tag">Recommendation</span> <strong>Use 50/50 for a pilot.</strong> The original brief held back 20%. An 80/20 split needs about 1.5 times as many bookings for the same answer: 6,212 instead of 4,072 at 15% to 12%. The rule of thumb, 1 / (4 x 0.8 x 0.2), says 1.56 times.</li>
+      <li><strong>A single operator gets a directional read.</strong> With 1,500 bookings and the top 10% eligible, you see about 150 eligible bookings a season, 75 in each arm at 50/50. A confirmatory answer needs about 27 seasons. A directional read is still worth having; it is not evidence to scale on.</li>
+      <li><strong>Pooling through ATIA can answer it in one season.</strong> About 28 operators running the same rules, the same messages and the same 50/50 split, sharing counts (never guest data), reach the sample size together. That needs a written data-sharing agreement <span class="tag contract">Contractual</span></li>
+    </ul>
+    <script type="application/json" id="calc-kit">{"base":"15","target":"12","hold":"50","bookings":"1500","elig":"10","ops":"1"}</script>
+    <script type="application/json" id="calc-8020">{"base":"15","target":"12","hold":"20","bookings":"1500","elig":"10","ops":"1"}</script>
+    <script type="application/json" id="calc-pool">{"base":"15","target":"12","hold":"50","bookings":"1500","elig":"10","ops":"28"}</script>
+    <p class="hint">Method: normal approximation for two proportions, pooled rate under "no effect", rounded up to whole bookings. The 15% baseline is an example, not a measured Alaska figure: use your own last season. Estimates only.</p>
+  </section>
+
+  <section class="card" aria-labelledby="readres">
+    <h2 id="readres">Read a result</h2>
+    <p>At the end of a month, type the counts from your report. The page shows each rate with a Wilson 95% interval and says how far to trust it.</p>
+    <form data-builder="read" id="read-form" autocomplete="off" novalidate>
+      <p class="privacy">Counts only. No guest names or booking details.</p>
+      <div class="inline-fields">
+        <div><label for="r-te">Treatment: changed or cancelled in window</label><input type="number" id="r-te" name="te" min="0" step="1" inputmode="numeric"></div>
+        <div><label for="r-tn">Treatment: bookings with an outcome</label><input type="number" id="r-tn" name="tn" min="0" step="1" inputmode="numeric"></div>
+        <div><label for="r-he">Holdout: changed or cancelled in window</label><input type="number" id="r-he" name="he" min="0" step="1" inputmode="numeric"></div>
+        <div><label for="r-hn">Holdout: bookings with an outcome</label><input type="number" id="r-hn" name="hn" min="0" step="1" inputmode="numeric"></div>
+      </div>
+      <div class="btns">
+        <button type="button" class="secondary" data-preset="read" data-example="read-demo" data-msg="Fictional demo result loaded. Type your own counts to replace it.">Load the fictional demo result</button>
+        <button type="button" class="ghost" data-reset="read">Clear</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </form>
+    <div class="verdict" id="read-out" role="status" aria-live="polite"><p>Type four counts to see the rates.</p></div>
+    <script type="application/json" id="read-demo">{"te":"2","tn":"14","he":"5","hn":"13"}</script>
+    <p class="hint">The demo result comes from the fictional, simulated season in the download. It looks like a big gap, but with 14 and 13 bookings it is most likely noise. Use the sample size above for "confirmatory": below it, the read is directional.</p>
+  </section>
+
+  <section class="card" aria-labelledby="files">
+    <h2 id="files">Download the reference pilot</h2>
+    <p>A small Python program that runs the whole method on 300 fictional bookings, with no keys and no internet. It scores, assigns, drafts A, B and C into an approval queue, reports with Wilson intervals, and runs the sample size. It has no sending code.</p>
+    <div class="btns"><a class="button" href="retention-pilot.zip" download>Download retention-pilot.zip</a> <span class="hint" style="align-self:center">about 78 KB · Python 3.10 or newer, standard library only</span></div>
+    <p>Unzip it, open a terminal in the folder, and type:</p>
+    <code class="cmd" id="cmd-demo">python pilot.py demo</code>
+    <div class="btns"><button type="button" class="secondary" id="copy-cmd" data-copy-src="cmd-demo" data-msg="Copied. Paste it into a terminal opened in the retention-pilot folder.">Copy command</button></div>
+    <p class="status" role="status" aria-live="polite"></p>
+    <p class="hint">On a Mac, type <code>python3</code> instead of <code>python</code>. The README walks a non-developer through every step, including your own data and optional model drafts.</p>
+    <h3>Look inside first</h3>
+    <ul class="files">
+      <li><a href="retention-pilot/README.md">README.md</a> <span class="hint">Start here. Plain-language steps, rules and limits.</span></li>
+      <li><a href="retention-pilot/sample_output/example-drafts.md">sample_output/example-drafts.md</a> <span class="hint">One draft of each type, plus a bad draft and the flags the checks raise.</span></li>
+      <li><a href="retention-pilot/sample_output/output/approval_queue.csv" download>sample_output/output/approval_queue.csv</a> <span class="hint">The approval queue from the demo, every row PENDING.</span></li>
+      <li><a href="retention-pilot/sample_output/output/report.md">sample_output/output/report.md</a> <span class="hint">The demo report: treatment versus holdout with intervals.</span></li>
+      <li><a href="retention-pilot/rules.json">rules.json</a> <span class="hint">Scoring points, holdout share and seed, message order, banned phrases.</span></li>
+      <li><a href="retention-pilot/approved_facts.md">approved_facts.md</a> <span class="hint">The only facts a draft may use (fictional).</span></li>
+      <li><a href="retention-pilot/approved_addons.csv" download>approved_addons.csv</a> <span class="hint">Partner add-ons with "fits when" rules (fictional).</span></li>
+      <li><span><a href="retention-pilot/templates/A_confidence.md">templates/A</a> · <a href="retention-pilot/templates/B_addon.md">B</a> · <a href="retention-pilot/templates/C_lockin.md">C</a></span> <span class="hint">A, B and C wording with blanks.</span></li>
+      <li><a href="retention-pilot/data/baylight-bookings-mock.csv" download>data/baylight-bookings-mock.csv</a> <span class="hint">300 fictional bookings, no personal data.</span></li>
+      <li><a href="retention-pilot/pilot.py">pilot.py</a> <span class="hint">The program.</span></li>
+      <li><a href="../Prompt-Kit-3x3.html#s2c">Prompt-Kit-3x3.html, section 2.c</a> <span class="hint">The original brief in the printable kit.</span></li>
+    </ul>
+    <p class="hint">Platform connections (FareHarbor, Peek, Checkfront, Cloudbeds) are empty stubs: their APIs are not verified here. Optional model drafting works with Claude; the OpenAI and Gemini options are not tested against a live API. Effort and cost are estimates.</p>
+  </section>
+
+  <section class="card note" aria-labelledby="measure">
+    <h2 id="measure">How you will know it worked</h2>
+    <h3>Number 4 · In-window changes and cancellations, against the holdout</h3>
+    <p>Bookings changed or cancelled inside the free-cancellation window, divided by bookings, counted monthly in season. Show flexible and non-refundable bookings separately. Compare treatment with holdout by assigned group, whether or not each draft was sent. Leave operator cancellations (a marine warning) out.</p>
+    <p><strong>Revenue kept:</strong> the value of in-window cancellations in each group, per booking. <strong>Cost:</strong> staff minutes per approved draft, plus API fees. <strong>Guardrails:</strong> complaints and opt-outs.</p>
+    <p class="hint">Start counting before the pilot so you have a baseline. Most single operators will get a directional read, not proof <span class="tag">Recommendation</span></p>
+  </section>
+
+  <section class="card" aria-labelledby="next">
+    <h2 id="next">Before this rung</h2>
+    <p>2.c is the top rung of Pain 2. Message A is only as good as the facts behind it: <a href="../2a/">2.a The honest picture</a> gives you the "what to expect" lines, and <a href="../2b/">2.b Grounded answer assistant</a> gives you approved facts that cite their source.</p>
+    <div class="btns"><a class="button secondary" href="../2a/">Go to 2.a</a> <a class="button secondary" href="../2b/">Go to 2.b</a> <a class="button secondary" href="../">All nine tools</a></div>
+  </section>
+
+  <section class="card warn" aria-labelledby="safe">
+    <h2 id="safe">Before you use it</h2>
+    <p><strong>AI drafts. A person approves.</strong> Every draft is marked DRAFT - PENDING OWNER REVIEW and waits in a queue. A person who knows the operation checks every fact, fills every [FILL] and sends approved messages from the booking platform. Local checks and AI self-review are not verification.</p>
+    <ul class="rules">
+      <li><span class="tag">Recommendation</span> Test on the fictional data first, then on a copy of your own export with personal columns removed. Never paste guest names, emails, phone numbers, card numbers, IDs or medical information into any tool.</li>
+      <li><span class="tag contract">Contractual</span> Read your booking platform's API terms, your OTA agreements and your model provider's data terms before connecting anything.</li>
+      <li><span class="tag policy">Policy choice</span> Your cancellation terms, any lock-in offer and the holdout share are business decisions. The AI words them; it does not set them.</li>
+      <li><span class="tag">Recommendation</span> Safety-critical lines (weather go/no-go, sea state, glacier, wildlife) are owned by your captain or operations lead.</li>
+    </ul>
+    <p>This page keeps what you type in this browser only. Nothing is sent anywhere.</p>
+    <div class="btns"><button type="button" class="danger" id="clear-all">Clear my data on this page</button></div>
+    <p class="status" role="status" aria-live="polite"></p>
+    <p class="hint">Facts and figures last verified 2026-10-10.</p>
+  </section>
+</main>
+
+<footer class="kit">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates.</p>
+  <p><a href="../">All nine tools</a> · <a href="../Prompt-Kit-3x3.html">Printable prompt kit</a></p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var ZA = 1.959963984540054, ZB = 0.8416212335729143; // alpha 0.05 two-sided, power 0.8
+  function $(id) { return document.getElementById(id); }
+  function fmt(n) { return Math.round(n).toLocaleString("en-US"); }
+  function num(v) { var x = parseFloat(String(v == null ? "" : v).replace(/,/g, "")); return isFinite(x) ? x : NaN; }
+
+  /* ---------- sample size (same formula as retention/stats.py) ---------- */
+  function required(p0, p1, h) {
+    var t = 1 - h, pbar = h * p0 + t * p1;
+    var a = Math.sqrt(pbar * (1 - pbar) * (1 / h + 1 / t));
+    var b = Math.sqrt(p0 * (1 - p0) / h + p1 * (1 - p1) / t);
+    var n = Math.pow((ZA * a + ZB * b) / Math.abs(p0 - p1), 2);
+    var nh = Math.ceil(h * n - 1e-9), nt = Math.ceil(t * n - 1e-9);
+    return { hold: nh, treat: nt, total: nh + nt };
+  }
+  window.KIT_2C = { required: required };
+
+  function verdict(el, cls, html) {
+    el.className = "verdict" + (cls ? " " + cls : "");
+    el.innerHTML = html;
+  }
+
+  function calc() {
+    var f = $("calc-form"); if (!f) return;
+    var base = num(f.base.value) / 100, target = num(f.target.value) / 100, hold = num(f.hold.value) / 100;
+    var out = $("o-verdict"), status = $("calc-status");
+    var err = "";
+    if (!(base > 0 && base < 1) || !(target > 0 && target < 1)) err = "Type both rates as percents between 0 and 100, for example 15 and 12.";
+    else if (base === target) err = "The two rates are the same, so there is nothing to detect. Type a target rate you hope to reach.";
+    else if (!(hold >= 0.05 && hold <= 0.95)) err = "Type a holdout share between 5 and 95 percent. 50 is the recommendation for a pilot.";
+    if (err) {
+      ["o-hold", "o-treat", "o-total"].forEach(function (id) { $(id).textContent = "?"; });
+      $("o-table").innerHTML = "";
+      verdict(out, "err", "<p>" + err + "</p>");
+      status.textContent = err;
+      return;
+    }
+    var mine = required(base, target, hold), even = required(base, target, 0.5);
+    $("o-hold").textContent = fmt(mine.hold);
+    $("o-treat").textContent = fmt(mine.treat);
+    $("o-total").textContent = fmt(mine.total);
+    var shares = [0.5, 0.3, 0.2], rows = "";
+    if (shares.every(function (s) { return Math.abs(s - hold) > 1e-9; })) shares.push(hold);
+    shares.forEach(function (s) {
+      var r = required(base, target, s), isMine = Math.abs(s - hold) < 1e-9;
+      rows += "<tr" + (isMine ? ' class="mine"' : "") + "><td>" + Math.round(100 * (1 - s)) + "/" + Math.round(100 * s) +
+        (isMine ? '<span class="yours">yours</span>' : "") + '</td><td class="num">' + fmt(r.hold) + '</td><td class="num">' + fmt(r.treat) +
+        '</td><td class="num">' + fmt(r.total) + '</td><td class="num">' + (r.total / even.total).toFixed(2) + "x</td></tr>";
+    });
+    $("o-table").innerHTML = rows;
+
+    var bookings = num(f.bookings.value), elig = num(f.elig.value) / 100, ops = Math.max(1, Math.floor(num(f.ops.value) || 1));
+    var summary = "Needs " + fmt(mine.total) + " eligible bookings: " + fmt(mine.hold) + " holdout and " + fmt(mine.treat) + " treatment.";
+    if (bookings > 0 && elig > 0 && elig <= 1) {
+      var per = bookings * elig, pooled = per * ops, seasons = mine.total / pooled, opsNeeded = Math.ceil(mine.total / per);
+      var html = "<p><strong>Your season:</strong> " + fmt(bookings) + " bookings x " + Math.round(elig * 100) + "% eligible = " +
+        fmt(per) + " eligible bookings per operator, about " + fmt(per * hold) + " in the holdout and " + fmt(per * (1 - hold)) + " in treatment.</p>";
+      if (ops > 1) html += "<p>Pooled across " + fmt(ops) + " operators running the same design: " + fmt(pooled) + " eligible bookings a season.</p>";
+      if (seasons <= 1) {
+        html += "<p><strong>Verdict: one season can reach the sample size.</strong> Still read the intervals, and keep flexible and non-refundable separate.</p>";
+        verdict(out, "ok", html);
+        summary += " One season can reach it.";
+      } else {
+        html += "<p><strong>Verdict: directional read only.</strong> " + (ops > 1 ? "Pooled, the group" : "Alone, you") + " would need about " +
+          (seasons < 10 ? seasons.toFixed(1) : fmt(seasons)) + " seasons. About " + fmt(opsNeeded) +
+          " operators pooling the same design could reach it in one season.</p>";
+        if (Math.abs(hold - 0.5) > 1e-9) html += "<p>Switching to 50/50 would cut the total to " + fmt(even.total) + ".</p>";
+        verdict(out, "", html);
+        summary += " Directional read only for this season.";
+      }
+    } else {
+      verdict(out, "", "<p>Add your bookings per season to see whether one season is enough.</p>");
+    }
+    status.textContent = summary;
+  }
+
+  /* ---------- Wilson interval reader ---------- */
+  function wilson(x, n) {
+    if (!(n > 0)) return null;
+    var p = x / n, z = ZA, z2 = z * z, d = 1 + z2 / n;
+    var c = (p + z2 / (2 * n)) / d, h = (z * Math.sqrt(p * (1 - p) / n + z2 / (4 * n * n))) / d;
+    return { p: p, lo: x === 0 ? 0 : Math.max(0, c - h), hi: x === n ? 1 : Math.min(1, c + h) };
+  }
+  window.KIT_2C.wilson = wilson;
+  function pct(v) { return (100 * v).toFixed(1) + "%"; }
+
+  function readResult() {
+    var f = $("read-form"); if (!f) return;
+    var te = num(f.te.value), tn = num(f.tn.value), he = num(f.he.value), hn = num(f.hn.value), out = $("read-out");
+    if ([te, tn, he, hn].some(isNaN)) { verdict(out, "", "<p>Type four counts to see the rates.</p>"); return; }
+    if (te < 0 || he < 0 || tn <= 0 || hn <= 0 || te > tn || he > hn || [te, tn, he, hn].some(function (v) { return v % 1 !== 0; })) {
+      verdict(out, "err", "<p>Use whole numbers. Each group needs at least one booking, and changes plus cancellations cannot exceed bookings.</p>");
+      return;
+    }
+    var t = wilson(te, tn), h = wilson(he, hn), diff = 100 * (t.p - h.p);
+    var base = num($("calc-form").base.value) / 100, target = num($("calc-form").target.value) / 100, hold = num($("calc-form").hold.value) / 100;
+    var need = (base > 0 && base < 1 && target > 0 && target < 1 && base !== target && hold >= 0.05 && hold <= 0.95) ? required(base, target, hold) : required(0.15, 0.12, 0.5);
+    var overlap = !(t.hi < h.lo || h.hi < t.lo), label, cls = "";
+    if (Math.min(tn, hn) < 30) label = "Too small to read: counts only, no conclusion.";
+    else if (tn < need.treat || hn < need.hold) label = "Directional only: below the sample size from the calculator above (" + fmt(need.treat) + " treatment, " + fmt(need.hold) + " holdout).";
+    else { label = "Sample size reached. " + (overlap ? "The intervals still overlap, so there is no clear difference." : "The intervals do not overlap: a clear difference."); cls = "ok"; }
+    verdict(out, cls,
+      "<p><strong>Treatment:</strong> " + pct(t.p) + " (" + fmt(te) + " of " + fmt(tn) + "), 95% interval " + pct(t.lo) + " to " + pct(t.hi) + "</p>" +
+      "<p><strong>Holdout:</strong> " + pct(h.p) + " (" + fmt(he) + " of " + fmt(hn) + "), 95% interval " + pct(h.lo) + " to " + pct(h.hi) + "</p>" +
+      "<p><strong>Difference:</strong> " + (diff > 0 ? "+" : "") + diff.toFixed(1) + " points (treatment minus holdout). " +
+      (overlap ? "The intervals overlap." : "The intervals do not overlap.") + "</p>" +
+      "<p><strong>Read:</strong> " + label + "</p>");
+  }
+
+  /* ---------- fit check ---------- */
+  function fit() {
+    var f = $("fit-form"), out = $("fit-out");
+    var vol = f.vol.value, api = f.api.value, dev = f.dev.value;
+    if (!vol || !api || !dev) return;
+    var msg, cls = "";
+    if (vol === "small" || api === "no" || dev === "no") {
+      msg = "<p><strong>Start lower on the ladder.</strong> Do <a href=\"../2a/\">2.a</a> and <a href=\"../2b/\">2.b</a>, then use the post-booking calendar from the session: five messages, one job each, no code. Run the demo below to learn the method.</p>";
+    } else if (vol === "mid" || api === "unsure" || dev === "maybe") {
+      msg = "<p><strong>Possible, with homework.</strong> Ask your platform in writing about an API or a full CSV export. As a single operator, expect a directional read, not proof. Use the sample size calculator, and ask ATIA about pooling the same design with other members.</p>";
+    } else {
+      msg = "<p><strong>A good fit.</strong> Copy the build brief, download the reference pilot, and start with 50/50 on fictional data. Plan 4 to 8 weeks with a developer (estimate).</p>";
+      cls = "ok";
+    }
+    verdict(out, cls, msg);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var cf = $("calc-form"), rf = $("read-form"), ff = $("fit-form");
+    cf.addEventListener("kit:change", function () { calc(); readResult(); });
+    cf.addEventListener("input", function () { calc(); readResult(); });
+    rf.addEventListener("kit:change", readResult);
+    rf.addEventListener("input", readResult);
+    ff.addEventListener("change", fit);
+    calc();
+    readResult();
+    /* Copy with a message that fits what is copied (a brief or a command, not a chat prompt). */
+    function copyWithMsg(btn) {
+      var text = KIT.textOf($(btn.dataset.copySrc)), msg = btn.dataset.msg || "Copied.";
+      function fallback() {
+        var area = document.createElement("textarea");
+        area.value = text; area.setAttribute("readonly", ""); area.style.position = "fixed"; area.style.left = "-10000px";
+        document.body.appendChild(area); area.select();
+        var ok = false; try { ok = document.execCommand("copy"); } catch (e) { }
+        area.remove();
+        KIT.say(btn, ok ? msg : "Select the text and press Ctrl+C (Cmd+C on a Mac).");
+      }
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { KIT.say(btn, msg); }, fallback);
+      else fallback();
+    }
+    /* Calculator presets: load numbers with a status line that fits a calculator. */
+    function preset(btn) {
+      var bl = KIT.builders && KIT.builders[btn.dataset.preset], s = $(btn.dataset.example), data = null;
+      try { data = JSON.parse(s.textContent); } catch (e) { }
+      if (bl && data) { bl.set(data); KIT.say(btn, btn.dataset.msg || "Example loaded."); }
+    }
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      if (b.dataset.copySrc) { e.preventDefault(); copyWithMsg(b); }
+      else if (b.dataset.preset) { e.preventDefault(); preset(b); }
+    });
+    $("clear-all").addEventListener("click", function () {
+      if (window.KIT && KIT.builders) Object.keys(KIT.builders).forEach(function (k) { var b = KIT.builders[k]; b.form.reset(); b.refresh(); });
+      try {
+        var keys = [];
+        for (var i = 0; i < window.localStorage.length; i++) { var k = window.localStorage.key(i); if (k && k.indexOf("atiakit:2c:") === 0) keys.push(k); }
+        keys.forEach(function (k) { window.localStorage.removeItem(k); });
+      } catch (e) { }
+      ff.reset();
+      verdict($("fit-out"), "", "<p>Answer the three questions to see where to start.</p>");
+      calc(); readResult();
+      if (window.KIT && KIT.say) KIT.say(this, "Cleared everything this page saved in this browser.");
+    });
+  });
+})();
+</script>
+</body>
+</html>

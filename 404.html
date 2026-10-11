@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="robots" content="noindex">
+<title>Page not found · ATIA AI Take-Home Kit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='10' width='4' height='5' fill='%235c8727'/%3E%3Crect x='6' y='6' width='4' height='9' fill='%235c8727'/%3E%3Crect x='11' y='1' width='4' height='14' fill='%230d92b4'/%3E%3C/svg%3E">
+<!-- GitHub Pages serves this file at any missing address, so every link here is absolute. -->
+<link rel="stylesheet" href="/atiakit/assets/kit.css">
+<style>
+/* Minimal fallback in case the shared stylesheet cannot load. */
+body{font:17px/1.6 Arial,Helvetica,sans-serif;color:#333;background:#f4f6f4;margin:0}
+h1{color:#5c8727}
+a{color:#176374}
+.big-link{font-size:18px}
+.suggest{display:none}
+.suggest.on{display:block}
+.short{list-style:none;padding:0;margin:10px 0;display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.short a{display:block;background:#fff;border:1px solid #d9ddd6;border-radius:4px;padding:8px 12px;text-decoration:none}
+.short a:hover,.short a:focus-visible{border-color:#0d92b4;text-decoration:underline}
+.short code{background:none;padding:0;color:#64748b;font-size:13px;display:block}
+</style>
+</head>
+<body data-page="404">
+<div class="band" aria-hidden="true"></div>
+<header class="kit">
+  <p class="crumbs"><a href="/atiakit/">ATIA AI Take-Home Kit</a> › Page not found</p>
+  <p class="kicker"><span class="rung r3" aria-hidden="true"><i></i><i></i><i></i></span>ATIA 2026 · Take-home kit</p>
+  <h1>That page is not here</h1>
+  <p class="lede">The address may have a typo, or this page is not published yet. Everything in the kit starts from one page.</p>
+</header>
+
+<main class="kit">
+  <section class="card teal" aria-labelledby="go-h">
+    <h2 id="go-h" style="margin-top:0">Go to the kit</h2>
+    <p id="suggest" class="callout suggest" role="status" aria-live="polite"></p>
+    <p><a class="button big-link" href="/atiakit/">Open all nine tools</a></p>
+    <p class="hint">Addresses are lowercase, for example preig.github.io/atiakit/1a</p>
+  </section>
+
+  <section class="card" aria-labelledby="list-h">
+    <h2 id="list-h" style="margin-top:0">Short addresses</h2>
+    <ul class="short">
+      <li><a href="/atiakit/audit/">AI visibility audit<code>/atiakit/audit/</code></a></li>
+      <li><a href="/atiakit/1a/">1.a Rewrite for the short list<code>/atiakit/1a/</code></a></li>
+      <li><a href="/atiakit/1b/">1.b Your own curated ten<code>/atiakit/1b/</code></a></li>
+      <li><a href="/atiakit/1c/">1.c AI answer monitoring<code>/atiakit/1c/</code></a></li>
+      <li><a href="/atiakit/2a/">2.a The honest picture<code>/atiakit/2a/</code></a></li>
+      <li><a href="/atiakit/2b/">2.b Grounded answer assistant<code>/atiakit/2b/</code></a></li>
+      <li><a href="/atiakit/2c/">2.c Post-booking retention engine<code>/atiakit/2c/</code></a></li>
+      <li><a href="/atiakit/3a/">3.a The AI trip kit<code>/atiakit/3a/</code></a></li>
+      <li><a href="/atiakit/3b/">3.b Partner circle<code>/atiakit/3b/</code></a></li>
+      <li><a href="/atiakit/3c/">3.c Agent-ready trip record<code>/atiakit/3c/</code></a></li>
+      <li><a href="/atiakit/team/">For your team<code>/atiakit/team/</code></a></li>
+      <li><a href="/atiakit/Prompt-Kit-3x3.html">Printable prompt kit<code>/atiakit/Prompt-Kit-3x3.html</code></a></li>
+    </ul>
+  </section>
+</main>
+
+<footer class="kit">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates.</p>
+  <p><a href="/atiakit/">All nine tools</a> · <a href="/atiakit/Prompt-Kit-3x3.html">Printable prompt kit</a></p>
+  <p>Facts last checked 10 October 2026.</p>
+</footer>
+<script>
+/* Offer a one-tap fix for common typos (capital letters, "1.a", missing parts). Nothing is sent anywhere. */
+(function () {
+  var known = {
+    "audit": ["/atiakit/audit/", "the AI visibility audit"],
+    "1a": ["/atiakit/1a/", "1.a Rewrite for the short list"], "1b": ["/atiakit/1b/", "1.b Your own curated ten"],
+    "1c": ["/atiakit/1c/", "1.c AI answer monitoring"], "2a": ["/atiakit/2a/", "2.a The honest picture"],
+    "2b": ["/atiakit/2b/", "2.b Grounded answer assistant"], "2c": ["/atiakit/2c/", "2.c Post-booking retention engine"],
+    "3a": ["/atiakit/3a/", "3.a The AI trip kit"], "3b": ["/atiakit/3b/", "3.b Partner circle"],
+    "3c": ["/atiakit/3c/", "3.c Agent-ready trip record"], "team": ["/atiakit/team/", "the team tools"],
+    /* addresses from an older plan for the four Monday tools, and the map rows */
+    "listing": ["/atiakit/1a/#listing-test", "the one-listing test (in 1.a)"],
+    "restart": ["/atiakit/2b/#restart", "the restart-tax checklist (in 2.b)"],
+    "calendar": ["/atiakit/3a/#calendar", "the post-booking calendar (in 3.a)"],
+    "pain1": ["/atiakit/#pain1", "Pain 1 on the map"], "pain2": ["/atiakit/#pain2", "Pain 2 on the map"],
+    "pain3": ["/atiakit/#pain3", "Pain 3 on the map"],
+    "promptkit3x3html": ["/atiakit/Prompt-Kit-3x3.html", "the printable prompt kit"],
+    "promptkit3x3": ["/atiakit/Prompt-Kit-3x3.html", "the printable prompt kit"],
+    "promptkit": ["/atiakit/Prompt-Kit-3x3.html", "the printable prompt kit"],
+    "future": ["https://preig.github.io/atiafuture/", "the AI impact horizon page"],
+    "atiafuture": ["https://preig.github.io/atiafuture/", "the AI impact horizon page"],
+    "atiaai": ["https://preig.github.io/atiaai/", "the workshop prompt kit"],
+    "index": ["/atiakit/", "the kit home page"], "indexhtml": ["/atiakit/", "the kit home page"]
+  };
+  function link(href, text) {
+    var a = document.createElement("a");
+    a.href = href; a.textContent = text;
+    return a;
+  }
+  function say(nodes) {
+    var box = document.getElementById("suggest");
+    if (!box) return;
+    box.textContent = "";
+    nodes.forEach(function (n) { box.appendChild(typeof n === "string" ? document.createTextNode(n) : n); });
+    box.className += " on";
+  }
+  function show(target) {
+    if (target) say(["Did you mean ", link(target[0], target[1]), "?"]);
+  }
+  try {
+    var path = decodeURIComponent(location.pathname || "");
+    var parts = path.split("/").filter(function (p) { return p; });
+    var i = parts.map(function (p) { return p.toLowerCase(); }).indexOf("atiakit");
+    var rest = i >= 0 ? parts.slice(i + 1) : parts;
+    for (var n = 0; n < rest.length; n++) {
+      var key = rest[n].toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (known[key]) {
+        var exact = known[key][0] === path || known[key][0] === path + "/";
+        if (!exact) show(known[key]);
+        else if (/^[123][abc]$/.test(key)) {
+          /* the address is right but that tool page is not uploaded yet: point to its prompt in the printable kit */
+          say(["This tool page is not published yet. Its prompt is in the ",
+            link("/atiakit/Prompt-Kit-3x3.html#s" + key, "printable prompt kit, section " + key.charAt(0) + "." + key.charAt(1)), "."]);
+        }
+        else say(["This page is not published yet. Start from ", link("/atiakit/", "all nine tools"), "."]);
+        break;
+      }
+    }
+    if (i < 0 && !rest.length) show(known.index);
+  } catch (e) { }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+{
+ "_note": "Fictional recorded responses for teaching and tests. Shapes follow each API's documented response format; names, sites and numbers are invented (Bay Light Day Cruises is a fictional teaching business; .example domains are reserved and never resolve).",
+ "_week": "week2",
+ "responses": {
+  "P02": {
+   "id": "resp_mock_P02",
+   "object": "response",
+   "model": "mock-openai",
+   "status": "completed",
+   "output": [
+    {
+     "type": "web_search_call",
+     "id": "ws_mock_P02_0",
+     "status": "completed",
+     "action": {
+      "type": "search",
+      "query": "Seward half-day glacier cruise family prices",
+      "sources": [
+       {
+        "type": "url",
+        "url": "https://ota.example/bay-light-cruise"
+       },
+       {
+        "type": "url",
+        "url": "https://samplefjord.example/"
+       },
+       {
+        "type": "url",
+        "url": "https://reviews.example/seward"
+       }
+      ]
+     }
+    },
+    {
+     "type": "message",
+     "id": "msg_mock_P02",
+     "role": "assistant",
+     "status": "completed",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "[MOCK ANSWER, FICTIONAL] Bay Light Day Cruises (4 hours, heated cabin, minimum age 4) is listed on a booking site. Sample Fjord Tours offers a longer fjord trip. Prices vary by date.",
+       "annotations": [
+        {
+         "type": "url_citation",
+         "start_index": 0,
+         "end_index": 114,
+         "url": "https://ota.example/bay-light-cruise?utm_source=openai",
+         "title": "Bay Light cruise | OTA Example"
+        },
+        {
+         "type": "url_citation",
+         "start_index": 115,
+         "end_index": 161,
+         "url": "https://samplefjord.example/?utm_source=openai",
+         "title": "Sample Fjord Tours"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "usage": {
+    "input_tokens": 9800,
+    "output_tokens": 1150,
+    "total_tokens": 10950
+   }
+  },
+  "P03": {
+   "id": "resp_mock_P03",
+   "object": "response",
+   "model": "mock-openai",
+   "status": "completed",
+   "output": [
+    {
+     "type": "web_search_call",
+     "id": "ws_mock_P03_0",
+     "status": "completed",
+     "action": {
+      "type": "search",
+      "query": "Seward rainy day shore excursion",
+      "sources": [
+       {
+        "type": "url",
+        "url": "https://visitseward.example/rainy-day"
+       }
+      ]
+     }
+    },
+    {
+     "type": "message",
+     "id": "msg_mock_P03",
+     "role": "assistant",
+     "status": "completed",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "[MOCK ANSWER, FICTIONAL] Indoor options near the harbor and short covered tours work best on a rainy port day. Bay Light Day Cruises runs in rain and meets guests a 12-minute walk from the cruise ship dock. Keep the ship's all-aboard time in mind.",
+       "annotations": [
+        {
+         "type": "url_citation",
+         "start_index": 0,
+         "end_index": 110,
+         "url": "https://visitseward.example/rainy-day?utm_source=openai",
+         "title": "Rainy day ideas | Visit Seward Example"
+        },
+        {
+         "type": "url_citation",
+         "start_index": 111,
+         "end_index": 206,
+         "url": "https://baylight.example/cruise?utm_source=openai",
+         "title": "Bay Light Day Cruises"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "usage": {
+    "input_tokens": 8100,
+    "output_tokens": 720,
+    "total_tokens": 8820
+   }
+  },
+  "P06": {
+   "id": "resp_mock_P06",
+   "object": "response",
+   "model": "mock-openai",
+   "status": "completed",
+   "output": [
+    {
+     "type": "web_search_call",
+     "id": "ws_mock_P06_0",
+     "status": "completed",
+     "action": {
+      "type": "search",
+      "query": "beginner kayaking Seward outfitter",
+      "sources": [
+       {
+        "type": "url",
+        "url": "https://harborkayak.example/"
+       }
+      ]
+     }
+    },
+    {
+     "type": "message",
+     "id": "msg_mock_P06",
+     "role": "assistant",
+     "status": "completed",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "[MOCK ANSWER, FICTIONAL] Harbor Kayak runs guided beginner paddles from the harbor. Ask about the minimum age before you book.",
+       "annotations": [
+        {
+         "type": "url_citation",
+         "start_index": 0,
+         "end_index": 83,
+         "url": "https://harborkayak.example/?utm_source=openai",
+         "title": "Harbor Kayak Co."
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "usage": {
+    "input_tokens": 8600,
+    "output_tokens": 690,
+    "total_tokens": 9290
+   }
+  },
+  "P07": {
+   "id": "resp_mock_P07",
+   "object": "response",
+   "model": "mock-openai",
+   "status": "completed",
+   "output": [
+    {
+     "type": "web_search_call",
+     "id": "ws_mock_P07_0",
+     "status": "completed",
+     "action": {
+      "type": "search",
+      "query": "Seward summer dog sled kids",
+      "sources": [
+       {
+        "type": "url",
+        "url": "https://reviews.example/mile-12-kennel"
+       }
+      ]
+     }
+    },
+    {
+     "type": "message",
+     "id": "msg_mock_P07",
+     "role": "assistant",
+     "status": "completed",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "[MOCK ANSWER, FICTIONAL] Mile 12 Kennel offers summer cart rides; reviewers mention it works for young kids.",
+       "annotations": [
+        {
+         "type": "url_citation",
+         "start_index": 0,
+         "end_index": 108,
+         "url": "https://reviews.example/mile-12-kennel?utm_source=openai",
+         "title": "Mile 12 Kennel reviews | Reviews Example"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "usage": {
+    "input_tokens": 8300,
+    "output_tokens": 610,
+    "total_tokens": 8910
+   }
+  },
+  "P16": {
+   "id": "resp_mock_P16",
+   "object": "response",
+   "model": "mock-openai",
+   "status": "completed",
+   "output": [
+    {
+     "type": "web_search_call",
+     "id": "ws_mock_P16_0",
+     "status": "completed",
+     "action": {
+      "type": "search",
+      "query": "Seward June add-on activities",
+      "sources": [
+       {
+        "type": "url",
+        "url": "https://samplefjord.example/"
+       }
+      ]
+     }
+    },
+    {
+     "type": "message",
+     "id": "msg_mock_P16",
+     "role": "assistant",
+     "status": "completed",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "[MOCK ANSWER, FICTIONAL] Sample Fjord Tours is a common add-on for lodge guests. Bay Light Day Cruises has a 4-hour cruise that starts at the small-boat harbor.",
+       "annotations": [
+        {
+         "type": "url_citation",
+         "start_index": 0,
+         "end_index": 80,
+         "url": "https://samplefjord.example/?utm_source=openai",
+         "title": "Sample Fjord Tours"
+        },
+        {
+         "type": "url_citation",
+         "start_index": 80,
+         "end_index": 160,
+         "url": "https://baylight.example/?utm_source=openai",
+         "title": "Bay Light Day Cruises"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "usage": {
+    "input_tokens": 8900,
+    "output_tokens": 650,
+    "total_tokens": 9550
+   }
+  },
+  "_default": {
+   "id": "resp_mock__default",
+   "object": "response",
+   "model": "mock-openai",
+   "status": "completed",
+   "output": [
+    {
+     "type": "web_search_call",
+     "id": "ws_mock__default_0",
+     "status": "completed",
+     "action": {
+      "type": "search",
+      "query": "Alaska trip ideas",
+      "sources": [
+       {
+        "type": "url",
+        "url": "https://ota.example/alaska"
+       }
+      ]
+     }
+    },
+    {
+     "type": "message",
+     "id": "msg_mock__default",
+     "role": "assistant",
+     "status": "completed",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "[MOCK ANSWER, FICTIONAL] Generic recorded answer for teaching. It names no watched business. Compare options on a booking site.",
+       "annotations": [
+        {
+         "type": "url_citation",
+         "start_index": 0,
+         "end_index": 127,
+         "url": "https://ota.example/alaska?utm_source=openai",
+         "title": "Alaska tours | OTA Example"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "usage": {
+    "input_tokens": 7600,
+    "output_tokens": 540,
+    "total_tokens": 8140
+   }
+  }
+ }
+}

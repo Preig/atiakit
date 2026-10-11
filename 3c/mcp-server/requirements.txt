@@ -1,0 +1,7 @@
+# The demo, the staff console, the validator and the tests need only Python 3.10 or newer (standard library).
+# The MCP server itself needs the MCP Python SDK. Tested with mcp 2.3.0 (October 2026).
+mcp[cli]>=2,<3
+
+# Optional extras for the tests:
+#   pytest        lets you run "python -m pytest" (otherwise use "python -m unittest")
+#   jsonschema    adds a cross-check of trip-record.schema.json with a second validator

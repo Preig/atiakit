@@ -1,0 +1,4 @@
+product_id,business,product,duration,minimum_age,season,departures,runs_in_rain,distance_from_meeting_point,notes
+BL-CRUISE-4H,Bay Light Day Cruises,Wildlife and glacier cruise,4 hours,4,May 15 to September 15,9:00 and 14:00,"Yes. Cancels only for a marine warning, with a full refund.","Small-boat harbor, a 12-minute walk from the cruise ship dock","FICTIONAL EXAMPLE. Capacity 40. Heated enclosed cabin, two restrooms, hot drinks included, lunch not included."
+MK-CART-90,Mile 12 Kennel,Summer sled-dog cart ride,90 minutes,2,Summer,,Yes,15 minutes by car from the harbor,FICTIONAL EXAMPLE. How guests without a car get there: not supplied.
+HK-PADDLE-3H,Harbor Kayak Co.,Guided paddle,3 hours,12,,8:00 and 13:00,Not supplied. Cancels in wind over 15 knots.,,FICTIONAL EXAMPLE. Meeting point not supplied.

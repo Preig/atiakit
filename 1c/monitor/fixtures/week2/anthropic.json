@@ -1,0 +1,721 @@
+{
+ "_note": "Fictional recorded responses for teaching and tests. Shapes follow each API's documented response format; names, sites and numbers are invented (Bay Light Day Cruises is a fictional teaching business; .example domains are reserved and never resolve).",
+ "_week": "week2",
+ "responses": {
+  "P01": [
+   {
+    "type": "message",
+    "role": "assistant",
+    "model": "mock-claude",
+    "stop_sequence": null,
+    "id": "msg_mock_P01_a",
+    "stop_reason": "pause_turn",
+    "content": [
+     {
+      "type": "server_tool_use",
+      "id": "srvtoolu_mock_P01_0",
+      "name": "web_search",
+      "input": {
+       "query": "Fairbanks late February things to do"
+      }
+     },
+     {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_mock_P01_0",
+      "content": [
+       {
+        "type": "web_search_result",
+        "url": "https://ota.example/fairbanks-winter",
+        "title": "Fairbanks winter tours | OTA Example",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       },
+       {
+        "type": "web_search_result",
+        "url": "https://reviews.example/fairbanks",
+        "title": "Fairbanks reviews | Reviews Example",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       },
+       {
+        "type": "web_search_result",
+        "url": "https://visitfairbanks.example/winter",
+        "title": "Winter in Fairbanks | Visit Fairbanks Example",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "server_tool_use",
+      "id": "srvtoolu_mock_P01_1",
+      "name": "web_search",
+      "input": {
+       "query": "Fairbanks aurora tours hotel pickup"
+      }
+     }
+    ],
+    "usage": {
+     "input_tokens": 9100,
+     "output_tokens": 310,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "server_tool_use": {
+      "web_search_requests": 1
+     }
+    }
+   },
+   {
+    "type": "message",
+    "role": "assistant",
+    "model": "mock-claude",
+    "stop_sequence": null,
+    "id": "msg_mock_P01_b",
+    "stop_reason": "end_turn",
+    "content": [
+     {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_mock_P01_1",
+      "content": [
+       {
+        "type": "web_search_result",
+        "url": "https://ota.example/fairbanks-winter",
+        "title": "Fairbanks winter tours | OTA Example",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       },
+       {
+        "type": "web_search_result",
+        "url": "https://reviews.example/fairbanks",
+        "title": "Fairbanks reviews | Reviews Example",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       },
+       {
+        "type": "web_search_result",
+        "url": "https://visitfairbanks.example/winter",
+        "title": "Winter in Fairbanks | Visit Fairbanks Example",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "[MOCK ANSWER, FICTIONAL] Late February in Fairbanks is cold, with long nights that suit aurora viewing. "
+     },
+     {
+      "type": "text",
+      "text": "Most visitors book a night aurora tour with hotel pickup, a dog mushing ride and a day at a hot spring. ",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://ota.example/fairbanks-winter",
+        "title": "Fairbanks winter tours | OTA Example",
+        "cited_text": "Most visitors book a night aurora tour with hotel pickup, a dog mushing ride and",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "Compare pickup times and cancellation terms before you book, because several operators run similar trips.",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://reviews.example/fairbanks",
+        "title": "Fairbanks reviews | Reviews Example",
+        "cited_text": "Compare pickup times and cancellation terms before you book, because several ope",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": " The city visitor bureau lists current tour operators.",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://visitfairbanks.example/winter",
+        "title": "Winter in Fairbanks | Visit Fairbanks Example",
+        "cited_text": "The city visitor bureau lists current tour operators.",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     }
+    ],
+    "usage": {
+     "input_tokens": 12400,
+     "output_tokens": 880,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "server_tool_use": {
+      "web_search_requests": 1
+     }
+    }
+   }
+  ],
+  "P02": [
+   {
+    "type": "message",
+    "role": "assistant",
+    "model": "mock-claude",
+    "stop_sequence": null,
+    "id": "msg_mock_P02",
+    "stop_reason": "end_turn",
+    "content": [
+     {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "MOCK"
+     },
+     {
+      "type": "server_tool_use",
+      "id": "srvtoolu_mock_P02_0",
+      "name": "web_search",
+      "input": {
+       "query": "half-day glacier cruise Seward family"
+      }
+     },
+     {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_mock_P02_0",
+      "content": [
+       {
+        "type": "web_search_result",
+        "url": "https://baylight.example/cruise",
+        "title": "4-hour wildlife and glacier cruise | Bay Light Day Cruises",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       },
+       {
+        "type": "web_search_result",
+        "url": "https://samplefjord.example/cruises",
+        "title": "Cruises | Sample Fjord Tours",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       },
+       {
+        "type": "web_search_result",
+        "url": "https://ota.example/seward-cruises",
+        "title": "Seward cruises | OTA Example",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "server_tool_use",
+      "id": "srvtoolu_mock_P02_1",
+      "name": "web_search",
+      "input": {
+       "query": "Seward glacier cruise prices"
+      }
+     },
+     {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_mock_P02_1",
+      "content": [
+       {
+        "type": "web_search_result",
+        "url": "https://baylight.example/cruise",
+        "title": "4-hour wildlife and glacier cruise | Bay Light Day Cruises",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       },
+       {
+        "type": "web_search_result",
+        "url": "https://samplefjord.example/cruises",
+        "title": "Cruises | Sample Fjord Tours",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       },
+       {
+        "type": "web_search_result",
+        "url": "https://ota.example/seward-cruises",
+        "title": "Seward cruises | OTA Example",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "[MOCK ANSWER, FICTIONAL] Three half-day options from Seward that suit an 8-year-old:\n\n1. "
+     },
+     {
+      "type": "text",
+      "text": "Bay Light Day Cruises runs a 4-hour wildlife and glacier cruise with a heated enclosed cabin; minimum age 4.",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://baylight.example/cruise",
+        "title": "4-hour wildlife and glacier cruise | Bay Light Day Cruises",
+        "cited_text": "Bay Light Day Cruises runs a 4-hour wildlife and glacier cruise with a heated en",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "\n2. "
+     },
+     {
+      "type": "text",
+      "text": "Sample Fjord Tours runs a 5-hour fjord cruise; check the current price on its site.",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://samplefjord.example/cruises",
+        "title": "Cruises | Sample Fjord Tours",
+        "cited_text": "Sample Fjord Tours runs a 5-hour fjord cruise; check the current price on its si",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "\n3. "
+     },
+     {
+      "type": "text",
+      "text": "A third operator lists family fares on a booking site.",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://ota.example/seward-cruises",
+        "title": "Seward cruises | OTA Example",
+        "cited_text": "A third operator lists family fares on a booking site.",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "\n\nPrices change by date, so confirm on each booking page."
+     }
+    ],
+    "usage": {
+     "input_tokens": 18200,
+     "output_tokens": 1420,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "server_tool_use": {
+      "web_search_requests": 2
+     }
+    }
+   }
+  ],
+  "P03": [
+   {
+    "type": "message",
+    "role": "assistant",
+    "model": "mock-claude",
+    "stop_sequence": null,
+    "id": "msg_mock_P03",
+    "stop_reason": "end_turn",
+    "content": [
+     {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "MOCK"
+     },
+     {
+      "type": "server_tool_use",
+      "id": "srvtoolu_mock_P03_0",
+      "name": "web_search",
+      "input": {
+       "query": "Seward rainy day cruise ship 5 hours"
+      }
+     },
+     {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_mock_P03_0",
+      "content": [
+       {
+        "type": "web_search_result",
+        "url": "https://mile12kennel.example/",
+        "title": "Mile 12 Kennel",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "[MOCK ANSWER, FICTIONAL] With 5 hours ashore on a rainy day, stay close to the harbor. "
+     },
+     {
+      "type": "text",
+      "text": "Mile 12 Kennel offers a summer sled-dog cart ride about 15 minutes by car from the harbor. ",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://mile12kennel.example/",
+        "title": "Mile 12 Kennel",
+        "cited_text": "Mile 12 Kennel offers a summer sled-dog cart ride about 15 minutes by car from t",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "Leave a buffer for the ship's all-aboard time."
+     }
+    ],
+    "usage": {
+     "input_tokens": 15100,
+     "output_tokens": 990,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "server_tool_use": {
+      "web_search_requests": 1
+     }
+    }
+   }
+  ],
+  "P05": [
+   {
+    "type": "message",
+    "role": "assistant",
+    "model": "mock-claude",
+    "stop_sequence": null,
+    "id": "msg_mock_P05",
+    "stop_reason": "end_turn",
+    "content": [
+     {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "MOCK"
+     },
+     {
+      "type": "server_tool_use",
+      "id": "srvtoolu_mock_P05_0",
+      "name": "web_search",
+      "input": {
+       "query": "4-hour vs full-day boat tour Seward July"
+      }
+     },
+     {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_mock_P05_0",
+      "content": [
+       {
+        "type": "web_search_result",
+        "url": "https://visitseward.example/",
+        "title": "Visit Seward Example",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "server_tool_use",
+      "id": "srvtoolu_mock_P05_err",
+      "name": "web_search",
+      "input": {
+       "query": "4-hour vs full-day boat tour Seward July details"
+      }
+     },
+     {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_mock_P05_err",
+      "content": {
+       "type": "web_search_tool_result_error",
+       "error_code": "max_uses_exceeded"
+      }
+     },
+     {
+      "type": "text",
+      "text": "[MOCK ANSWER, FICTIONAL] For first-time visitors in July, a 4-hour tour fits a tight schedule and a full-day tour reaches more of the coast. Both depend on the weather."
+     }
+    ],
+    "usage": {
+     "input_tokens": 7400,
+     "output_tokens": 640,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "server_tool_use": {
+      "web_search_requests": 1
+     }
+    }
+   }
+  ],
+  "P06": [
+   {
+    "type": "message",
+    "role": "assistant",
+    "model": "mock-claude",
+    "stop_sequence": null,
+    "id": "msg_mock_P06",
+    "stop_reason": "end_turn",
+    "content": [
+     {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "MOCK"
+     },
+     {
+      "type": "server_tool_use",
+      "id": "srvtoolu_mock_P06_0",
+      "name": "web_search",
+      "input": {
+       "query": "beginner sea kayaking Seward guided"
+      }
+     },
+     {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_mock_P06_0",
+      "content": [
+       {
+        "type": "web_search_result",
+        "url": "https://harborkayak.example/tours",
+        "title": "Guided paddles | Harbor Kayak Co.",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "[MOCK ANSWER, FICTIONAL] For a first paddle, book a guided trip rather than a rental. "
+     },
+     {
+      "type": "text",
+      "text": "Harbor Kayak Co. runs a 3-hour guided paddle for beginners, minimum age 12.",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://harborkayak.example/tours",
+        "title": "Guided paddles | Harbor Kayak Co.",
+        "cited_text": "Harbor Kayak Co. runs a 3-hour guided paddle for beginners, minimum age 12.",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     }
+    ],
+    "usage": {
+     "input_tokens": 13800,
+     "output_tokens": 820,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "server_tool_use": {
+      "web_search_requests": 1
+     }
+    }
+   }
+  ],
+  "P07": [
+   {
+    "type": "message",
+    "role": "assistant",
+    "model": "mock-claude",
+    "stop_sequence": null,
+    "id": "msg_mock_P07",
+    "stop_reason": "end_turn",
+    "content": [
+     {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "MOCK"
+     },
+     {
+      "type": "server_tool_use",
+      "id": "srvtoolu_mock_P07_0",
+      "name": "web_search",
+      "input": {
+       "query": "summer sled dog ride Seward kids"
+      }
+     },
+     {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_mock_P07_0",
+      "content": [
+       {
+        "type": "web_search_result",
+        "url": "https://mile12kennel.example/",
+        "title": "Mile 12 Kennel",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "[MOCK ANSWER, FICTIONAL] Summer dog rides use wheeled carts instead of sleds. "
+     },
+     {
+      "type": "text",
+      "text": "Mile 12 Kennel runs a 90-minute cart ride for ages 2 and up.",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://mile12kennel.example/",
+        "title": "Mile 12 Kennel",
+        "cited_text": "Mile 12 Kennel runs a 90-minute cart ride for ages 2 and up.",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     }
+    ],
+    "usage": {
+     "input_tokens": 12900,
+     "output_tokens": 700,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "server_tool_use": {
+      "web_search_requests": 1
+     }
+    }
+   }
+  ],
+  "P16": [
+   {
+    "type": "message",
+    "role": "assistant",
+    "model": "mock-claude",
+    "stop_sequence": null,
+    "id": "msg_mock_P16",
+    "stop_reason": "end_turn",
+    "content": [
+     {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "MOCK"
+     },
+     {
+      "type": "server_tool_use",
+      "id": "srvtoolu_mock_P16_0",
+      "name": "web_search",
+      "input": {
+       "query": "things to add Seward June lodge"
+      }
+     },
+     {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_mock_P16_0",
+      "content": [
+       {
+        "type": "web_search_result",
+        "url": "https://baylight.example/cruise",
+        "title": "Bay Light Day Cruises",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       },
+       {
+        "type": "web_search_result",
+        "url": "https://harborkayak.example/tours",
+        "title": "Harbor Kayak Co.",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "[MOCK ANSWER, FICTIONAL] Two add-ons that fit a June stay: "
+     },
+     {
+      "type": "text",
+      "text": "Bay Light Day Cruises departs at 9:00 and 14:00 for a 4-hour cruise. ",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://baylight.example/cruise",
+        "title": "Bay Light Day Cruises",
+        "cited_text": "Bay Light Day Cruises departs at 9:00 and 14:00 for a 4-hour cruise.",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "Harbor Kayak Co. has morning and afternoon paddles for ages 12 and up.",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://harborkayak.example/tours",
+        "title": "Harbor Kayak Co.",
+        "cited_text": "Harbor Kayak Co. has morning and afternoon paddles for ages 12 and up.",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     }
+    ],
+    "usage": {
+     "input_tokens": 16300,
+     "output_tokens": 1010,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "server_tool_use": {
+      "web_search_requests": 2
+     }
+    }
+   }
+  ],
+  "_default": [
+   {
+    "type": "message",
+    "role": "assistant",
+    "model": "mock-claude",
+    "stop_sequence": null,
+    "id": "msg_mock__default",
+    "stop_reason": "end_turn",
+    "content": [
+     {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "MOCK"
+     },
+     {
+      "type": "server_tool_use",
+      "id": "srvtoolu_mock__default_0",
+      "name": "web_search",
+      "input": {
+       "query": "Alaska trip ideas"
+      }
+     },
+     {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_mock__default_0",
+      "content": [
+       {
+        "type": "web_search_result",
+        "url": "https://visitseward.example/",
+        "title": "Visit Seward Example",
+        "page_age": "2026-09-30",
+        "encrypted_content": "MOCK"
+       }
+      ]
+     },
+     {
+      "type": "text",
+      "text": "[MOCK ANSWER, FICTIONAL] Generic recorded answer for teaching. It names no watched business. "
+     },
+     {
+      "type": "text",
+      "text": "Check the local visitor bureau for current options.",
+      "citations": [
+       {
+        "type": "web_search_result_location",
+        "url": "https://visitseward.example/",
+        "title": "Visit Seward Example",
+        "cited_text": "Check the local visitor bureau for current options.",
+        "encrypted_index": "MOCK"
+       }
+      ]
+     }
+    ],
+    "usage": {
+     "input_tokens": 11000,
+     "output_tokens": 600,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0,
+     "server_tool_use": {
+      "web_search_requests": 1
+     }
+    }
+   }
+  ]
+ }
+}

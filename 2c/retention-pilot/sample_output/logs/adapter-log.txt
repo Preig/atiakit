@@ -1,0 +1,3 @@
+2026-10-10 12:56:43  loaded baylight-bookings-mock.csv
+2026-10-10 12:56:43  dropped column 'booking_note': looks like personal or payment data
+2026-10-10 12:56:43  loaded baylight-outcomes-mock.csv

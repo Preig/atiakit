@@ -1,0 +1,155 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://baylight.example/#business",
+      "name": "Bay Light Day Cruises",
+      "description": "Fictional teaching business. 4-hour wildlife and glacier cruises from the Seward small-boat harbor, May 15 to September 15.",
+      "url": "https://baylight.example/",
+      "telephone": "+1-907-555-0142",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "1 Example Harbor Way",
+        "addressLocality": "Seward",
+        "addressRegion": "AK",
+        "postalCode": "99664",
+        "addressCountry": "US"
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "09:00",
+          "closes": "18:00",
+          "validFrom": "2027-05-15",
+          "validThrough": "2027-09-15"
+        }
+      ],
+      "amenityFeature": [
+        {
+          "@type": "LocationFeatureSpecification",
+          "name": "Heated enclosed cabin",
+          "value": true
+        },
+        {
+          "@type": "LocationFeatureSpecification",
+          "name": "Restrooms",
+          "value": 2
+        },
+        {
+          "@type": "LocationFeatureSpecification",
+          "name": "Hot drinks included",
+          "value": true
+        },
+        {
+          "@type": "LocationFeatureSpecification",
+          "name": "Lunch included",
+          "value": false
+        }
+      ]
+    },
+    {
+      "@type": "TouristTrip",
+      "name": "4-hour wildlife and glacier cruise",
+      "description": "A 4-hour wildlife and glacier cruise from Seward in a heated enclosed cabin. Hot drinks included; lunch not included.",
+      "url": "https://baylight.example/cruise",
+      "touristType": [
+        "Families with children 4 and older",
+        "Wildlife watchers",
+        "Cruise ship passengers"
+      ],
+      "provider": {
+        "@type": "LocalBusiness",
+        "@id": "https://baylight.example/#business",
+        "name": "Bay Light Day Cruises",
+        "url": "https://baylight.example/"
+      },
+      "itinerary": {
+        "@type": "ItemList",
+        "numberOfItems": 3,
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+              "@type": "Place",
+              "name": "Seward small-boat harbor (meeting point)"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+              "@type": "Place",
+              "name": "Resurrection Bay"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "item": {
+              "@type": "Place",
+              "name": "Seward small-boat harbor (return)"
+            }
+          }
+        ]
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": 129,
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "validFrom": "2027-05-15",
+        "validThrough": "2027-09-15",
+        "url": "https://baylight.example/book",
+        "additionalProperty": [
+          {
+            "@type": "PropertyValue",
+            "name": "Minimum age",
+            "value": 4,
+            "unitText": "years"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Duration",
+            "value": "4 hours"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Departure times",
+            "value": "9:00 and 14:00"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Rain and weather policy",
+            "value": "Runs in rain. Cancels only for a marine warning, with a full refund."
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Cancellation policy",
+            "value": "Free cancellation until 48 hours before departure. Inside 48 hours, no refund."
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Capacity",
+            "value": "40 guests"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Meeting point",
+            "value": "small-boat harbor, a 12-minute walk from the cruise ship dock"
+          }
+        ]
+      }
+    }
+  ]
+}

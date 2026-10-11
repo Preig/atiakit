@@ -1,0 +1,4 @@
+month,code,honored_by,count_bay_light_day_cruises,count_mile_12_kennel,count_harbor_kayak_co,difference,status,agreed_count,agreed_by,notes
+2027-07,BAYLIGHT-K,Mile 12 Kennel (FICTIONAL),14,12,,2,Mismatch,,,"Counts differ by 2. Compare booking dates for this code, then agree a number."
+2027-07,BAYLIGHT-P,Harbor Kayak Co. (FICTIONAL),6,,6,0,Match,6,,
+2027-07,BAYLITE-P,,,,1,,Unknown code,,,Not in the shared fact sheet. Closest: BAYLIGHT-P. Check for a typo.

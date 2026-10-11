@@ -1,0 +1,7 @@
+# Nothing is required for the demo, dry runs, reports or the power command: Python 3.10+ standard library only.
+# Install ONE of these only if you want real model drafts:
+#   anthropic        (PROVIDER=anthropic)
+#   openai           (PROVIDER=openai, not tested against a live API in this kit)
+#   google-genai     (PROVIDER=gemini, not tested against a live API in this kit)
+# Optional, to run the tests with pytest instead of unittest:
+#   pytest

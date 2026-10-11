@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1.c Structured data generator · ATIA AI Take-Home Kit</title>
+<meta name="description" content="Turn approved business facts into schema.org JSON-LD (LocalBusiness and TouristTrip) in your browser. No AI, nothing leaves the page.">
+<link rel="stylesheet" href="../../assets/kit.css">
+<script src="../../assets/kit.js" defer></script>
+<style>
+  input[type=tel],input[type=time],input[type=email]{width:100%;font:16px/1.45 Arial,sans-serif;padding:9px 11px;border:1px solid #b8beb4;border-radius:4px;background:#fff;color:var(--ink)}
+  .row{display:grid;gap:0 12px;grid-template-columns:repeat(auto-fit,minmax(125px,1fr))}
+  .row.wide{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .days{display:flex;flex-wrap:wrap;gap:6px 14px;margin:4px 0 0}
+  .days label{display:inline-flex;align-items:center;gap:6px;font-weight:normal;margin:0;font-size:15px}
+  .days input{width:20px;height:20px}
+  fieldset.trip{border-left:5px solid var(--teal)}
+  .trip-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .trip-head h3{margin:.4em 0}
+  .fixed{background:#eef1ec;color:var(--slate)}
+  .warnings{list-style:none;padding:0;margin:8px 0}
+  .warnings li{padding:8px 12px;margin:6px 0;border-radius:4px;background:var(--amber-t);border-left:4px solid #d49a1a;font-size:15px}
+  .warnings li.err{background:var(--red-t);border-left-color:var(--red)}
+  .warnings li.ok{background:var(--green-t);border-left-color:var(--green)}
+  .checklist{list-style:none;padding:0;margin:6px 0 14px}
+  .checklist li{margin:4px 0}
+  .checklist label{display:flex;gap:10px;align-items:flex-start;font-weight:normal;margin:0;font-size:15px;color:var(--ink)}
+  .checklist input{width:20px;height:20px;flex:none;margin-top:2px}
+  .page-out h3{overflow-wrap:anywhere}
+  .label-tag{font-size:13px;font-weight:bold;color:var(--slate-m)}
+  [hidden]{display:none!important} /* kit.css sets display on buttons, which would override the hidden attribute */
+  @media print{.page-out pre{font-size:11px}body.print-checklist main>section:not(#sec-visible),body.print-checklist footer{display:none!important}}
+</style>
+</head>
+<body data-page="1c-schema">
+<div class="band" aria-hidden="true"></div>
+<header class="kit">
+  <p class="crumbs"><a href="../../">ATIA AI Take-Home Kit</a> › Pain 1 · Comparison overload › <a href="../">1.c AI answer monitoring</a></p>
+  <p class="kicker"><span class="rung r3" aria-hidden="true"><i></i><i></i><i></i></span>Advanced rung · Tool 1.c · Part A: structured data</p>
+  <h1>Structured data generator</h1>
+  <p class="lede">Turn your approved facts into schema.org JSON-LD: the machine-readable copy of your fact sheet that search engines and AI tools read. It runs in this browser. There is no AI here, and nothing you type leaves this page.</p>
+  <ul class="meta">
+    <li><b>Time</b> about 1 hour</li><li><b>Cost</b> free</li><li><b>Skill</b> copy and paste into your website builder</li><li><b>Needs</b> the 1.a fact sheet</li><li><b>Helps</b> the Cited check</li>
+  </ul>
+  <nav class="tool-nav" data-toolnav="1c" data-root="../../" aria-label="All tools"></nav>
+</header>
+
+<main class="kit">
+  <section class="card teal" aria-labelledby="what">
+    <h2 id="what">What this does, and what it does not</h2>
+    <div class="grid two">
+      <div>
+        <h3>It does</h3>
+        <ul>
+          <li>Write one <code>&lt;script type="application/ld+json"&gt;</code> block per page: your business on the home page, one trip on each product page.</li>
+          <li>Put checkable facts where machines look for them: hours, season, price, minimum age, duration, rain and cancellation policy.</li>
+          <li>List the facts that also need to be visible on each page, so the markup and the page match.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>It does not</h3>
+        <ul>
+          <li>Get you into Google's "Things to do" listings. Those come from booking feeds through connectivity partners, not from markup. Ask your booking platform whether it sends one.</li>
+          <li>Create review stars. Leave <code>AggregateRating</code> out when the reviews are your own: Google does not show stars for reviews a business collects about itself.</li>
+          <li>Guarantee that AI tools name or cite you. It makes your facts easier to read and match. Measure with the <a href="../../audit/">AI visibility audit</a> and the <a href="../">monitor</a>.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="facts">
+    <h2 id="facts">Your facts</h2>
+    <p class="hint">Business facts only, from your approved fact sheet (tool 1.a). Never enter guest names, emails, phone numbers, card numbers or other guest details. Your entries are saved in this browser only, so you can close the page and come back.</p>
+    <div class="btns">
+      <button type="button" class="secondary" id="load-demo">Load the fictional example (Bay Light)</button>
+      <button type="button" class="ghost" id="clear-all">Clear all</button>
+    </div>
+    <p class="status" role="status" aria-live="polite" id="form-status"></p>
+
+    <form id="schema-form" novalidate>
+      <fieldset>
+        <legend>The business (goes on your home page)</legend>
+        <label for="b-type">Type</label>
+        <select id="b-type" data-b="type">
+          <option value="LocalBusiness">LocalBusiness: most tour operators, guides and outfitters</option>
+          <option value="TouristAttraction">TouristAttraction: a place visitors go to</option>
+          <option value="LodgingBusiness">LodgingBusiness: lodges, B&amp;Bs, cabins</option>
+          <option value="both">LocalBusiness and TouristAttraction: a business that is also the place</option>
+        </select>
+        <div class="row wide">
+          <div><label for="b-name">Business name</label><input type="text" id="b-name" data-b="name" autocomplete="organization"></div>
+          <div><label for="b-url">Website home page <small>(https://...)</small></label><input type="url" id="b-url" data-b="url" inputmode="url"></div>
+        </div>
+        <label for="b-desc">One factual sentence <small>(no "best" or "unforgettable")</small></label>
+        <textarea id="b-desc" data-b="description" rows="3" style="min-height:90px"></textarea>
+        <div class="row wide">
+          <div><label for="b-tel">Business telephone</label><input type="tel" id="b-tel" data-b="telephone" autocomplete="tel"></div>
+          <div><label for="b-street">Street address</label><input type="text" id="b-street" data-b="street" autocomplete="street-address"></div>
+        </div>
+        <div class="row">
+          <div><label for="b-town">Town</label><input type="text" id="b-town" data-b="town"></div>
+          <div><label for="b-region">State</label><input type="text" id="b-region" data-b="region"></div>
+          <div><label for="b-zip">ZIP</label><input type="text" id="b-zip" data-b="zip" inputmode="numeric"></div>
+          <div><label for="b-country">Country</label><input type="text" id="b-country" data-b="country"></div>
+        </div>
+        <div class="row">
+          <div><label for="b-lat">Latitude <small>(optional)</small></label><input type="text" id="b-lat" data-b="lat" inputmode="decimal"></div>
+          <div><label for="b-lng">Longitude <small>(optional)</small></label><input type="text" id="b-lng" data-b="lng" inputmode="decimal"></div>
+          <div><label for="b-price">Price range <small>(optional)</small></label><input type="text" id="b-price" data-b="priceRange"></div>
+        </div>
+
+        <h3>Season and hours</h3>
+        <div class="row">
+          <div><label for="b-from">Season opens</label><input type="date" id="b-from" data-b="seasonFrom"></div>
+          <div><label for="b-through">Season closes</label><input type="date" id="b-through" data-b="seasonThrough"></div>
+          <div><label for="b-opens">Opens</label><input type="time" id="b-opens" data-b="opens"></div>
+          <div><label for="b-closes">Closes</label><input type="time" id="b-closes" data-b="closes"></div>
+        </div>
+        <p class="label-tag" id="days-label">Open on</p>
+        <div class="days" role="group" aria-labelledby="days-label" id="b-days"></div>
+
+        <label for="b-amen">Checkable facts about the place <small>(one per line: "Heated enclosed cabin", or "Restrooms: 2", or "Lunch included: no")</small></label>
+        <textarea id="b-amen" data-b="amenities" rows="5"></textarea>
+        <label for="b-same">Other official profiles <small>(optional, one web address per line: your listing pages, social profiles)</small></label>
+        <textarea id="b-same" data-b="sameAs" rows="3" style="min-height:90px"></textarea>
+      </fieldset>
+
+      <div id="trips"></div>
+      <div class="btns"><button type="button" class="secondary" id="add-trip">Add another trip</button></div>
+    </form>
+  </section>
+
+  <section class="card" aria-labelledby="out">
+    <h2 id="out">Your JSON-LD, one block per page</h2>
+    <p class="hint">Paste each block on the page named above it, once. Most website builders have a per-page box called "code injection", "custom code" or "structured data" in page settings. If you are not sure where, send the block to your web person.</p>
+    <h3>Check before you publish</h3>
+    <ul class="warnings" id="warnings"></ul>
+    <div id="pages"></div>
+    <div class="btns">
+      <button type="button" id="save-all">Save all blocks as .txt</button>
+    </div>
+    <p class="status" role="status" aria-live="polite" id="out-status"></p>
+  </section>
+
+  <section class="card" aria-labelledby="visible" id="sec-visible">
+    <h2 id="visible">Facts that also need to be visible on the page</h2>
+    <p><span class="pill">Recommendation</span> Based on Google's structured data guidelines: mark up only what a visitor can see on that page. Tick each fact once you have found it on the page. If a fact is in the markup but not on the page, add it to the page or take it out of the markup.</p>
+    <div id="checklists"></div>
+    <div class="btns no-print"><button type="button" class="secondary" id="print-list">Print the checklist</button></div>
+  </section>
+
+  <section class="card" aria-labelledby="validate">
+    <h2 id="validate">Validate, then publish</h2>
+    <ol class="steps">
+      <li><strong>Every block: the Schema.org validator.</strong> Paste the block at <a href="https://validator.schema.org/" target="_blank" rel="noopener">validator.schema.org</a>. It checks TouristTrip, Offer and the amenity list. Fix errors; warnings about optional fields are fine.</li>
+      <li><strong>Home page block: also Google's Rich Results Test.</strong> <a href="https://search.google.com/test/rich-results" target="_blank" rel="noopener">The Rich Results Test</a> only covers the LocalBusiness part. TouristTrip and TouristAttraction are not Google rich result types, so "no items detected" for a trip block is expected there, not a mistake.</li>
+      <li><strong>Publish, then test the live page.</strong> Run both tools again on the published web address. Update the markup whenever a price, season or policy changes (Recommendation), at the same time as your website, listings and confirmation emails (tool 1.a).</li>
+      <li><strong>Measure.</strong> Re-run the <a href="../../audit/">AI visibility audit</a> next quarter. The <a href="../">weekly monitor</a> counts the Cited check for you.</li>
+    </ol>
+    <p>Google "Things to do": the listings with prices and booking buttons come from booking feeds sent by connectivity partners (often your booking platform), not from this markup. <a href="https://developers.google.com/travel/things-to-do" target="_blank" rel="noopener">Google's Things to do documentation</a> explains the partner route.</p>
+  </section>
+
+  <section class="card note" aria-labelledby="measure">
+    <h2 id="measure">How you will know it worked</h2>
+    <p>Both validators show no errors, every checklist box is ticked, and over the next quarter the Cited share for your business in the <a href="../">monitor</a> or the <a href="../../audit/">audit</a> goes up (Number 1). One week is noise; compare quarters.</p>
+  </section>
+
+  <section class="card warn" aria-labelledby="safe">
+    <h2 id="safe">Before you use it</h2>
+    <p><strong>No AI on this page, and a person still approves.</strong> The owner checks every fact against the approved fact sheet before it goes on the website. The markup states your policy; it does not replace the judgment on the day.</p>
+    <ul>
+      <li><strong>Recommendation: safety calls stay with a qualified person.</strong> A rain or weather policy in the markup describes your business rule. The go or no-go call on the water is made by your licensed captain or guide, never by the markup or an AI tool.</li>
+      <li><strong>Recommendation:</strong> the same price, season and policies everywhere: website, markup, listing sites, confirmation emails. Conflicting facts cost trust (see tool 1.a).</li>
+      <li><strong>Recommendation:</strong> no AggregateRating built from reviews you collect yourself; no claims you cannot show on the page.</li>
+      <li>The Bay Light example is a fictional teaching business. Its web addresses end in <code>.example</code> and lead nowhere. Its price ($129), street address, 555 phone number, office hours and the year on its season dates (2027) were invented for this example; the other facts come from the kit's fictional fact sheet.</li>
+    </ul>
+  </section>
+</main>
+
+<footer class="kit">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates. Facts last verified 2026-10-10.</p>
+  <p><a href="../../">All nine tools</a> · <a href="../../Prompt-Kit-3x3.html">Printable prompt kit</a></p>
+</footer>
+
+<template id="trip-tpl">
+  <fieldset class="trip">
+    <legend>Trip <span class="n"></span> (goes on its own product page)</legend>
+    <div class="trip-head"><h3 class="visually-hidden">Trip details</h3><button type="button" class="danger remove-trip">Remove this trip</button></div>
+    <div class="row wide">
+      <div><label data-for="name">Trip name</label><input type="text" data-t="name"></div>
+      <div><label data-for="pageUrl">Product page web address <small>(where this block goes)</small></label><input type="url" data-t="pageUrl" inputmode="url"></div>
+    </div>
+    <label data-for="description">One factual sentence about the trip</label>
+    <textarea data-t="description" rows="3" style="min-height:90px"></textarea>
+    <div class="row wide">
+      <div><label data-for="touristType">Who it is for <small>(comma separated)</small></label><input type="text" data-t="touristType"></div>
+      <div><label data-for="bookingUrl">Booking web address <small>(blank = product page)</small></label><input type="url" data-t="bookingUrl" inputmode="url"></div>
+    </div>
+    <label data-for="stops">Itinerary stops <small>(one place per line, in order)</small></label>
+    <textarea data-t="stops" rows="3" style="min-height:80px"></textarea>
+    <div class="row">
+      <div><label data-for="price">Price per person <small>(number)</small></label><input type="text" data-t="price" inputmode="decimal"></div>
+      <div><label data-for="currency">Currency</label><input type="text" data-t="currency" class="fixed" value="USD" readonly></div>
+      <div><label data-for="availability">Availability</label>
+        <select data-t="availability">
+          <option value="InStock">Bookable now</option>
+          <option value="LimitedAvailability">Limited availability</option>
+          <option value="PreOrder">Bookable for next season</option>
+          <option value="SoldOut">Sold out</option>
+        </select></div>
+    </div>
+    <div class="row">
+      <div><label data-for="validFrom">Season starts</label><input type="date" data-t="validFrom"></div>
+      <div><label data-for="validThrough">Season ends</label><input type="date" data-t="validThrough"></div>
+      <div><label data-for="minAge">Minimum age <small>(years)</small></label><input type="number" min="0" max="120" data-t="minAge"></div>
+      <div><label data-for="duration">Duration</label><input type="text" data-t="duration"></div>
+    </div>
+    <label data-for="departures">Departure times</label>
+    <input type="text" data-t="departures">
+    <label data-for="rain">Rain and weather policy</label>
+    <textarea data-t="rain" rows="3" style="min-height:90px"></textarea>
+    <label data-for="cancel">Cancellation policy</label>
+    <textarea data-t="cancel" rows="3" style="min-height:90px"></textarea>
+    <label data-for="other">Other trip facts <small>(one per line, "Name: value")</small></label>
+    <textarea data-t="other" rows="3" style="min-height:80px"></textarea>
+  </fieldset>
+</template>
+
+<script id="schema-lib">
+/* Pure JSON-LD builder. No DOM, no network. Also runs in Node for tests. */
+(function (root) {
+  "use strict";
+  var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  var GENERIC = ["unforgettable", "best", "perfect", "stunning", "world-class", "world class", "amazing", "breathtaking", "family-friendly", "family friendly", "once-in-a-lifetime", "once in a lifetime", "incredible", "must-see", "must see"];
+
+  function clean(s) { return String(s == null ? "" : s).trim(); }
+  function lines(s) { return clean(s).split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean); }
+  function csv(s) { return clean(s).split(/\s*[,;]\s*|\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean); }
+  function num(s) { var t = clean(s).replace(/[$,\s]/g, ""); return /^-?\d+(\.\d+)?$/.test(t) ? Number(t) : null; }
+  function put(o, k, v) { if (v !== "" && v !== null && v !== undefined && !(Array.isArray(v) && !v.length)) o[k] = v; }
+  function scalarValue(v) {
+    if (/^(yes|true)$/i.test(v)) return true;
+    if (/^(no|false|not included)$/i.test(v)) return false;
+    var n = num(v); return n === null ? v : n;
+  }
+  function splitFact(line) {
+    var m = line.match(/^([^:]{1,80}):\s*(.+)$/);
+    return m ? { name: m[1].trim(), value: scalarValue(m[2].trim()), text: line } : { name: line, value: true, text: line };
+  }
+  function prop(name, value, unit) {
+    var p = { "@type": "PropertyValue", "name": name, "value": value };
+    if (unit) p.unitText = unit;
+    return p;
+  }
+  function typeOf(t) { return t === "both" ? ["LocalBusiness", "TouristAttraction"] : (t || "LocalBusiness"); }
+  function homeUrl(b) { return clean(b.url); }
+  function bizId(b) { var u = homeUrl(b); return (u ? u.replace(/#.*$/, "") : "https://example.com/") + "#business"; }
+
+  function business(b) {
+    var o = { "@context": "https://schema.org", "@type": typeOf(b.type), "@id": bizId(b) };
+    put(o, "name", clean(b.name));
+    put(o, "description", clean(b.description));
+    put(o, "url", homeUrl(b));
+    put(o, "telephone", clean(b.telephone));
+    var a = { "@type": "PostalAddress" };
+    put(a, "streetAddress", clean(b.street)); put(a, "addressLocality", clean(b.town));
+    put(a, "addressRegion", clean(b.region)); put(a, "postalCode", clean(b.zip)); put(a, "addressCountry", clean(b.country));
+    if (Object.keys(a).length > 1) o.address = a;
+    var lat = num(b.lat), lng = num(b.lng);
+    if (lat !== null && lng !== null) o.geo = { "@type": "GeoCoordinates", "latitude": lat, "longitude": lng };
+    if (b.type !== "TouristAttraction") put(o, "priceRange", clean(b.priceRange)); // priceRange is a LocalBusiness property
+    var days = (b.days || []).filter(function (d) { return DAYS.indexOf(d) >= 0; });
+    if (clean(b.opens) && clean(b.closes) && days.length) {
+      var h = { "@type": "OpeningHoursSpecification", "dayOfWeek": days, "opens": clean(b.opens), "closes": clean(b.closes) };
+      put(h, "validFrom", clean(b.seasonFrom)); put(h, "validThrough", clean(b.seasonThrough));
+      o.openingHoursSpecification = [h];
+    }
+    var am = lines(b.amenities).map(function (l) {
+      var f = splitFact(l); return { "@type": "LocationFeatureSpecification", "name": f.name, "value": f.value };
+    });
+    put(o, "amenityFeature", am);
+    put(o, "sameAs", lines(b.sameAs));
+    return o;
+  }
+
+  function trip(t, b) {
+    var o = { "@context": "https://schema.org", "@type": "TouristTrip" };
+    put(o, "name", clean(t.name));
+    put(o, "description", clean(t.description));
+    put(o, "url", clean(t.pageUrl));
+    var types = csv(t.touristType);
+    if (types.length) o.touristType = types.length === 1 ? types[0] : types;
+    // provider expects an Organization or Person. A TouristAttraction alone is only a Place,
+    // so the trip names the same @id as an Organization (the operator of that place).
+    var prov = { "@type": b.type === "TouristAttraction" ? "Organization" : typeOf(b.type), "@id": bizId(b) };
+    put(prov, "name", clean(b.name)); put(prov, "url", homeUrl(b));
+    o.provider = prov;
+    var stops = lines(t.stops);
+    if (stops.length) {
+      o.itinerary = { "@type": "ItemList", "numberOfItems": stops.length, "itemListElement": stops.map(function (s, i) {
+        return { "@type": "ListItem", "position": i + 1, "item": { "@type": "Place", "name": s } };
+      }) };
+    }
+    var offer = { "@type": "Offer" };
+    var price = num(t.price);
+    put(offer, "price", price === null ? clean(t.price) : price);
+    offer.priceCurrency = "USD";
+    offer.availability = "https://schema.org/" + (clean(t.availability) || "InStock");
+    put(offer, "validFrom", clean(t.validFrom)); put(offer, "validThrough", clean(t.validThrough));
+    put(offer, "url", clean(t.bookingUrl) || clean(t.pageUrl));
+    var props = [];
+    var age = num(t.minAge);
+    if (age !== null) props.push(prop("Minimum age", age, "years"));
+    if (clean(t.duration)) props.push(prop("Duration", clean(t.duration)));
+    if (clean(t.departures)) props.push(prop("Departure times", clean(t.departures)));
+    if (clean(t.rain)) props.push(prop("Rain and weather policy", clean(t.rain)));
+    if (clean(t.cancel)) props.push(prop("Cancellation policy", clean(t.cancel)));
+    lines(t.other).forEach(function (l) { var f = splitFact(l); props.push(prop(f.name, f.value)); });
+    put(offer, "additionalProperty", props);
+    o.offers = offer;
+    return o;
+  }
+
+  function scriptBlock(obj) {
+    // Escape "<" so no value can close the script tag early.
+    return '<script type="application/ld+json">\n' + JSON.stringify(obj, null, 2).replace(/</g, "\\u003c") + "\n</scr" + "ipt>";
+  }
+
+  function slug(s, fallback) {
+    var x = clean(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+    return x || fallback;
+  }
+
+  function daysText(days) {
+    if (!days || !days.length) return "";
+    if (days.length === 7) return "every day";
+    return days.join(", ");
+  }
+
+  function visibleFacts(state) {
+    var b = state.business, out = [];
+    var home = [];
+    if (clean(b.name)) home.push("Business name: " + clean(b.name));
+    var addr = [clean(b.street), clean(b.town), [clean(b.region), clean(b.zip)].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+    if (addr && (clean(b.street) || clean(b.town))) home.push("Address: " + addr);
+    if (clean(b.telephone)) home.push("Telephone: " + clean(b.telephone));
+    if (clean(b.opens) && clean(b.closes) && (b.days || []).length) {
+      home.push("Hours: " + daysText(b.days) + ", " + clean(b.opens) + " to " + clean(b.closes) +
+        (clean(b.seasonFrom) || clean(b.seasonThrough) ? " (season " + [clean(b.seasonFrom), clean(b.seasonThrough)].filter(Boolean).join(" to ") + ")" : ""));
+    }
+    if (clean(b.priceRange) && b.type !== "TouristAttraction") home.push("Price range: " + clean(b.priceRange));
+    lines(b.amenities).forEach(function (l) { home.push(l); });
+    out.push({ title: "Home page", url: homeUrl(b), facts: home });
+    (state.trips || []).forEach(function (t, i) {
+      var f = [];
+      if (clean(t.name)) f.push("Trip name: " + clean(t.name));
+      if (clean(t.price)) f.push("Price: " + (num(t.price) !== null ? "$" + num(t.price) : clean(t.price)) + " (USD)");
+      if (clean(t.validFrom) || clean(t.validThrough)) f.push("Season: " + [clean(t.validFrom), clean(t.validThrough)].filter(Boolean).join(" to "));
+      if (num(t.minAge) !== null) f.push("Minimum age: " + num(t.minAge));
+      if (clean(t.duration)) f.push("Duration: " + clean(t.duration));
+      if (clean(t.departures)) f.push("Departure times: " + clean(t.departures));
+      if (clean(t.rain)) f.push("Rain and weather policy: " + clean(t.rain));
+      if (clean(t.cancel)) f.push("Cancellation policy: " + clean(t.cancel));
+      lines(t.stops).forEach(function (s) { f.push("Itinerary stop: " + s); });
+      lines(t.other).forEach(function (l) { f.push(l); });
+      if (clean(t.bookingUrl)) f.push("A booking link to " + clean(t.bookingUrl));
+      out.push({ title: "Trip " + (i + 1) + " page" + (clean(t.name) ? ": " + clean(t.name) : ""), url: clean(t.pageUrl), facts: f });
+    });
+    return out;
+  }
+
+  function isHttps(u) { return /^https:\/\/[^\s/]+\.[^\s/]+/i.test(clean(u)); }
+  function host(u) { var m = clean(u).match(/^https?:\/\/([^\/?#:]+)/i); return m ? m[1].toLowerCase().replace(/^www\./, "") : ""; }
+
+  function warnings(state) {
+    var w = [], b = state.business;
+    function add(level, msg) { w.push({ level: level, msg: msg }); }
+    if (!clean(b.name)) add("err", "Business name is missing.");
+    if (!clean(b.url)) add("err", "Website home page is missing. The trips point to the business through it.");
+    else if (!isHttps(b.url)) add("warn", "Website should be a full https:// address.");
+    if (!clean(b.street) || !clean(b.town)) add("warn", "Address is incomplete. Google's LocalBusiness rules expect a full address.");
+    if (!clean(b.telephone)) add("warn", "No business telephone. It is optional, but it helps match your listings.");
+    if (clean(b.seasonFrom) && clean(b.seasonThrough) && clean(b.seasonThrough) < clean(b.seasonFrom)) add("err", "Season closes before it opens.");
+    if ((clean(b.opens) || clean(b.closes)) && !(b.days || []).length) add("warn", "Hours are set but no days are ticked, so no opening hours are written.");
+    if ((clean(b.lat) || clean(b.lng)) && (num(b.lat) === null || num(b.lng) === null)) add("warn", "Latitude and longitude need to be numbers; they were left out.");
+    if (clean(b.priceRange) && b.type === "TouristAttraction") add("warn", "Price range was left out: it belongs to a business type, not to TouristAttraction alone. Pick LocalBusiness and TouristAttraction to keep it.");
+    (state.trips || []).forEach(function (t, i) {
+      var n = "Trip " + (i + 1) + ": ";
+      if (!clean(t.name)) add("err", n + "trip name is missing.");
+      if (!clean(t.pageUrl)) add("err", n + "product page address is missing. Each trip block goes on its own page.");
+      else if (!isHttps(t.pageUrl)) add("warn", n + "product page should be a full https:// address.");
+      else if (clean(b.url) && host(t.pageUrl) !== host(b.url)) add("warn", n + "product page is on a different website from the business. That is fine for a listing site, but the markup belongs on your own page.");
+      if (!clean(t.price)) add("warn", n + "no price. An Offer without a price is weak; add the adult price.");
+      else if (num(t.price) === null) add("warn", n + "price should be a plain number, for example 129.");
+      if (clean(t.validFrom) && clean(t.validThrough) && clean(t.validThrough) < clean(t.validFrom)) add("err", n + "season ends before it starts.");
+      if (!clean(t.validThrough)) add("warn", n + "no season end date. Without it, an old price can look current.");
+      if (clean(t.minAge) && num(t.minAge) === null) add("warn", n + "minimum age should be a number.");
+    });
+    var all = JSON.stringify(state);
+    if (/\[FILL/i.test(all)) add("err", "Some fields still say [FILL]. Replace them with approved facts or leave them empty.");
+    if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(all)) add("warn", "An email address was found. Use business contact details only, never a guest's.");
+    var descs = [b.description].concat((state.trips || []).map(function (t) { return t.description; })).join(" ").toLowerCase();
+    var hits = GENERIC.filter(function (g) { return new RegExp("(^|[^a-z])" + g.replace(/[-\s]/g, "[-\\s]") + "([^a-z]|$)").test(descs); });
+    if (hits.length) add("warn", "Generic claims in a description (" + hits.join(", ") + "). Swap them for checkable facts (tool 1.a).");
+    return w;
+  }
+
+  function build(state) {
+    var pages = [{ key: "home", title: "Home page", url: homeUrl(state.business), file: slug(state.business.name, "business") + "-home.jsonld", obj: business(state.business) }];
+    (state.trips || []).forEach(function (t, i) {
+      pages.push({ key: "trip" + i, title: "Trip " + (i + 1) + " page" + (clean(t.name) ? ": " + clean(t.name) : ""), url: clean(t.pageUrl),
+        file: slug(t.name, "trip-" + (i + 1)) + ".jsonld", obj: trip(t, state.business) });
+    });
+    pages.forEach(function (p) { p.json = JSON.stringify(p.obj, null, 2); p.script = scriptBlock(p.obj); });
+    return { pages: pages, warnings: warnings(state), checklists: visibleFacts(state) };
+  }
+
+  function graph(state) {
+    var items = build(state).pages.map(function (p) { var o = JSON.parse(p.json); delete o["@context"]; return o; });
+    return { "@context": "https://schema.org", "@graph": items };
+  }
+
+  function blankTrip() { return { name: "", pageUrl: "", description: "", touristType: "", bookingUrl: "", stops: "", price: "", availability: "InStock", validFrom: "", validThrough: "", minAge: "", duration: "", departures: "", rain: "", cancel: "", other: "" }; }
+  function blank() {
+    return { business: { type: "LocalBusiness", name: "", url: "", description: "", telephone: "", street: "", town: "", region: "AK", zip: "", country: "US", lat: "", lng: "", priceRange: "", seasonFrom: "", seasonThrough: "", opens: "", closes: "", days: [], amenities: "", sameAs: "" }, trips: [blankTrip()] };
+  }
+
+  /* Fictional teaching data: the facts of Bay Light Day Cruises (FICTIONAL), Seward. The price and street address are invented. */
+  var DEMO = {
+    business: {
+      type: "LocalBusiness", name: "Bay Light Day Cruises", url: "https://baylight.example/",
+      description: "Fictional teaching business. 4-hour wildlife and glacier cruises from the Seward small-boat harbor, May 15 to September 15.",
+      telephone: "+1-907-555-0142", street: "1 Example Harbor Way", town: "Seward", region: "AK", zip: "99664", country: "US",
+      lat: "", lng: "", priceRange: "", seasonFrom: "2027-05-15", seasonThrough: "2027-09-15", opens: "09:00", closes: "18:00",
+      days: DAYS.slice(),
+      amenities: "Heated enclosed cabin\nRestrooms: 2\nHot drinks included\nLunch included: no",
+      sameAs: ""
+    },
+    trips: [{
+      name: "4-hour wildlife and glacier cruise", pageUrl: "https://baylight.example/cruise",
+      description: "A 4-hour wildlife and glacier cruise from Seward in a heated enclosed cabin. Hot drinks included; lunch not included.",
+      touristType: "Families with children 4 and older, Wildlife watchers, Cruise ship passengers",
+      bookingUrl: "https://baylight.example/book",
+      stops: "Seward small-boat harbor (meeting point)\nResurrection Bay\nSeward small-boat harbor (return)",
+      price: "129", availability: "InStock", validFrom: "2027-05-15", validThrough: "2027-09-15", minAge: "4", duration: "4 hours",
+      departures: "9:00 and 14:00",
+      rain: "Runs in rain. Cancels only for a marine warning, with a full refund.",
+      cancel: "Free cancellation until 48 hours before departure. Inside 48 hours, no refund.",
+      other: "Capacity: 40 guests\nMeeting point: small-boat harbor, a 12-minute walk from the cruise ship dock"
+    }]
+  };
+
+  var api = { build: build, graph: graph, business: business, trip: trip, warnings: warnings, visibleFacts: visibleFacts,
+    scriptBlock: scriptBlock, blank: blank, blankTrip: blankTrip, demo: function () { return JSON.parse(JSON.stringify(DEMO)); }, DAYS: DAYS };
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+  root.SchemaGen = api;
+})(typeof window !== "undefined" ? window : this);
+</script>
+
+<script>
+/* Page wiring: form <-> state, render outputs. Saved in this browser only. */
+(function () {
+  "use strict";
+  var G = window.SchemaGen, KEY = "atiakit:1c-schema:v1";
+  var form = document.getElementById("schema-form");
+  var tripsBox = document.getElementById("trips");
+  var state, built;
+
+  function store() { return window.KIT && KIT.store; }
+  function save() { var s = store(); if (s) s.set(KEY, state); }
+  function loadSaved() { var s = store(); var v = s ? s.get(KEY) : null; return v && v.business && v.trips ? v : null; }
+  function status(id, msg) { var el = document.getElementById(id); el.textContent = msg; clearTimeout(el._t); el._t = setTimeout(function () { el.textContent = ""; }, 6000); }
+
+  // Day checkboxes
+  var daysBox = document.getElementById("b-days");
+  G.DAYS.forEach(function (d) {
+    var id = "day-" + d.toLowerCase();
+    var lab = document.createElement("label"); lab.setAttribute("for", id);
+    var cb = document.createElement("input"); cb.type = "checkbox"; cb.id = id; cb.value = d; cb.setAttribute("data-day", "");
+    lab.appendChild(cb); lab.appendChild(document.createTextNode(d.slice(0, 3)));
+    lab.title = d; cb.setAttribute("aria-label", d);
+    daysBox.appendChild(lab);
+  });
+
+  function renderTrips() {
+    tripsBox.innerHTML = "";
+    var tpl = document.getElementById("trip-tpl");
+    state.trips.forEach(function (t, i) {
+      var node = tpl.content.cloneNode(true);
+      var fs = node.querySelector("fieldset");
+      fs.setAttribute("data-index", i);
+      fs.querySelector(".n").textContent = String(i + 1);
+      fs.querySelectorAll("[data-t]").forEach(function (el) {
+        var k = el.getAttribute("data-t"), id = "t" + i + "-" + k;
+        el.id = id;
+        if (k !== "currency") el.value = t[k] == null ? "" : t[k];
+      });
+      fs.querySelectorAll("label[data-for]").forEach(function (lab) { lab.setAttribute("for", "t" + i + "-" + lab.getAttribute("data-for")); });
+      var rm = fs.querySelector(".remove-trip");
+      rm.setAttribute("aria-label", "Remove trip " + (i + 1));
+      rm.hidden = state.trips.length < 2;
+      rm.addEventListener("click", function () {
+        readForm(); state.trips.splice(i, 1); renderTrips(); update(); status("form-status", "Trip " + (i + 1) + " removed.");
+      });
+      tripsBox.appendChild(node);
+    });
+  }
+
+  function fillForm() {
+    form.querySelectorAll("[data-b]").forEach(function (el) { var k = el.getAttribute("data-b"); el.value = state.business[k] == null ? "" : state.business[k]; });
+    form.querySelectorAll("[data-day]").forEach(function (cb) { cb.checked = (state.business.days || []).indexOf(cb.value) >= 0; });
+    renderTrips();
+  }
+
+  function readForm() {
+    form.querySelectorAll("[data-b]").forEach(function (el) { state.business[el.getAttribute("data-b")] = el.value; });
+    state.business.days = Array.prototype.filter.call(form.querySelectorAll("[data-day]"), function (cb) { return cb.checked; }).map(function (cb) { return cb.value; });
+    tripsBox.querySelectorAll("fieldset.trip").forEach(function (fs) {
+      var i = Number(fs.getAttribute("data-index")), t = state.trips[i] || G.blankTrip();
+      fs.querySelectorAll("[data-t]").forEach(function (el) { var k = el.getAttribute("data-t"); if (k !== "currency") t[k] = el.value; });
+      state.trips[i] = t;
+    });
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  function renderOutputs() {
+    built = G.build(state);
+    var wl = document.getElementById("warnings");
+    wl.innerHTML = built.warnings.length ? built.warnings.map(function (w) {
+      return '<li class="' + (w.level === "err" ? "err" : "") + '"><strong>' + (w.level === "err" ? "Fix: " : "Check: ") + "</strong>" + esc(w.msg) + "</li>";
+    }).join("") : '<li class="ok"><strong>No problems found.</strong> Still validate each block (see below) and tick the checklist.</li>';
+
+    var pages = document.getElementById("pages");
+    pages.innerHTML = built.pages.map(function (p, i) {
+      return '<div class="page-out"><h3>' + esc(p.title) + "</h3>" +
+        '<p class="hint">Paste on: ' + (p.url ? "<code>" + esc(p.url) + "</code>" : "[FILL the page address]") + "</p>" +
+        '<div class="output"><p class="label">JSON-LD block ' + (i + 1) + " of " + built.pages.length + "</p>" +
+        '<pre id="block-' + i + '"></pre></div>' +
+        '<div class="btns"><button type="button" data-copyblock="' + i + '">Copy block ' + (i + 1) + "</button>" +
+        '<button type="button" class="secondary" data-save="' + i + '">Save ' + esc(p.file) + "</button></div></div>";
+    }).join("");
+    built.pages.forEach(function (p, i) { document.getElementById("block-" + i).textContent = p.script; });
+
+    var cl = document.getElementById("checklists");
+    // Keep ticks across edits: remember checked facts by their text.
+    var ticked = {};
+    cl.querySelectorAll("input:checked").forEach(function (cb) { ticked[cb.getAttribute("data-fact")] = true; });
+    cl.innerHTML = built.checklists.map(function (page, pi) {
+      var items = page.facts.length ? page.facts.map(function (f, fi) {
+        var id = "chk-" + pi + "-" + fi;
+        var key = esc(page.title + "|" + f);
+        return '<li><label for="' + id + '"><input type="checkbox" id="' + id + '" data-fact="' + key + '"' + (ticked[page.title + "|" + f] ? " checked" : "") + "><span>" + esc(f) + "</span></label></li>";
+      }).join("") : "<li>No facts entered yet.</li>";
+      return "<h3>" + esc(page.title) + (page.url ? ' <span class="label-tag">' + esc(page.url) + "</span>" : "") + "</h3>" +
+        '<ul class="checklist">' + items + "</ul>";
+    }).join("");
+  }
+
+  function update() { readForm(); save(); renderOutputs(); }
+
+  form.addEventListener("input", update);
+  form.addEventListener("change", update);
+  form.addEventListener("submit", function (e) { e.preventDefault(); });
+
+  document.getElementById("add-trip").addEventListener("click", function () {
+    readForm(); state.trips.push(G.blankTrip()); renderTrips(); update();
+    var last = tripsBox.querySelector("fieldset.trip:last-child input[data-t=name]");
+    if (last) last.focus();
+    status("form-status", "Trip " + state.trips.length + " added.");
+  });
+  document.getElementById("load-demo").addEventListener("click", function () {
+    state = G.demo(); fillForm(); update(); status("form-status", "Fictional example loaded. Replace it with your own approved facts.");
+  });
+  document.getElementById("clear-all").addEventListener("click", function () {
+    state = G.blank(); fillForm(); update(); status("form-status", "Cleared.");
+  });
+  function copyText(text, statusId, okMsg) {
+    function fallback() {
+      var area = document.createElement("textarea");
+      area.value = text; area.setAttribute("readonly", ""); area.style.position = "fixed"; area.style.left = "-10000px";
+      document.body.appendChild(area); area.select();
+      var ok = false; try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+      area.remove();
+      status(statusId, ok ? okMsg : "Select the text and press Ctrl+C (Cmd+C on a Mac).");
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () { status(statusId, okMsg); }, fallback);
+    } else fallback();
+  }
+  document.addEventListener("click", function (e) {
+    var c = e.target.closest("button[data-copyblock]");
+    if (c && built) {
+      var pg = built.pages[Number(c.getAttribute("data-copyblock"))];
+      copyText(pg.script, "out-status", "Copied block for " + pg.title + ". Paste it into that page's code or structured data box.");
+      return;
+    }
+    var b = e.target.closest("button[data-save]");
+    if (!b || !built) return;
+    var p = built.pages[Number(b.getAttribute("data-save"))];
+    if (window.KIT) { KIT.download(p.file, p.json + "\n", "application/ld+json"); }
+    status("out-status", "Saved " + p.file + " to your downloads.");
+  });
+  document.getElementById("save-all").addEventListener("click", function () {
+    if (!built) return;
+    var txt = "JSON-LD blocks for " + (state.business.name || "your business") + "\nGenerated in your browser by the ATIA AI Take-Home Kit, tool 1.c. Validate each block at https://validator.schema.org/ before publishing.\n\n" +
+      built.pages.map(function (p) { return "=== " + p.title + "\nPaste on: " + (p.url || "[FILL the page address]") + "\n\n" + p.script + "\n"; }).join("\n");
+    if (window.KIT) KIT.download("jsonld-blocks.txt", txt, "text/plain");
+    status("out-status", "Saved jsonld-blocks.txt to your downloads.");
+  });
+
+  document.getElementById("print-list").addEventListener("click", function () {
+    document.body.classList.add("print-checklist");
+    window.print();
+  });
+  window.addEventListener("afterprint", function () { document.body.classList.remove("print-checklist"); });
+
+  // kit.js loads with defer, so wait for it before reading saved values.
+  function init() { state = loadSaved() || G.demo(); fillForm(); renderOutputs(); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
+})();
+</script>
+</body>
+</html>

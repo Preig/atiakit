@@ -1,0 +1,17 @@
+prompt_id,prompt,intent,locale
+P01,"I am in Fairbanks for three nights in late February. What should I do, and who should I book with?",itinerary,en-US
+P02,Best half-day glacier cruise from Seward for a family with an 8-year-old. Give me three with prices.,shortlist,en-US
+P03,What can I do in Seward on a rainy day with 5 hours ashore from a cruise ship?,shore-excursion,en-US
+P04,Which wildlife cruise from Seward is best for someone who gets seasick?,shortlist,en-US
+P05,Is a 4-hour or a full-day boat tour from Seward better for first-time visitors in July?,comparison,en-US
+P06,Where can a beginner go sea kayaking near Seward? Recommend two outfitters.,shortlist,en-US
+P07,Are there summer sled dog experiences near Seward that work for kids under 10?,shortlist,en-US
+P08,What should we book in Seward for a 2-day stop in June with two teenagers?,itinerary,en-US
+P09,Best aurora viewing tours from Fairbanks in March. Which companies pick up from hotels?,shortlist,en-US
+P10,Fairbanks in winter with kids: which tours are worth the money?,shortlist,en-US
+P11,Chena Hot Springs day trip from Fairbanks: should I take a tour or rent a car?,comparison,en-US
+P12,What happens to a Seward boat tour booking if the weather is bad? How do refunds usually work?,policy,en-US
+P13,Which wildlife tours in Seward are accessible for a wheelchair user?,accessibility,en-US
+P14,What are the best stops on a one-day drive from Anchorage to Seward?,itinerary,en-US
+P15,"What can I do in Fairbanks under the midnight sun in June, and who runs those trips?",shortlist,en-US
+P16,I booked a lodge near Seward for June. What should I add?,add-on,en-US

@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' file:; script-src 'self' file:; style-src 'self' 'unsafe-inline' file:; img-src 'self' data: file:; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
+<title>3.b A partner circle with shared facts · ATIA AI Take-Home Kit</title>
+<meta name="description" content="Three to five businesses that complete each other's trips share one fact sheet. A no-code automation drafts a trip kit for every booking a month before arrival, with partner options and referral codes, and saves it as a Gmail draft for one person to approve. Fact-sheet builder, AI-step prompt, Zapier and Make recipes, and a referral-code reconciliation helper. Works in your browser; nothing you type leaves it.">
+<link rel="stylesheet" href="../assets/kit.css">
+<style>
+  /* Page-specific styles for tool 3.b. Shared styles live in ../assets/kit.css. */
+  .toc{display:flex;flex-wrap:wrap;gap:4px 16px;list-style:none;padding:0;margin:4px 0 0;font-size:15px}
+  .reminder{font-size:14px;line-height:1.45;color:#5c3d00;background:var(--amber-t);border-left:4px solid #d49a1a;border-radius:4px;padding:7px 11px;margin:6px 0 4px}
+  .src{font-size:14px;color:var(--slate-m)}
+  .figs{list-style:none;padding:0;margin:0}
+  .figs li{margin:0 0 12px}
+  .figs b.n{font-size:28px;color:var(--teal);display:block;line-height:1.1}
+  [hidden]{display:none!important}
+  .flow{list-style:none;padding:0;margin:12px 0;display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr));counter-reset:flow}
+  .flow li{counter-increment:flow;background:#fff;border:1px solid var(--line);border-top:4px solid var(--teal);border-radius:4px;padding:10px 12px;font-size:15px;line-height:1.45}
+  .flow li::before{content:counter(flow);display:block;font-weight:bold;color:var(--teal-d);font-size:20px}
+  .flow li.person{border-top-color:var(--green)}
+  .flow li.person::before{color:var(--green-d)}
+  .flow b{display:block;color:var(--slate)}
+  button.small{font-size:14px;padding:6px 12px}
+  .btns.tight{margin:6px 0}
+  textarea.short{min-height:64px}
+  textarea.mono{font:14.5px/1.5 Consolas,"Courier New",monospace}
+  details.pblock{border-left:4px solid var(--teal);padding:0;margin:12px 0}
+  details.pblock>summary{padding:10px 14px;line-height:1.6}
+  details.pblock[open]>summary{border-bottom:1px solid var(--line)}
+  .pname{color:var(--slate)}
+  .pills .pill{margin:0 4px 2px 0;vertical-align:1px}
+  .pbody{padding:2px 14px 10px}
+  .pfields{display:grid;gap:0 16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+  .pfields>div{min-width:0}
+  ul.chk{list-style:none;padding:0;margin:10px 0 6px;font-size:15px}
+  ul.chk li{padding:6px 0;border-bottom:1px dashed var(--line);overflow-wrap:anywhere}
+  .tag{display:inline-block;min-width:56px;font-size:12px;font-weight:bold;letter-spacing:.05em;text-transform:uppercase;border-radius:3px;padding:1px 6px;margin-right:4px;text-align:center}
+  li.ok .tag{background:var(--green-t);color:var(--green-d)}
+  li.warn .tag{background:var(--amber-t);color:var(--amber)}
+  li.bad .tag{background:var(--red-t);color:var(--red)}
+  li.info .tag{background:var(--teal-t);color:var(--teal-d)}
+  .output pre{max-height:26em;overflow:auto}
+  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0}
+  .tablewrap table.wide{min-width:760px}
+  .tablewrap table:not(.wide) td{overflow-wrap:anywhere}
+  #approve-list{max-height:none}
+  .nw,#recon-table td:first-child,#recon-table .pill{white-space:nowrap}
+  .swipe{display:none;font-size:13px;color:var(--slate-m);margin:0}
+  .fgrid{display:grid;gap:0 16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
+  .fgrid>div{min-width:0}
+  .pii{font-size:14px;font-weight:bold;color:var(--red);margin:6px 0 0}
+  .pii:empty{display:none}
+  .obl{list-style:none;padding:0;margin:10px 0}
+  .obl li{padding:8px 0;border-top:1px solid var(--line)}
+  .lab{display:inline-block;font-size:12px;font-weight:bold;letter-spacing:.05em;text-transform:uppercase;border-radius:3px;padding:1px 7px;margin-right:6px;white-space:nowrap}
+  .lab.legal{background:var(--red-t);color:var(--red)}
+  .lab.contract{background:var(--teal-t);color:var(--teal-d)}
+  .lab.policy{background:var(--green-t);color:var(--green-d)}
+  .lab.rec{background:var(--amber-t);color:var(--amber)}
+  .card.warn .lab.policy,.card.warn .lab.rec,.card.warn .lab.contract{background:#fff}
+  .recipe h3{margin-top:0}
+  .recipe ol{padding-left:1.4em;margin:6px 0 10px}
+  .recipe li{margin:0 0 8px}
+  .recipe .where{display:block;font-size:14px;color:var(--slate-m)}
+  #recon-lists{display:grid;gap:0 14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))}
+  fieldset.rlist{background:#fbfcfa;min-width:0}
+  #queue-rows td:nth-child(-n+5){white-space:nowrap}
+  .pf textarea,.pf input{transition:border-color .2s}
+  .pf .empty{border-color:#d49a1a;background:#fffdf6}
+  textarea.short{overflow-y:hidden}
+  .files li{flex-wrap:wrap;gap:4px 12px}
+  .calcout{font-weight:bold;color:var(--teal-d);min-height:1.6em}
+  .ailinks a{margin-right:12px;white-space:nowrap}
+  .sum{font-weight:bold;color:var(--slate)}
+  .src-list li{margin:6px 0}
+  @media(max-width:640px){details.pblock>summary{padding:10px}.pbody{padding:2px 10px 10px}.flow{grid-template-columns:repeat(2,minmax(0,1fr))}.swipe{display:block}}
+  @media print{.reminder,.pii,#blocks .btns{display:none}details.pblock{break-inside:avoid}}
+</style>
+<script src="../assets/kit.js" defer></script>
+<script src="circle.js" defer></script>
+</head>
+<body data-page="3b">
+<div class="band" aria-hidden="true"></div>
+<header class="kit">
+  <p class="crumbs"><a href="../">ATIA AI Take-Home Kit</a> › Pain 3 · Coordinating the trip</p>
+  <p class="kicker"><span class="rung r2" aria-hidden="true"><i></i><i></i><i></i></span>Intermediate rung · Tool 3.b</p>
+  <h1>A partner circle with shared facts</h1>
+  <p class="lede">Three to five businesses that complete each other's trips keep one shared fact sheet. A no-code automation then drafts a trip kit for every booking a month before arrival, with partner options and referral codes. Each kit waits as a Gmail draft until one person checks it and sends it. The codes show what the circle is worth.</p>
+  <ul class="meta">
+    <li><b>Time</b> about a week (estimate)</li><li><b>Cost</b> automation plan roughly $20 to $30 a month, plus cents per kit for the AI step (estimate)</li><li><b>Skill</b> no code: Zapier or Make</li><li><b>Measure</b> cross-referrals by code · attach rate</li><li><b>Needs</b> 3.a, and 1.a from every partner</li><li><b>Feeds</b> 3.c</li>
+  </ul>
+  <nav class="tool-nav" data-toolnav="3b" aria-label="All tools"></nav>
+</header>
+
+<main class="kit">
+  <noscript><p class="callout amber">The builder, the checks and the reconciliation helper on this page need JavaScript. The recipes and the agreement checklist below still work, and the original prompt is in the <a href="../Prompt-Kit-3x3.html#s3b">printable prompt kit</a>.</p></noscript>
+
+  <nav class="card note" aria-labelledby="toc-h">
+    <h2 id="toc-h" style="margin-top:0;font-size:18px">On this page</h2>
+    <ul class="toc">
+      <li><a href="#why">The pain</a></li>
+      <li><a href="#flow">How it works</a></li>
+      <li><a href="#agree">1. Agree the circle</a></li>
+      <li><a href="#sheet">2. Shared fact sheet</a></li>
+      <li><a href="#queue">3. Booking queue</a></li>
+      <li><a href="#ai">4. The AI step</a></li>
+      <li><a href="#recipes">5. Zapier or Make</a></li>
+      <li><a href="#test">6. Test with five bookings</a></li>
+      <li><a href="#recon">7. Reconcile the codes</a></li>
+      <li><a href="#measure">Measure</a></li>
+      <li><a href="#files">Downloads</a></li>
+      <li><a href="#safe">Before you use it</a></li>
+    </ul>
+  </nav>
+
+  <section class="card teal" aria-labelledby="why">
+    <h2 id="why" style="margin-top:0">The pain it fixes</h2>
+    <div class="grid two">
+      <div>
+        <h3>For the traveler</h3>
+        <ul class="figs">
+          <li><b class="n">39%</b> of US travelers name coordinating across different parts of the trip as a frustrating moment in planning.</li>
+          <li><b class="n">78%</b> keep planning after they book, and 68% research restaurants and activities.</li>
+          <li>In a diary study of 26 travelers, the handoffs between platforms were the most frequent source of negative feelings. Treat that one as directional.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>For your business</h3>
+        <p>Alaska trips are multi-business by default: a cruise, a meal, a kennel visit, a drive. Every handoff is a place where the guest starts over. <span class="hint">(Our read; nobody has measured this for Alaska.)</span></p>
+        <p>Many operators already send guests to each other. What is usually missing is one set of facts everyone agrees on, and a count of who sent whom.</p>
+        <p>One sheet, kept true by named owners, lets the AI draft a kit that is right about every partner. The codes turn referrals into a number you can check each month.</p>
+      </div>
+    </div>
+    <p class="src">Sources: Skift Research + McKinsey, <i>Winning Hearts in an Age of Infinite Travel Choices</i>, Sept 2026, n = 1,015 US travelers (survey data as of June 2026). Diary finding: Skift Research Booking Journey Diary Study 2026, 26 travelers and 211 sessions, July 2026. US travelers, not Alaska visitors.</p>
+  </section>
+
+  <section class="card" aria-labelledby="flow">
+    <h2 id="flow" style="margin-top:0">How it works</h2>
+    <ol class="flow">
+      <li><b>Booking in</b>A row goes into your queue sheet: dates, party, product, and send_date = arrival minus 30 days.</li>
+      <li><b>Every morning</b>The automation picks rows that are queued and due: send_date today or earlier.</li>
+      <li><b>AI drafts</b>From the shared fact sheet and the booking fields. Nothing else reaches the AI step.</li>
+      <li><b>Gmail draft</b>The kit is saved as a draft. Nothing is sent.</li>
+      <li class="person"><b>A person approves</b>One person checks the draft, sends it, and records it in the sheet.</li>
+      <li class="person"><b>Monthly count</b>Partners count the codes and agree the numbers.</li>
+    </ol>
+    <div class="callout amber">
+      <p style="margin-top:0"><strong>Why a sheet, and not a "wait until 30 days before arrival" step?</strong> A delay step holds each booking inside the automation for weeks or months. A booking made far ahead can need a longer wait than the product allows (Make's sleep step waits minutes, not weeks; check Zapier's current delay limit). A held booking also misses date changes and cancellations, and you cannot see what is waiting. A queue sheet with a send_date column is visible, editable and handles all of this, including late bookings.</p>
+    </div>
+    <h3>Your week</h3>
+    <ol class="steps">
+      <li><b>Day 1: agree the circle</b> with your partners (Step 1). Pick the businesses, the codes and who approves kits. <span class="hint">About 2 hours together.</span></li>
+      <li><b>Day 2: fill the shared fact sheet</b> (Step 2). Each partner fills or approves its own block. <span class="hint">About 30 minutes per partner.</span></li>
+      <li><b>Day 3: set up the queue sheet</b> and paste in the five fictional test bookings (Step 3). <span class="hint">About 1 hour.</span></li>
+      <li><b>Day 4: dry-run the AI step by hand</b> and check the draft (Step 4), then build the automation in Zapier or Make (Step 5). <span class="hint">3 to 5 hours.</span></li>
+      <li><b>Day 5: run the five fictional bookings end to end</b>, drafts only (Step 6). Fix what you find, then connect real bookings.</li>
+      <li><b>Every month:</b> reconcile the codes (Step 7), note the attach rate, and re-check any block older than 60 days.</li>
+    </ol>
+    <p class="hint">Times are estimates for a small operator who already has a 1.a fact sheet and has used 3.a by hand.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="card" aria-labelledby="agree">
+    <h2 id="agree" style="margin-top:0">Step 1. Agree the circle</h2>
+    <p>Agree the rules before you build anything. The referral codes are the measurement, so agree them first. The agreement template is <strong>a starting checklist, not legal advice</strong>. Each line says what kind of obligation it is.</p>
+    <ul class="obl">
+      <li><span class="lab rec">Recommendation</span> Three to five businesses that complete each other's trips: a lodge, a cruise, a kayak outfitter, a restaurant. Not two businesses selling the same hour to the same guest.</li>
+      <li><span class="lab policy">Policy choice</span> <b>Approvals.</b> One named person at the business that sends the kit approves each kit before it goes out. Each partner approves the wording of its own block before it is used.</li>
+      <li><span class="lab policy">Policy choice</span> <b>Fact owners.</b> Each block has one named owner who re-checks it at least every 60 days and before the season opens, and tells the circle about a change within two business days.</li>
+      <li><span class="lab contract">Contractual</span> <b>Referral codes.</b> One unique code for each pair of businesses (the one that sends the guest, the one that honors the code), what the guest gets with it, and any referral fee, written into your signed partner agreement. Check each booking platform's terms on promo codes.</li>
+      <li><span class="lab policy">Policy choice</span> <b>Monthly reconciliation.</b> Each business sends its code counts by the 5th of the month, and the circle settles differences within a week (Step 7).</li>
+      <li><span class="lab policy">Policy choice</span> <b>Data.</b> The AI step receives dates, party size and ages, and the product booked. Nothing else: no names, emails, phone numbers, payment details or medical notes.</li>
+      <li><span class="lab contract">Contractual</span> <b>Tools.</b> Check the terms and data processing agreements of Zapier or Make, your AI provider, Google Workspace and your booking platform before you connect them.</li>
+      <li><span class="lab legal">Legal mandate</span> <b>Guide licensing.</b> A partner that guides big game hunting needs its license under AS 08.54; a sport fishing guide and business register with ADF&amp;G each year. That license stays with that partner. It is not delegable to the circle, the coordinator or an AI tool.</li>
+    </ul>
+    <p><a class="button secondary" href="partner-agreement-template.md" download>Download the agreement checklist (.md)</a></p>
+    <p class="hint">A .md file is plain text. Open it in Notepad, TextEdit, Word or Google Docs, fill the brackets, and have every partner review it. Ask your attorney before you sign anything that involves money.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card" aria-labelledby="sheet">
+    <h2 id="sheet" style="margin-top:0">Step 2. Build the shared fact sheet</h2>
+    <p>One block per business, including yours. Each partner fills its own block, or approves what you typed. The sheet goes into the AI step for every booking, so use published, approved facts only.</p>
+    <p class="reminder">Business facts only. No guest names, emails, phone numbers or booking details in this sheet. Everything stays in this browser.</p>
+    <p class="sum" id="sheet-summary" role="status" aria-live="polite"></p>
+    <div class="btns">
+      <button type="button" id="add-partner">Add a partner</button>
+      <button type="button" class="secondary" id="load-demo">Load the fictional example</button>
+      <button type="button" class="secondary" id="import-btn">Import a CSV</button>
+      <button type="button" class="ghost" id="clear-all">Clear all</button>
+    </div>
+    <input type="file" id="import-file" accept=".csv,text/csv" class="visually-hidden" tabindex="-1" aria-hidden="true">
+    <p class="status" id="st-sheet" role="status" aria-live="polite"></p>
+    <p class="hint">A block is flagged when a required field is empty or it was last checked more than 60 days ago. Empty fields become [FILL] in the AI step, so the AI asks instead of guessing. Import reads shared-facts-template.csv, a CSV saved here, or the partner list saved from 3.a.</p>
+
+    <div id="blocks"></div>
+
+    <label for="month-notes">Month notes <small>(one line per month, starting with the month name; the AI uses only the arrival month's line)</small></label>
+    <textarea id="month-notes" class="short" rows="3"></textarea>
+    <p class="hint">The fictional example has July only. For any other month the AI step writes [FILL: month note] instead of describing weather.</p>
+
+    <div class="output">
+      <p class="label">Shared fact sheet, as the AI step will read it</p>
+      <pre id="sheet-text" tabindex="0" aria-label="Shared fact sheet as plain text"></pre>
+    </div>
+    <div>
+      <div class="btns">
+        <button type="button" id="copy-sheet">Copy fact sheet text</button>
+        <button type="button" class="secondary" id="save-csv">Save as CSV</button>
+        <button type="button" class="secondary" id="save-md">Save as Markdown</button>
+        <button type="button" class="ghost" data-download="shared-fact-sheet.txt" data-from="sheet-text">Save as .txt</button>
+      </div>
+      <p class="status" id="st-export" role="status" aria-live="polite"></p>
+    </div>
+    <p><b>Where it lives:</b> make a tab called <code>facts</code> in your queue spreadsheet, with the headers <code>id</code>, <code>shared_fact_sheet</code>, <code>month_notes</code> in row 1. In row 2, type <code>current</code> in A2, paste the fact sheet text into B2 and the month notes into C2. The automation reads row 2 every morning, so an update reaches the next kit. Send the Markdown version to partners when they review their blocks.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card" aria-labelledby="queue">
+    <h2 id="queue" style="margin-top:0">Step 3. Set up the booking queue</h2>
+    <p>The queue is a sheet with one row per booking, in Google Sheets or Excel online. The automation never holds a booking inside itself; it reads the sheet every morning. Start from <a href="kit-queue-template.csv" download>kit-queue-template.csv</a>: it has the columns and five fictional test bookings.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th scope="col">Column</th><th scope="col">Filled by</th><th scope="col">What goes in</th></tr></thead>
+        <tbody>
+          <tr><td><code>booking_ref</code></td><td>new-booking step</td><td>Your booking number. It stays in the sheet and never goes to the AI step.</td></tr>
+          <tr><td><code>booked_on</code></td><td>new-booking step</td><td>Date of booking, YYYY-MM-DD.</td></tr>
+          <tr><td><code>arrival</code>, <code>departure</code></td><td>new-booking step</td><td>Dates, YYYY-MM-DD.</td></tr>
+          <tr><td><code>send_date</code></td><td>new-booking step</td><td>Arrival minus 30 days.</td></tr>
+          <tr><td><code>party</code></td><td>new-booking step</td><td>Number of people.</td></tr>
+          <tr><td><code>ages</code></td><td>new-booking step</td><td>For example "2 adults; children 6 and 9". Ages only, never names.</td></tr>
+          <tr><td><code>product</code></td><td>new-booking step</td><td>What was booked, with date and time.</td></tr>
+          <tr><td><code>status</code></td><td>both, and a person</td><td><code>queued</code> when added; <code>drafted</code> by the daily run; <code>sent</code> or <code>canceled</code> by a person.</td></tr>
+          <tr><td><code>drafted_on</code>, <code>draft_link</code></td><td>daily run</td><td>Date drafted and the Gmail draft id or link.</td></tr>
+          <tr><td><code>approved_by</code>, <code>sent_date</code></td><td>a person</td><td>Initials of the one person who approved, and the day they pressed Send.</td></tr>
+          <tr><td><code>notes</code></td><td>a person</td><td>Anything else. No guest details.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="reminder">The queue holds dates, ages and products only. Keep guest names, emails and phone numbers in your booking system, not in this sheet.</p>
+
+    <h3>The five fictional test bookings</h3>
+    <p>When would the daily run draft each kit? The rule is "queued, and send_date today or earlier", so a late booking is picked up the morning after it arrives.</p>
+    <p class="swipe" aria-hidden="true">Swipe the table sideways to see every column.</p>
+    <div class="tablewrap">
+      <table class="wide">
+        <thead><tr><th scope="col">Booking</th><th scope="col">Booked on</th><th scope="col">Arrival</th><th scope="col">send_date</th><th scope="col">Status</th><th scope="col">Kit drafted on</th><th scope="col">What it tests</th></tr></thead>
+        <tbody id="queue-rows"></tbody>
+      </table>
+    </div>
+
+    <h3>Try the rule on a date</h3>
+    <div class="fgrid">
+      <div><label for="calc-booked">Booked on</label><input type="date" id="calc-booked"></div>
+      <div><label for="calc-arrival">Arrival</label><input type="date" id="calc-arrival"></div>
+    </div>
+    <p class="calcout" id="calc-out" role="status" aria-live="polite"></p>
+    <ul>
+      <li><b>Changed dates:</b> update arrival and send_date in the row. If a kit was already drafted, delete the draft and set status back to queued.</li>
+      <li><b>Canceled:</b> set status to canceled, and delete any draft. The daily run skips the row.</li>
+      <li><b>A missed morning:</b> nothing is lost. The next run picks up every row that is still queued and due.</li>
+      <li><b>Booked less than 3 days before arrival:</b> <span class="lab policy">Policy choice</span> write to the guest yourself. Delete the automated draft if one appears, and set the row to sent with a note.</li>
+    </ul>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card" aria-labelledby="ai">
+    <h2 id="ai" style="margin-top:0">Step 4. The AI step</h2>
+    <p>This is the Prompt Kit 3.b prompt with six additions: partners are introduced as partners, age and time clashes are left out, safety calls stay with each business, missing facts become a question list, internal fields (fact owners, check dates, code counting) stay out of the guest's kit, and the draft is marked at both ends.</p>
+    <label for="host">Your business <small>(the one that sends the kits)</small></label>
+    <input type="text" id="host" autocomplete="organization">
+    <div class="output">
+      <p class="label">Prompt for the AI step in Zapier or Make</p>
+      <pre id="prompt-ai" tabindex="0" aria-label="Prompt for the AI step"></pre>
+    </div>
+    <div>
+      <div class="btns">
+        <button type="button" id="copy-prompt">Copy prompt</button>
+        <button type="button" class="secondary" data-download="3b-ai-step-prompt.txt" data-from="prompt-ai">Save as .txt</button>
+      </div>
+      <p class="status" id="st-prompt" role="status" aria-live="polite"></p>
+    </div>
+    <template id="tpl-ai">You draft a pre-arrival trip kit for one booking at [HOST BUSINESS]. We work with a circle of [N] businesses that complete each other's trips. A person at [HOST BUSINESS] reviews every kit before it is sent.
+
+SHARED FACT SHEET (your only source of facts):
+{{shared_fact_sheet}}
+
+MONTH NOTES (use only the line for the arrival month):
+{{month_notes}}
+
+BOOKING (no names or contact details are given, and none are needed):
+Arrival: {{arrival}}
+Departure: {{departure}}
+Party size: {{party}}
+Ages: {{ages}}
+Booked: {{product}}
+
+Write a one-page kit in plain text, under 400 words:
+1. Day by day from arrival to departure, with the booked product anchored at its date and time.
+2. For each open half-day, up to two options from our partner businesses. For each option, give the drive time from the meeting point and a one-line reason that cites a fact from the sheet (minimum age, duration, runs in rain). Leave out any option whose minimum age the party does not meet, or whose times overlap the booking once drive time is added.
+3. Call them "our partner businesses". For each partner you suggest, give its referral code exactly as written in the sheet, and what the guest gets with it if the sheet says.
+4. What to wear this month, from the month note only.
+5. A weather plan B for every outdoor item, using only conditions and options from the sheet.
+6. A final list headed QUESTIONS FOR THE OWNER: every fact you needed and did not find, each written as [FILL: what is missing].
+
+Rules:
+- Use only the sheet, the month note and the booking. Do not add prices, times, distances, availability or wildlife sightings that are not there.
+- Do not promise availability, prices, weather or wildlife. Guests book each partner directly.
+- Do not make safety calls about weather, water, glaciers or wildlife. Repeat each business's own conditions as written.
+- Where the sheet says [FILL] or "not supplied", do not guess. Add it to QUESTIONS FOR THE OWNER.
+- If the arrival month has no month note, write [FILL: month note] and do not describe the weather.
+- Do not include guest names, emails or phone numbers.
+- Keep internal fields out of the kit: fact owners, last-checked dates and how codes are counted.
+- Put this line first and last: DRAFT - PENDING OWNER REVIEW</template>
+
+    <h3>Map each placeholder</h3>
+    <p>In Zapier or Make, delete each <code>{{placeholder}}</code> and insert the matching field with the field picker. Typing the braces does nothing.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th scope="col">Placeholder</th><th scope="col">Comes from</th></tr></thead>
+        <tbody>
+          <tr><td><code>{{shared_fact_sheet}}</code></td><td>facts tab, row 2, column shared_fact_sheet (the text from Step 2)</td></tr>
+          <tr><td><code>{{month_notes}}</code></td><td>facts tab, row 2, column month_notes</td></tr>
+          <tr><td><code>{{arrival}}</code>, <code>{{departure}}</code></td><td>queue row: arrival, departure</td></tr>
+          <tr><td><code>{{party}}</code>, <code>{{ages}}</code></td><td>queue row: party, ages</td></tr>
+          <tr><td><code>{{product}}</code></td><td>queue row: product</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="reminder">Never map a guest name, email, phone, booking notes or payment field into the AI step. The booking_ref stays out too.</p>
+
+    <h3 id="dry">Dry run: fill it by hand with a fictional booking</h3>
+    <p>Before you build anything, run the prompt once by hand. Pick a test booking, copy the filled prompt, paste it into Claude, ChatGPT or Gemini, then paste the answer into the check below.</p>
+    <label for="dry-booking">Fictional test booking</label>
+    <select id="dry-booking"></select>
+    <div class="fgrid">
+      <div><label for="dry-arrival">Arrival</label><input type="text" id="dry-arrival" autocomplete="off" placeholder="YYYY-MM-DD"></div>
+      <div><label for="dry-departure">Departure</label><input type="text" id="dry-departure" autocomplete="off" placeholder="YYYY-MM-DD"></div>
+      <div><label for="dry-party">Party size</label><input type="text" id="dry-party" autocomplete="off" inputmode="numeric"></div>
+      <div><label for="dry-ages">Ages</label><input type="text" id="dry-ages" autocomplete="off" placeholder="2 adults; children 6 and 9"></div>
+    </div>
+    <label for="dry-product">Booked</label>
+    <input type="text" id="dry-product" autocomplete="off">
+    <p class="reminder">Fictional or de-identified only: dates, party size, ages and product. No guest names, emails, phone numbers, card numbers, IDs or medical details.</p>
+    <p class="hint" id="dry-month"></p>
+    <p class="pii" id="dry-pii" role="alert"></p>
+    <div class="output">
+      <p class="label">Filled prompt for the dry run</p>
+      <pre id="dry-prompt" tabindex="0" aria-label="Filled prompt for the dry run"></pre>
+    </div>
+    <div>
+      <div class="btns">
+        <button type="button" id="dry-copy">Copy filled prompt</button>
+        <button type="button" class="danger" id="dry-anyway" hidden>Copy anyway: it is fictional</button>
+      </div>
+      <p class="status" id="st-dry" role="status" aria-live="polite"></p>
+    </div>
+    <p class="ailinks">Open: <a href="https://claude.ai/new" target="_blank" rel="noopener">Claude</a> <a href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a> <a href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini</a> <span class="hint">(internet required; check each tool's data-use setting)</span></p>
+
+    <h3 id="check">Check the draft</h3>
+    <p>Paste the AI's answer. The page checks it in this browser for the DRAFT line, length, referral codes, numbers that are not in your facts, promise words, age clashes, guest details and open [FILL] items. It checks against the booking above.</p>
+    <label for="draft-in">The AI draft</label>
+    <textarea id="draft-in" class="tall"></textarea>
+    <p class="reminder">Drafts from fictional bookings only. If a draft has a real guest's details, remove them before pasting.</p>
+    <div>
+      <div class="btns">
+        <button type="button" id="draft-check">Check the draft</button>
+        <button type="button" class="ghost" id="draft-clear">Clear</button>
+      </div>
+      <p class="status" id="st-check" role="status" aria-live="polite"></p>
+    </div>
+    <ul class="chk" id="draft-results" aria-label="Draft check results"></ul>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="card" aria-labelledby="recipes">
+    <h2 id="recipes" style="margin-top:0">Step 5. Build the automation in Zapier or Make</h2>
+    <p>Two automations: one adds each new booking to the queue, one runs every morning and drafts the kits that are due. Both products offer built-in AI steps for Claude, OpenAI and Gemini. Pick the one you already pay for.</p>
+    <p class="callout amber" style="margin-top:0">Step names change often. The names below are generic; the grey line under each step says roughly what to look for. Check current names in each product's help (<a href="https://help.zapier.com/" target="_blank" rel="noopener">Zapier help</a>, <a href="https://help.make.com/" target="_blank" rel="noopener">Make help</a>). No ready-made template files are shipped, because they are tied to each account's connections.</p>
+
+    <div class="card note" style="margin-bottom:16px">
+      <h3 style="margin-top:0">Automation 1, in either product: new booking to queue row</h3>
+      <ol>
+        <li><b>Trigger: a new booking.</b> <span class="hint">Your booking platform's own app in Zapier or Make, if it has one; or a new confirmation email in a Gmail label, parsed for the fields. Simplest start: a person types the row from the confirmation, about 2 minutes per booking, for the first month.</span></li>
+        <li><b>Work out send_date</b> = arrival minus 30 days, as YYYY-MM-DD. <span class="hint">Zapier: the date/time formatter, add or subtract time. Make: the addDays and formatDate functions.</span></li>
+        <li><b>Add a row</b> to the queue tab: booking_ref, booked_on, arrival, departure, send_date, party, ages, product, and status <code>queued</code>. <span class="hint">Do not map guest name, email, phone or payment fields.</span></li>
+      </ol>
+    </div>
+
+    <div class="grid two">
+      <div class="card recipe" style="margin:0">
+        <h3>Zapier: daily kit drafts</h3>
+        <ol>
+          <li>Run every day, early morning, Alaska time. <span class="where">A schedule trigger. Set your time zone in Zapier's settings.</span></li>
+          <li>Read the facts tab: the row where id is <code>current</code>. <span class="where">Google Sheets: look up a spreadsheet row.</span></li>
+          <li>Find every row with status <code>queued</code>. <span class="where">Google Sheets: find many rows (an "advanced" lookup that returns several rows).</span></li>
+          <li>Repeat the next steps once per row. <span class="where">Looping by Zapier.</span></li>
+          <li>Continue only if send_date is today or earlier. <span class="where">A filter with a date condition: send_date before tomorrow's date, made with the date formatter. Or a due column in the sheet (see the recipe file).</span></li>
+          <li>AI step: the prompt from Step 4, with fields mapped. <span class="where">AI by Zapier, or the Anthropic (Claude), OpenAI or Google AI app.</span></li>
+          <li>Optional guard: continue only if the text contains DRAFT - PENDING OWNER REVIEW. <span class="where">A filter.</span></li>
+          <li>Create a Gmail draft. Never a send step. <span class="where">Gmail: create draft.</span></li>
+          <li>Update the row: status <code>drafted</code>, drafted_on, draft_link. <span class="where">Google Sheets: update row.</span></li>
+        </ol>
+        <p><a href="zapier-recipe.md" download>Full Zapier recipe (.md)</a></p>
+      </div>
+      <div class="card recipe" style="margin:0">
+        <h3>Make: daily kit drafts</h3>
+        <ol>
+          <li>Schedule the scenario every day, early morning. <span class="where">Scenario scheduling. Check the time zone in your Make settings.</span></li>
+          <li>Read the facts tab: the row where id is <code>current</code>. <span class="where">Google Sheets: search rows, or get a cell.</span></li>
+          <li>Search the queue tab for rows with status <code>queued</code>. Each row becomes its own bundle. <span class="where">Google Sheets: search rows.</span></li>
+          <li>Filter: send_date earlier than or equal to now. <span class="where">A filter on the route, with a date operator.</span></li>
+          <li>AI step: the prompt from Step 4, with fields mapped. <span class="where">The Anthropic Claude app: a prompt module with your own key, or a simple text prompt module that runs on Make credits. Or the OpenAI or Gemini app.</span></li>
+          <li>Optional guard filter: the text contains DRAFT - PENDING OWNER REVIEW.</li>
+          <li>Create a Gmail draft. Never a send module. <span class="where">Gmail: create a draft.</span></li>
+          <li>Update the row: status <code>drafted</code>, drafted_on, draft_link. <span class="where">Google Sheets: update a row.</span></li>
+          <li>Add an error handler to the AI and Gmail steps, so one bad row does not stop the rest. <span class="where">Error handlers; turn on error notifications.</span></li>
+        </ol>
+        <p><a href="make-recipe.md" download>Full Make recipe (.md)</a></p>
+      </div>
+    </div>
+    <p class="hint">Running cost is an estimate: roughly $20 to $30 a month for an automation plan that allows multi-step automations and a daily schedule, plus cents per kit for the AI step. Each kit uses a few tasks (Zapier) or operations (Make). Check current plans before you choose.</p>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="card" aria-labelledby="test">
+    <h2 id="test" style="margin-top:0">Step 6. Test with five fictional bookings, then approve every kit</h2>
+    <p>Run the whole chain on the five fictional rows before any real booking touches it.</p>
+    <ol class="steps">
+      <li>Copy the five TEST rows from <a href="kit-queue-template.csv" download>kit-queue-template.csv</a> into your queue tab. Change send_date on <span class="nw">TEST-001</span> to <span class="nw">TEST-004</span> to today's date. Leave <span class="nw">TEST-005</span> as canceled.</li>
+      <li>Put the fact sheet text and month notes in the facts tab (the fictional ones are fine for the test).</li>
+      <li>Run the daily automation once by hand. <span class="hint">Zapier: test it step by step, or turn it on and run it. Make: Run once.</span></li>
+      <li><b>Expect four Gmail drafts and nothing in Sent.</b> <span class="nw">TEST-005</span> is untouched. Four rows now say drafted, with a date and a draft id.</li>
+      <li>Run it again. <b>Expect no new drafts:</b> those rows are no longer queued.</li>
+      <li>Open each draft. Paste it into <a href="#check">Check the draft</a> and go through the approval checklist below. Expect <span class="nw">TEST-001</span> to leave out the kayak (minimum age 12), and the June and August kits to ask for a month note.</li>
+      <li>Delete the four test drafts and the TEST rows. Only then point the booking trigger at real bookings. Keep drafts only.</li>
+    </ol>
+    <h3>The approval checklist: one person, every kit</h3>
+    <div class="output">
+      <p class="label">Kit approval check</p>
+      <pre id="approve-list" tabindex="0" aria-label="Kit approval checklist">KIT APPROVAL CHECK: one person, every kit
+[ ] Booked product, date and time match the booking system.
+[ ] Every partner option fits the party's ages (minimum age in the fact sheet).
+[ ] No partner option overlaps the booking once drive time is added.
+[ ] Every fact matches the shared fact sheet. Nothing added, nothing rounded.
+[ ] Referral codes are exactly as in the sheet.
+[ ] If you earn referral fees from these partners, the kit says so.
+[ ] No promises about availability, prices, weather or wildlife.
+[ ] Safety wording (weather, water, glacier, wildlife) is each business's own wording.
+[ ] Every [FILL] is answered or its line deleted. QUESTIONS FOR THE OWNER is answered, then removed.
+[ ] The guest's address goes in the To field, from the booking system. No other guest details in the body.
+[ ] Both DRAFT - PENDING OWNER REVIEW lines deleted, last.
+Then send it. In the queue sheet: your initials in approved_by, the date in sent_date, status sent.</pre>
+    </div>
+    <div>
+      <div class="btns">
+        <button type="button" id="copy-approve">Copy checklist</button>
+        <button type="button" class="secondary" data-download="3b-approval-checklist.txt" data-from="approve-list">Save as .txt</button>
+      </div>
+      <p class="status" id="st-approve" role="status" aria-live="polite"></p>
+    </div>
+    <p><span class="lab policy">Policy choice</span> One named person approves each kit, and the automation only ever creates drafts. If you ever consider automatic sending, decide it with your partners after a full season of approved drafts, and write it into the agreement.</p>
+  </section>
+
+  <!-- STEP 7 -->
+  <section class="card" aria-labelledby="recon">
+    <h2 id="recon" style="margin-top:0">Step 7. Reconcile the referral codes each month</h2>
+    <p>By the 5th of each month, each business sends the codes it counted last month and how many. Add one count per business below. The page lines them up by code, shows what does not match, and catches codes that are not in the shared fact sheet, which are usually typos.</p>
+    <p class="reminder">Codes and numbers only. No guest names, booking numbers, emails or phone numbers.</p>
+    <div class="fgrid">
+      <div><label for="recon-month">Month <small>(for example 2027-07)</small></label><input type="text" id="recon-month" autocomplete="off"></div>
+      <div><label for="recon-kits">Kits sent that month <small>(from the queue sheet)</small></label><input type="number" id="recon-kits" min="0" step="1" inputmode="numeric"></div>
+    </div>
+    <div id="recon-lists"></div>
+    <div class="btns">
+      <button type="button" id="recon-add">Add a count</button>
+      <button type="button" class="secondary" id="recon-demo">Load the fictional example</button>
+      <button type="button" class="ghost" id="recon-clear">Clear</button>
+    </div>
+    <p class="pii" id="recon-pii" role="alert"></p>
+    <p class="swipe" aria-hidden="true">Swipe the table sideways to see every column.</p>
+    <div class="tablewrap"><table id="recon-table" class="wide" aria-describedby="recon-summary"></table></div>
+    <p class="sum" id="recon-summary" role="status" aria-live="polite"></p>
+    <div>
+      <div class="btns">
+        <button type="button" id="recon-save">Save as CSV</button>
+        <button type="button" class="secondary" id="recon-copy">Copy summary for partners</button>
+      </div>
+      <p class="status" id="st-recon" role="status" aria-live="polite"></p>
+    </div>
+    <p class="hint">Settle each mismatch by comparing booking dates for that code, then write the agreed number and who agreed it in the saved CSV. The format matches <a href="referral-reconciliation.csv" download>referral-reconciliation.csv</a>.</p>
+  </section>
+
+  <section class="card note" aria-labelledby="measure">
+    <h2 id="measure" style="margin-top:0">How you will know it worked</h2>
+    <ul>
+      <li><b>Cross-referrals by code.</b> Per code, per month: the agreed count from Step 7. Write down a baseline first: the month before the circle starts, including any informal count partners kept.</li>
+      <li><b>Attach rate per booking.</b> Partner bookings with a circle code, divided by kits sent. Count it monthly in season. The helper above works it out from agreed codes.</li>
+      <li><b>Also watch:</b> minutes per approval (your cost) and repeat questions per booking (Number 3). Fewer "what should we do after the cruise?" emails is the kit doing its job.</li>
+    </ul>
+    <p>After one season, decide whether to keep, revise or stop, using the "Decide whether to keep a rung" prompt in the <a href="../Prompt-Kit-3x3.html#measure">printable prompt kit</a>. Do not turn referrals into revenue claims without the partners' agreed counts.</p>
+  </section>
+
+  <section class="card" aria-labelledby="files">
+    <h2 id="files" style="margin-top:0">Downloads</h2>
+    <ul class="files">
+      <li><a href="shared-facts-template.csv" download>shared-facts-template.csv</a> <span class="hint">The fact-sheet fields plus fact_owner and last_checked, with the three fictional blocks. Replace the rows, then import it in Step 2.</span></li>
+      <li><a href="kit-queue-template.csv" download>kit-queue-template.csv</a> <span class="hint">The queue columns and five fictional test bookings (Step 3 and Step 6).</span></li>
+      <li><a href="referral-reconciliation.csv" download>referral-reconciliation.csv</a> <span class="hint">The monthly reconciliation format, with a fictional July.</span></li>
+      <li><a href="partner-agreement-template.md" download>partner-agreement-template.md</a> <span class="hint">Approvals, fact owners, monthly code reconciliation, what reaches the AI step. A starting checklist, not legal advice.</span></li>
+      <li><a href="zapier-recipe.md" download>zapier-recipe.md</a> <span class="hint">Both Zapier automations, step by step, with the test plan.</span></li>
+      <li><a href="make-recipe.md" download>make-recipe.md</a> <span class="hint">Both Make scenarios, step by step, with the test plan.</span></li>
+      <li><span>Your fact sheet, prompt and reconciliation</span> <span class="hint">Use the Save buttons above. Files are made in your browser.</span></li>
+    </ul>
+  </section>
+
+  <section class="card warn" aria-labelledby="safe">
+    <h2 id="safe" style="margin-top:0">Before you use it</h2>
+    <p><strong>AI drafts. A person approves.</strong> Every kit is a Gmail draft marked DRAFT - PENDING OWNER REVIEW until one named person checks it and sends it. An AI that checks its own work is not verification.</p>
+    <ul class="obl">
+      <li><span class="lab policy">Policy choice</span> <b>Drafts only.</b> Nothing in these recipes sends email. One named person approves each kit.</li>
+      <li><span class="lab policy">Policy choice</span> <b>Safety calls stay with people.</b> Weather go/no-go, water, glacier, wildlife, aviation and first aid are decided by each business's qualified person. The kit repeats their conditions; it never makes the call.</li>
+      <li><span class="lab legal">Legal mandate</span> <b>Guide licensing.</b> Big game guiding is licensed under AS 08.54, and sport fishing guides and businesses register with ADF&amp;G each year. Each licensed partner keeps its own license current. Not delegable.</li>
+      <li><span class="lab policy">Policy choice</span> <b>Guest data.</b> The AI step gets dates, party size and ages, and product only. Never paste guest names, emails, phone numbers, card numbers, IDs or medical details into this page or the AI step.</li>
+      <li><span class="lab contract">Contractual</span> <b>Data terms.</b> Check the terms of Zapier or Make, your AI provider, Google Workspace and your booking platform before you connect them. Some booking platforms limit what you may send to other tools.</li>
+      <li><span class="lab rec">Recommendation</span> <b>Say who your partners are.</b> The prompt calls them "our partner businesses". If you earn referral fees, say so, and ask your attorney whether the FTC Endorsement Guides (16 CFR Part 255) apply.</li>
+      <li><span class="lab rec">Recommendation</span> <b>Keep the kit about the guest's own trip.</b> Partner offers can make an email commercial under the CAN-SPAM Act. Ask your attorney, and give guests an easy way to opt out of partner suggestions.</li>
+      <li><span class="lab rec">Recommendation</span> <b>Share published facts only.</b> Do not agree on prices with a business that competes with you for the same guests.</li>
+    </ul>
+    <p>Bay Light Day Cruises, Mile 12 Kennel and Harbor Kayak Co. are fictional teaching businesses. Your entries stay in this browser only (local storage), and nothing goes into a URL.</p>
+    <div>
+      <div class="btns"><button type="button" class="danger" id="forget">Forget everything this page saved</button></div>
+      <p class="status" id="st-forget" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="card teal" aria-labelledby="next">
+    <h2 id="next" style="margin-top:0">Next rung: 3.c An agent-ready trip record</h2>
+    <p><a href="../3c/"><b>3.c</b></a>: your queue row and the kit are the first draft of a trip record: party, dates, product, partner options and open questions. The next rung keeps that record in a structured form and connects it to your booking platform, so an AI agent can place a reversible hold. For a small operator, that starts with one question to the booking platform.</p>
+    <p class="hint">Before this rung: <a href="../3a/">3.a The AI trip kit</a>, the same kit drafted by hand for one booking.</p>
+  </section>
+
+  <section class="card note" aria-labelledby="sources">
+    <h2 id="sources" style="margin-top:0">Sources</h2>
+    <ul class="src-list">
+      <li>Skift Research and McKinsey &amp; Company, <i>Winning Hearts in an Age of Infinite Travel Choices</i>, September 2026: survey of 1,015 US travelers (data as of June 2026), Exhibit 6 and p26; diary study of 26 travelers and 211 sessions (July 2026), p18. <a href="https://www.mckinsey.com/industries/travel/our-insights/winning-hearts-in-an-age-of-infinite-travel-choices" target="_blank" rel="noopener">McKinsey article</a>.</li>
+      <li>Alaska Statutes, Title 8, Chapter 54: Big Game Commercial Services. <a href="https://www.akleg.gov/basis/statutes.asp#08.54" target="_blank" rel="noopener">akleg.gov</a>.</li>
+      <li>FTC Guides Concerning the Use of Endorsements and Testimonials in Advertising, 16 CFR Part 255. <a href="https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-255" target="_blank" rel="noopener">eCFR</a>.</li>
+      <li>FTC, CAN-SPAM Act: A Compliance Guide for Business. <a href="https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business" target="_blank" rel="noopener">ftc.gov</a>.</li>
+      <li>Product help: <a href="https://help.zapier.com/" target="_blank" rel="noopener">Zapier</a> · <a href="https://help.make.com/" target="_blank" rel="noopener">Make</a>. Step names and plans change; check them before you build.</li>
+    </ul>
+    <p class="hint">Facts and tool names last checked 2026-10-10. Links need an internet connection.</p>
+  </section>
+</main>
+
+<footer class="kit">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates.</p>
+  <p><a href="../">All nine tools</a> · <a href="../Prompt-Kit-3x3.html">Printable prompt kit</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1.c AI answer monitoring + structured data · ATIA AI Take-Home Kit</title>
+<meta name="description" content="Advanced rung, Pain 1: a weekly monitor that counts whether Claude, ChatGPT and Gemini name and cite your business, plus a structured data generator for your website.">
+<link rel="stylesheet" href="../assets/kit.css">
+<script src="../assets/kit.js" defer></script>
+<style>
+  .checks td:first-child{font-weight:bold;color:var(--green-d);white-space:nowrap}
+  .who h3{margin-top:.2em}
+  .big{font-size:28px;font-weight:bold;color:var(--teal);line-height:1.1;margin:.2em 0}
+  .table-wrap{overflow-x:auto}
+  .files li{flex-wrap:wrap}
+  .files .hint{flex:1 1 260px}
+  pre.sample{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.5 Consolas,"Courier New",monospace;margin:8px 0 0}
+</style>
+</head>
+<body data-page="1c">
+<div class="band" aria-hidden="true"></div>
+<header class="kit">
+  <p class="crumbs"><a href="../">ATIA AI Take-Home Kit</a> › Pain 1 · Comparison overload</p>
+  <p class="kicker"><span class="rung r3" aria-hidden="true"><i></i><i></i><i></i></span>Advanced rung · Tool 1.c</p>
+  <h1>AI answer monitoring + structured data</h1>
+  <p class="lede">Every week, ask Claude, ChatGPT and Gemini the questions your travelers ask, and count whether your business is named and cited. Then publish your facts in a form machines read. A developer, a vendor or ATIA builds it once.</p>
+  <ul class="meta">
+    <li><b>Time</b> 2 to 4 weeks with a developer</li><li><b>Cost</b> model API fees, roughly $10 to $100 a month</li><li><b>Skill</b> developer or vendor</li><li><b>Needs</b> 1.a published</li><li><b>Feeds</b> Number 1</li>
+  </ul>
+  <nav class="tool-nav" data-toolnav="1c" aria-label="All tools"></nav>
+</header>
+
+<main class="kit">
+  <section class="card teal" aria-labelledby="why">
+    <h2 id="why">The pain it fixes</h2>
+    <div class="grid two">
+      <div>
+        <h3>For the traveler</h3>
+        <p class="big">45%</p>
+        <p>of US travelers named comparing multiple options as a frustrating moment in planning. Many already hand some of the narrowing to AI: 34% use AI during travel research, and 67% are comfortable with AI comparing and narrowing options.</p>
+        <p class="hint">Skift Research + McKinsey, Sept 2026, n = 1,015 US travelers (data as of June 2026). US travelers, not Alaska visitors.</p>
+      </div>
+      <div>
+        <h3>For your business</h3>
+        <p>The short list an AI tool writes is the new first page, and you cannot see it. In the report's own test, five AI tools answered the same hotel question and no hotel appeared in all five answers. Incomplete or poorly spread facts can keep a good offer off that list "without the provider ever knowing" (Skift Research + McKinsey, Sept 2026).</p>
+        <p>The monitor is how you find out every week, without opening three chat apps by hand.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="what">
+    <h2 id="what">What it automates</h2>
+    <p>The <a href="../audit/">AI visibility audit</a> scores four checks by hand, 0 to 2 each. The monitor runs two of them for you across three AI tools, every week. The other two stay with a person.</p>
+    <div class="table-wrap">
+      <table class="checks">
+        <thead><tr><th scope="col">Check</th><th scope="col">The question</th><th scope="col">Who scores it</th></tr></thead>
+        <tbody>
+          <tr><td>Appear</td><td>Are you in the answer at all?</td><td><span class="pill teal">Automated</span> The monitor looks for your name and its other spellings: whole words, any capitalization.</td></tr>
+          <tr><td>Cited</td><td>Are you in its sources?</td><td><span class="pill teal">Automated</span> The monitor looks for your website in the answer's citation links.</td></tr>
+          <tr><td>Described</td><td>Right category, place and promise?</td><td><span class="pill">A person</span> The weekly report lists the answers to read.</td></tr>
+          <tr><td>Current</td><td>Today's prices and policies?</td><td><span class="pill">A person</span> Structured data helps keep your facts machine-readable.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Two parts</h3>
+    <div class="grid two">
+      <div class="callout green">
+        <p><strong>Part A: structured data (fix the input).</strong> Your approved facts as schema.org markup on your own pages: hours, season, price, minimum age, duration, rain and cancellation policy. <a href="schema/">Open the generator</a>. No AI, no code.</p>
+      </div>
+      <div class="callout">
+        <p><strong>Part B: the weekly monitor (measure).</strong> A small Python program sends the same traveler questions to the Claude, OpenAI and Gemini APIs with live web search, and records who was named and which sites were cited. It writes a weekly diff and a quarterly trend.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="who">
+    <h2 id="who">Who should build it</h2>
+    <div class="grid three who">
+      <div>
+        <h3>A developer</h3>
+        <p>Start from the tested bundle below, or give the build brief to a coding agent (Claude Code, OpenAI Codex or Gemini CLI). Roughly 1 to 3 days of build (80% interval: 1 to 5), then about an hour a week to read the report.</p>
+      </div>
+      <div>
+        <h3>A vendor</h3>
+        <p>Commercial AI-visibility services exist. Compare them on the number of prompts, which AI tools they cover, whether you keep the raw answers and their citations, and the price per prompt.</p>
+      </div>
+      <div>
+        <h3>ATIA, once for every member</h3>
+        <p>Cost scales with prompts, not with businesses: one answer is checked for every watched name. 50 prompts × 3 tools × about 4.3 weeks is about 645 answers a month, whether the list holds 1 business or 300.</p>
+      </div>
+    </div>
+    <p class="callout amber"><strong>Estimate:</strong> API cost at 50 prompts, three AI tools, weekly is roughly $10 to $100 a month (80% interval). The monitor replaces this estimate with the measured cost after its first run, and stops at a monthly budget you set.</p>
+  </section>
+
+  <section class="card note" aria-labelledby="caveats">
+    <h2 id="caveats">Honest caveats</h2>
+    <ul>
+      <li><strong>API answers are a proxy panel, not what the consumer apps show.</strong> The apps travelers use add their own settings, location, account history and features. Watch the direction over time; do not treat one answer as what every traveler sees.</li>
+      <li><strong>One week is noise.</strong> The same question asked twice can get a different answer. Report quarterly trends. Do not infer ranking or bookings from one answer.</li>
+      <li><strong>Costs are estimates until the first run.</strong> After that, the monitor multiplies the usage each provider reports by the prices you set. Your provider billing page is the real bill.</li>
+      <li><strong>Model and tool names change.</strong> The bundle keeps them in one settings file, and its <code>check</code> command tells you when a name was rejected.</li>
+      <li><strong>Software counts mentions; it does not judge them.</strong> It can tell you that you were named, not whether you were described fairly. That is why Described and Current stay human.</li>
+    </ul>
+    <details>
+      <summary>See why one week is noise (fictional sample report)</summary>
+      <p>Two mock weeks of the bundle's fictional data. Bay Light was named in 5 of 48 answers both weeks, so the total looks flat, yet four answers flipped underneath it.</p>
+      <pre class="sample">Who was named and cited      Named this run   Named last run
+Bay Light Day Cruises        5 of 48 (10%)    5 of 48 (10%)
+Mile 12 Kennel               5 of 48 (10%)    5 of 48 (10%)
+Harbor Kayak Co.             4 of 48 (8%)     4 of 48 (8%)
+Sample Fjord Tours           4 of 48 (8%)     4 of 48 (8%)
+
+Gained mentions (same prompt and tool, named now, not last run)
+- Bay Light Day Cruises: openai, prompt P03
+- Bay Light Day Cruises: openai, prompt P16
+
+Lost mentions (named last run, not now)
+- Bay Light Day Cruises: anthropic, prompt P03
+- Bay Light Day Cruises: gemini, prompt P02
+
+Sources cited for the first time
+- visitfairbanks.example (cited in 1 answer)
+- travelblog.example (cited in 1 answer)</pre>
+      <p><a href="monitor/sample_output/weekly_diff.md">The full sample report</a> (plain text) also lists the most-cited sources, the answers to read by hand and the quarterly table.</p>
+    </details>
+  </section>
+
+  <section class="card" aria-labelledby="files">
+    <h2 id="files">Downloads</h2>
+    <ul class="files">
+      <li><a class="button" href="ai-answer-monitor.zip" download>ai-answer-monitor.zip</a> <span class="hint">The weekly monitor (Python, about 70 KB). Try it with no keys and no internet in mock mode on fictional data. Real runs need API keys. Includes a README for non-developers, tests and an optional weekly schedule for a private GitHub repository.</span></li>
+      <li><a href="monitor/README.md">monitor/README.md</a> <span class="hint">Read the setup steps before you download.</span></li>
+      <li><a href="schema/">Structured data generator</a> <span class="hint">Opens in your browser. Fill in your facts, copy one block per page, tick the visible-facts checklist.</span></li>
+      <li><a href="schema/example-baylight.jsonld" download>example-baylight.jsonld</a> <span class="hint">The fictional Bay Light example: the business and its trip in one file. On a website they go on two pages. The price, street address, phone number and hours are invented.</span></li>
+    </ul>
+    <h3>Try the monitor in two minutes</h3>
+    <p>Unzip, open a terminal in the folder, and run these (Python 3.10 or newer; nothing is sent anywhere):</p>
+    <div class="output"><p class="label">Commands</p><pre id="cmds">python monitor.py run --mock
+python monitor.py run --mock --fixtures fixtures/week2
+python monitor.py diff --mock</pre></div>
+    <div class="btns"><button type="button" id="copy-cmds">Copy commands</button></div>
+    <p class="status" role="status" aria-live="polite" id="cmds-status"></p>
+  </section>
+
+  <section class="card" aria-labelledby="brief">
+    <h2 id="brief">The build briefs</h2>
+    <p>For a developer or a coding agent. They are the Prompt Kit's 1.c briefs, updated with what the tested bundle does. <strong>AI drafts. You approve.</strong></p>
+
+    <div class="brief-block">
+    <h3>Brief 1: the weekly monitor</h3>
+    <form data-builder="monitor">
+      <div class="grid two">
+        <div>
+          <label for="f-who">Who runs it</label>
+          <select id="f-who" name="who">
+            <option value="our business (names.csv lists us and up to five nearby competitors)">Our business</option>
+            <option value="an association, run once for every member (names.csv lists every member; cost scales with prompts, not with members)">An association, for every member</option>
+          </select>
+        </div>
+        <div>
+          <label for="f-towns">Towns or regions travelers ask about</label>
+          <input type="text" id="f-towns" name="towns" value="Seward and Fairbanks">
+        </div>
+        <div>
+          <label for="f-count">Number of traveler questions</label>
+          <input type="number" id="f-count" name="count" min="10" max="100" value="30">
+        </div>
+        <div>
+          <label for="f-results">Where results go</label>
+          <select id="f-results" name="results">
+            <option value="an append-only CSV file">A CSV file</option>
+            <option value="a Google Sheet (append only; keep a CSV copy)">A Google Sheet</option>
+          </select>
+        </div>
+      </div>
+      <p class="hint">No guest data goes into this brief or into the questions.</p>
+    </form>
+    <div class="output">
+      <p class="label">Build brief</p>
+      <pre id="out-monitor" data-render="tpl-monitor" data-builder-src="monitor"></pre>
+    </div>
+    <div class="btns">
+      <button type="button" data-copy="out-monitor">Copy brief</button>
+      <button type="button" class="secondary" data-download="1c-monitor-brief.txt" data-from="out-monitor">Save as .txt</button>
+      <button type="button" class="ghost" data-reset="monitor">Reset</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+    <template id="tpl-monitor">Build a weekly AI answer monitor for {{who|our business}}. Mark every report it writes DRAFT - PENDING OWNER REVIEW.
+
+Inputs:
+- prompts.csv (prompt_id, prompt, intent, locale) with {{count|30}} generic traveler questions about {{towns|[YOUR TOWNS]}}, for example "best half-day glacier cruise from Seward for a family with an 8-year-old" and "what to do in Seward on a rainy day with 5 hours ashore". No traveler names, contact details or booking data.
+- names.csv (name, aliases, domains, is_member) with the businesses to watch.
+
+Each week, send every prompt to three models with live web access: Claude through the Anthropic Messages API web search tool, OpenAI through the Responses API web_search tool, and Gemini through the Gemini API with Grounding with Google Search. Keep each provider in its own module. Read model ids and tool type strings from environment variables; do not hard-code them.
+
+For each answer and each watched name, append one row to {{results|an append-only CSV file}} with: run_id, date, provider, model, tool_version, user_location, prompt_id, name, appears, first_offset, rank_among_watched, mention_count, cited, cited_urls, input_tokens, output_tokens, search_calls, cost_usd_measured, error. Store the full answers and their citation URLs separately.
+- appears: case-insensitive, whole-word match on the name or any alias.
+- cited: a watched domain appears in the answer's citation URLs. Resolve Google grounding redirect links, or fall back to the citation title.
+- Handle each provider's documented stop conditions and errors. For Claude: resume pause_turn, record refusal, and read search errors from inside the response (they are not raised as exceptions).
+
+Produce a weekly diff: names that gained or lost mentions for the same prompt and model, sources cited for the first time, the answers a person needs to read for the Described and Current checks, and a quarterly trend table. State at the top that one week is noise and that API answers are a proxy panel, not what consumer apps show.
+
+Costs: compute cost from the token and search counts each provider reports, times prices set in environment variables. Stop before an answer that would push the month past MONTHLY_BUDGET. Do not estimate from assumptions.
+
+Modes: check (one tiny call per provider to confirm the model and tool are accepted), run --dry-run (2 prompts), run --mock (recorded fixtures, no network, no keys). Write tests for name matching, the diff and a mock end-to-end run, using fixtures only.
+
+Keep API keys in environment variables or GitHub Secrets. If it runs on a schedule in GitHub Actions, use a private repository. If answers are shown to anyone, show their citations too (check each provider's terms), and make storing full answer text a per-provider setting. Write a README a non-developer can follow to add a prompt or a name.</template>
+
+    </div>
+
+    <div class="brief-block">
+    <h3>Brief 2: structured data for the website</h3>
+    <p>Or skip the AI: the <a href="schema/">structured data generator</a> does this in your browser.</p>
+    <p class="hint">Paste approved business facts only. Never guest names, emails, phone numbers, card numbers or other guest details.</p>
+    <div class="output">
+      <p class="label">Build brief</p>
+      <pre id="out-schema">Generate JSON-LD for our website using schema.org, from the approved fact sheet below only.
+[PASTE APPROVED FACT SHEET AND PAGE LIST]
+
+- Home page: one LocalBusiness block (or TouristAttraction or LodgingBusiness if that fits better) with name, address, telephone, url, openingHoursSpecification for the season, and amenityFeature (LocationFeatureSpecification) for checkable facts such as a heated cabin or restrooms. amenityFeature belongs on the business, not on a trip.
+- Each product page: one TouristTrip block with provider (pointing to the business @id), touristType, itinerary (an ItemList of Place) and offers. The Offer carries price, priceCurrency USD, availability, validFrom and validThrough for the season, url, and additionalProperty (PropertyValue) for minimum age, duration, rain policy and cancellation policy.
+- No AggregateRating built from our own reviews.
+- Output one &lt;script type="application/ld+json"&gt; block per page and say which page each goes on. List every fact in the markup that a visitor also needs to see on that page, and flag any fact that is not on the page now, because the two need to match.
+- Use only the approved facts. Write [FILL] where a fact is missing; do not guess.
+
+Mark your reply DRAFT - PENDING OWNER REVIEW. I will check every block at validator.schema.org (TouristTrip) and run the home page through Google's Rich Results Test (it covers the LocalBusiness part only) before publishing.</pre>
+    </div>
+    <div class="btns">
+      <button type="button" data-copy="out-schema">Copy brief</button>
+      <button type="button" class="secondary" data-download="1c-structured-data-brief.txt" data-from="out-schema">Save as .txt</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <p class="hint">Google's "Things to do" listings come from booking feeds sent by connectivity partners, not from markup. Ask your booking platform whether it sends one.</p>
+  </section>
+
+  <section class="card note" aria-labelledby="measure">
+    <h2 id="measure">How you will know it worked</h2>
+    <p><strong>Number 1:</strong> the share of AI answers that name your business, by question and by AI tool, reported once a quarter. Start from your hand-run <a href="../audit/">audit</a> score as the baseline. Watch the Cited share next to it: when your own site is the source, the facts are yours.</p>
+    <p>Read the quarterly table in the report, not the weekly change.</p>
+    <p class="hint">Climb from: <a href="../1a/">1.a Rewrite for the short list</a> (identical facts everywhere) and <a href="../1b/">1.b Your own curated ten</a>. This rung needs 1.a published first.</p>
+  </section>
+
+  <section class="card warn" aria-labelledby="safe">
+    <h2 id="safe">Before you use it</h2>
+    <p><strong>AI drafts. You approve.</strong> The monitor reports; a person reads the report before it is shared, and scores Described and Current.</p>
+    <ul>
+      <li><strong>Recommendation:</strong> run the monitor in a private repository, never in the public kit repository. Keep API keys in environment variables or GitHub Secrets.</li>
+      <li><strong>Contractual:</strong> if you show AI answers to members, staff or anyone else, show their citations with them. Check the Anthropic and OpenAI usage terms. Check the Gemini API terms for Grounding with Google Search before you store or show grounded answers, including how Google Search suggestions are displayed (storing full Gemini answers is off by default in the bundle).</li>
+      <li><strong>Recommendation:</strong> generic traveler questions only. No traveler or guest data in the prompts.</li>
+      <li><strong>Policy choice:</strong> which businesses are watched (members only, or competitors too) and who sees the results. For an association, agree it with the board before the first run.</li>
+      <li><strong>Recommendation:</strong> markup facts match the visible page, and no AggregateRating from reviews you collect yourself.</li>
+      <li>Bay Light Day Cruises, Mile 12 Kennel, Harbor Kayak Co. and Sample Fjord Tours are fictional. Every <code>.example</code> address leads nowhere.</li>
+    </ul>
+  </section>
+</main>
+
+<footer class="kit">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates. Facts last verified 2026-10-10.</p>
+  <p><a href="../">All nine tools</a> · <a href="../Prompt-Kit-3x3.html">Printable prompt kit</a></p>
+</footer>
+<script>
+/* Copy the terminal commands with a message that fits (the shared copy message points to AI chat tools). */
+(function () {
+  "use strict";
+  var btn = document.getElementById("copy-cmds"), out = document.getElementById("cmds-status");
+  function say(msg) { out.textContent = msg; clearTimeout(out._t); out._t = setTimeout(function () { out.textContent = ""; }, 6000); }
+  btn.addEventListener("click", function () {
+    var text = document.getElementById("cmds").textContent, okMsg = "Copied. Paste the commands into a terminal opened in the unzipped folder.";
+    function fallback() {
+      var area = document.createElement("textarea");
+      area.value = text; area.setAttribute("readonly", ""); area.style.position = "fixed"; area.style.left = "-10000px";
+      document.body.appendChild(area); area.select();
+      var ok = false; try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      area.remove();
+      say(ok ? okMsg : "Select the text and press Ctrl+C (Cmd+C on a Mac).");
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { say(okMsg); }, fallback);
+    else fallback();
+  });
+})();
+</script>
+</body>
+</html>

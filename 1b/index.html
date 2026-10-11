@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-src 'self' about:; base-uri 'none'; form-action 'none'">
+<title>1.b Your own curated ten · ATIA AI Take-Home Kit</title>
+<meta name="description" content="Build a 'Which trip fits you?' page: up to three picks per traveler type from your trips and two partners' trips, each with the fact that earned its place. Runs in your browser; nothing is sent anywhere.">
+<link rel="stylesheet" href="../assets/kit.css">
+<style>
+  [hidden]{display:none!important}
+  .inv-list,.type-list{display:grid;gap:14px;margin:12px 0}
+  .inv-card,.type-card{background:#fff;border:1px solid var(--line);border-radius:4px;margin:0;padding:8px 14px 12px}
+  .inv-card legend,.type-card legend{font-size:15px}
+  .inv-card legend code{font-size:14px}
+  .inv-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 12px}
+  .inv-grid .w2{grid-column:span 2}
+  .inv-grid .w4{grid-column:1/-1}
+  .inv-grid label,.type-grid label,.type-card>label{margin:10px 0 3px;font-size:14px}
+  .inv-grid textarea{min-height:64px}
+  .inv-grid textarea.short{min-height:44px;height:auto}
+  .type-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 12px}
+  .row-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:10px}
+  .row-actions button{padding:6px 12px;font-size:14px}
+  .file-btn{position:relative;overflow:hidden}
+  .file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+  .file-btn:focus-within{outline:3px solid var(--teal);outline-offset:2px}
+  .summary{font-size:15px;color:var(--slate);margin:6px 0}
+  .issues{list-style:none;padding:0;margin:8px 0}
+  .issues li{padding:7px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.45}
+  .issues li .pill{margin-right:8px;vertical-align:1px}
+  .issues li b{color:var(--slate)}
+  .table-scroll{overflow-x:auto;max-width:100%;margin:10px 0}
+  .table-scroll table{min-width:900px}
+  .table-scroll.narrow table{min-width:0}
+  .seg{display:flex;flex-wrap:wrap;gap:8px;border:0;padding:0;margin:10px 0}
+  .seg legend{width:100%;padding:0;margin-bottom:6px;color:var(--slate);font-size:15px}
+  .seg label{margin:0;font-size:15px;font-weight:bold;border:2px solid var(--green);color:var(--green);border-radius:999px;padding:6px 14px;cursor:pointer;background:#fff}
+  .seg label:has(input:checked),.seg label.on{background:var(--green);color:#fff}
+  .seg label:focus-within{outline:3px solid var(--teal);outline-offset:2px}
+  .seg input{position:absolute;opacity:0;width:1px;height:1px}
+  .platform-steps[hidden]{display:none}
+  .val-badge{font-size:18px;font-weight:bold}
+  .val-badge.ok{color:var(--green-d)} .val-badge.bad{color:var(--red)} .val-badge.warn{color:var(--amber)}
+  .frame-wrap{background:#e9ece8;border:1px solid var(--line);border-radius:4px;padding:10px;margin:10px 0}
+  .frame-wrap iframe{display:block;width:100%;height:640px;border:1px solid #c9cfc6;background:#fff;margin:0 auto;transition:max-width .2s}
+  .frame-wrap.phone iframe{max-width:390px}
+  .approve label{display:flex;gap:10px;align-items:flex-start;font-weight:normal;color:var(--ink);margin:8px 0}
+  .approve input{width:20px;height:20px;margin-top:3px;flex:none}
+  .links-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 14px}
+  input[type=color]{width:64px;height:40px;padding:2px;border:1px solid #b8beb4;border-radius:4px;background:#fff}
+  button[disabled]{opacity:.45;cursor:not-allowed}
+  .evidence{font-size:15px;color:var(--slate-m)}
+  .big{font-size:30px;font-weight:bold;color:var(--teal);line-height:1.1;display:block}
+  .output pre{max-height:420px;overflow:auto}
+  pre.code{white-space:pre-wrap;overflow-wrap:anywhere;font:13.5px/1.5 Consolas,"Courier New",monospace;max-height:360px;overflow:auto;background:#fbfcfa;border:1px solid var(--line);padding:10px;margin:8px 0}
+  .lbl{display:inline-block;font-size:12px;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;border-radius:3px;padding:1px 7px;margin-right:6px;background:var(--teal-t);color:var(--teal-d);vertical-align:1px}
+  .lbl.legal{background:var(--red-t);color:var(--red)}
+  .lbl.contract{background:var(--amber-t);color:var(--amber)}
+  .lbl.policy{background:var(--green-t);color:var(--green-d)}
+  ul.tight{margin:6px 0;padding-left:22px} ul.tight li{margin:4px 0}
+  .card.warn ul li{margin:8px 0}
+  @media(max-width:640px){#val-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}#val-table table,#val-table tbody,#val-table tr,#val-table td{display:block;width:100%}#val-table tr{border:1px solid #ccd2c8;border-radius:4px;margin:0 0 10px;padding:4px 0}#val-table td{border:0;padding:4px 10px}#val-table td::before{content:attr(data-label);display:block;font-size:12px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;color:var(--green-d)}}
+  @media(max-width:760px){.inv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.inv-grid .w2{grid-column:1/-1}.type-grid{grid-template-columns:1fr}}
+  @media(max-width:420px){.inv-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}.inv-grid>div{grid-column:1/-1}.inv-grid>div.half{grid-column:auto}.inv-grid label small{display:block}.frame-wrap{padding:4px}}
+</style>
+<script src="../assets/kit.js" defer></script>
+<script src="curated-core.js" defer></script>
+<script src="curated-ui.js" defer></script>
+</head>
+<body data-page="1b">
+<div class="band" aria-hidden="true"></div>
+<header class="kit">
+  <p class="crumbs"><a href="../">ATIA AI Take-Home Kit</a> › Pain 1 · Comparison overload</p>
+  <p class="kicker"><span class="rung r2" aria-hidden="true"><i></i><i></i><i></i></span>Intermediate rung · Tool 1.b</p>
+  <h1>Your own curated ten</h1>
+  <p class="lede">Turn your trips and two partners' trips into a "Which trip fits you?" page. Each traveler type sees up to three picks, and each pick shows the fact that earned its place.</p>
+  <ul class="meta">
+    <li><b>Time</b> about a week of evenings</li><li><b>Cost</b> paid AI plan, about $20 a month</li><li><b>Skill</b> no code, copy and paste</li><li><b>Needs</b> 1.a from you and two partners</li><li><b>Feeds</b> 1.c, 3.b</li>
+  </ul>
+  <nav class="tool-nav" data-toolnav="1b" aria-label="All tools"></nav>
+</header>
+
+<main class="kit">
+  <section class="card teal" aria-labelledby="why">
+    <h2 id="why">The pain it fixes</h2>
+    <div class="grid two">
+      <div>
+        <h3>For the traveler</h3>
+        <p><span class="big">45%</span> of US travelers named comparing multiple options as a frustrating moment in planning, the most-cited pain in the survey.</p>
+        <p><span class="big">63%</span> would pick a site showing ten curated options, over one with 500 options and filters (30%) or a single AI-built plan (7%).</p>
+        <p class="evidence">Skift Research + McKinsey, <em>Winning Hearts in an Age of Infinite Travel Choices</em>, Sept 2026 · n = 1,015 US travelers, data as of June 2026. The 63% is a hypothetical choice with prices and inventory held equal. US travelers, not Alaska visitors.</p>
+      </div>
+      <div>
+        <h3>For your business</h3>
+        <p>A short, honest list that includes your partners makes you the local expert instead of one more open tab.</p>
+        <p>Visitors see why each trip made the cut, so they can check it. Partners send their guests to the same page.</p>
+        <p>The page is also plain, specific content that AI tools can quote. Tracking that is the next rung, 1.c.</p>
+        <p><strong>Ten is a ceiling, not a target.</strong> Three good trips from three businesses is a fine start.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="how">
+    <h2 id="how">How it works</h2>
+    <ol class="steps">
+      <li><strong>List your trips</strong> and two partners' trips, one row each, using the approved facts from 1.a. <span class="hint">About an evening.</span></li>
+      <li><strong>Name the traveler types</strong> you actually see, and choose which picker answers lead to each. <span class="hint">About 30 minutes.</span></li>
+      <li><strong>Set up a Claude Project, a ChatGPT Project or custom GPT, or a Gemini Gem</strong>, then paste the run prompt. <span class="hint">About an evening.</span></li>
+      <li><strong>Paste the AI's reply back here.</strong> The checker matches every pick against your trips. <span class="hint">Minutes, plus fixes.</span></li>
+      <li><strong>Generate the picker</strong>, get each partner's approval for its own lines, then paste it into Squarespace, Wix or a plain text block. <span class="hint">Two or three evenings, mostly waiting for approvals.</span></li>
+    </ol>
+    <p class="hint">Times are estimates. Everything on this page runs in your browser. Nothing you type is sent anywhere; your work is saved in this browser only.</p>
+    <div class="btns">
+      <button type="button" class="secondary" id="btn-demo">Load the fictional example</button>
+      <button type="button" class="ghost" id="btn-blank">Start blank</button>
+      <button type="button" class="ghost" id="btn-forget">Clear my saved data</button>
+      <button type="button" class="ghost" id="btn-undo" hidden>Undo</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+    <p class="callout amber" id="fictional-note">Loaded now: <strong>fictional teaching data.</strong> Bay Light Day Cruises (Seward), Mile 12 Kennel and Harbor Kayak Co. are invented businesses. Replace them with your own approved facts.</p>
+  </section>
+
+  <section class="card" aria-labelledby="s1">
+    <h2 id="s1">Step 1 · Your inventory</h2>
+    <p>One row per trip. Use facts a traveler could check, copied from the fact sheets you approved in 1.a. Leave a box empty when you do not know: the prompt shows it as <code>[FILL]</code> and the AI is told not to guess.</p>
+    <p class="hint">Business facts only. No guest names, emails, phone numbers, payment details or health information.</p>
+    <div class="btns">
+      <button type="button" id="inv-add">Add a trip</button>
+      <span class="button secondary file-btn">Import CSV<input type="file" id="inv-file" accept=".csv,.tsv,.txt,text/csv,text/plain" aria-label="Import a CSV file of trips"></span>
+      <button type="button" class="secondary" id="inv-export">Export CSV</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+    <details>
+      <summary>Or paste rows from a spreadsheet</summary>
+      <label for="inv-paste">Rows with a header line <small>(comma, semicolon or tab separated)</small></label>
+      <textarea id="inv-paste" placeholder="product_id,business,product,duration,minimum_age,season,departures,runs_in_rain,distance_from_meeting_point,notes"></textarea>
+      <div class="btns"><button type="button" class="secondary" id="inv-paste-go">Import pasted rows</button></div>
+    </details>
+    <p class="summary" id="inv-summary"></p>
+    <ul class="issues" id="inv-issues"></ul>
+    <div class="inv-list" id="inv-list"></div>
+    <details>
+      <summary>See the whole inventory as a table</summary>
+      <div class="table-scroll" id="inv-table" role="region" aria-label="Inventory table" tabindex="0"></div>
+    </details>
+  </section>
+
+  <section class="card" aria-labelledby="s2">
+    <h2 id="s2">Step 2 · Traveler types and picker answers</h2>
+    <p>List the traveler types you actually see. Four common ones are filled in. The picker on your site asks three questions: who is traveling, how much time, what matters most. For each type, choose the answers that should lead to its list. "Any" fits every answer.</p>
+    <p class="hint">The picker weighs "Who is traveling?" most, then the other two answers. When lists tie, it shows each of them. Each pick also shows the trip's duration and minimum age from step 1, so a family can spot a trip that is not for young children.</p>
+    <div class="type-list" id="type-list"></div>
+    <div class="btns"><button type="button" id="type-add">Add a traveler type</button></div>
+    <p class="status" role="status" aria-live="polite"></p>
+    <details>
+      <summary>Change the answer choices</summary>
+      <p class="hint">One choice per line. Changes apply when you leave the box.</p>
+      <div class="grid three">
+        <div><label for="q-who">Who is traveling?</label><textarea id="q-who" data-q="who"></textarea></div>
+        <div><label for="q-time">How much time do you have?</label><textarea id="q-time" data-q="time"></textarea></div>
+        <div><label for="q-matters">What matters most?</label><textarea id="q-matters" data-q="matters"></textarea></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="card" aria-labelledby="s3">
+    <h2 id="s3">Step 3 · Set up your AI workspace and run the prompt</h2>
+    <p>Use a workspace that keeps your files and instructions, so you can rerun this every season. A paid plan is for file limits and reliability, not a different model. About $20 a month is an estimate; check current plans.</p>
+    <fieldset class="seg" id="platform">
+      <legend>Where will you run it?</legend>
+      <label><input type="radio" name="platform" value="claude"> Claude Project</label>
+      <label><input type="radio" name="platform" value="chatgpt"> ChatGPT Project or custom GPT</label>
+      <label><input type="radio" name="platform" value="gemini"> Gemini Gem</label>
+    </fieldset>
+    <div class="platform-steps" data-platform="claude">
+      <h3>Claude Project</h3>
+      <ol class="steps">
+        <li>In Claude, open <strong>Projects</strong> and create a new project. Name it "Curated picks".</li>
+        <li>Paste the <strong>project instructions</strong> below into the project's instructions box.</li>
+        <li>Add the files listed below to the project's knowledge.</li>
+        <li>Start a new chat inside the project and paste the <strong>run prompt</strong>.</li>
+      </ol>
+    </div>
+    <div class="platform-steps" data-platform="chatgpt" hidden>
+      <h3>ChatGPT Project or custom GPT</h3>
+      <ol class="steps">
+        <li><strong>Project:</strong> in ChatGPT, create a new project from the sidebar. Open its settings and paste the <strong>project instructions</strong> below. Add the files listed below.</li>
+        <li><strong>Or custom GPT:</strong> open GPTs, choose Create, then Configure. Paste the instructions into Instructions and upload the files under Knowledge. Keep sharing set to only you while you test.</li>
+        <li>Start a chat in the project or GPT and paste the <strong>run prompt</strong>.</li>
+      </ol>
+    </div>
+    <div class="platform-steps" data-platform="gemini" hidden>
+      <h3>Gemini Gem</h3>
+      <ol class="steps">
+        <li>In Gemini, open <strong>Gems</strong> and create a new Gem. Name it "Curated picks".</li>
+        <li>Paste the <strong>project instructions</strong> below into the Gem's instructions, and add the files listed below as its knowledge.</li>
+        <li>Save the Gem, start a chat with it, and paste the <strong>run prompt</strong>.</li>
+      </ol>
+    </div>
+    <p class="hint">Open <a href="https://claude.ai/" target="_blank" rel="noopener">Claude</a>, <a href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a> or <a href="https://gemini.google.com/" target="_blank" rel="noopener">Gemini</a> in a new tab and paste the text yourself; this page never sends it anywhere. Menu names change. These steps were written in October 2026. A work account may have features turned off by your admin.</p>
+    <h3>Files to add</h3>
+    <ul class="tight">
+      <li>Your inventory as a CSV <button type="button" class="ghost" id="inv-export-2">Download inventory.csv</button></li>
+      <li>The approved fact sheet from 1.a for your business and for each partner.</li>
+      <li>Optional: your last 50 reviews, with guest names removed. They are background only.</li>
+    </ul>
+    <p class="hint"><span class="lbl">Recommendation</span> Before you upload anything, check the tool's data-use settings and your own business policy.</p>
+
+    <div class="output">
+      <p class="label">Project instructions</p>
+      <pre id="out-instructions" tabindex="0" aria-label="Project instructions"></pre>
+    </div>
+    <div class="btns">
+      <button type="button" data-guard="out-instructions">Copy instructions</button>
+      <button type="button" class="secondary" data-download="1b-project-instructions.txt" data-from="out-instructions">Save as .txt</button>
+    </div>
+    <div class="output">
+      <p class="label">Run prompt</p>
+      <pre id="out-run" tabindex="0" aria-label="Run prompt"></pre>
+    </div>
+    <div class="btns">
+      <button type="button" data-guard="out-run">Copy run prompt</button>
+      <button type="button" class="secondary" data-download="1b-run-prompt.txt" data-from="out-run">Save as .txt</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="card" aria-labelledby="s4">
+    <h2 id="s4">Step 4 · Check the AI's picks</h2>
+    <p>Paste the AI's whole reply, or only its JSON block. The checker runs in this browser. It confirms that:</p>
+    <ul class="tight">
+      <li>every <code>product_id</code> is in your inventory;</li>
+      <li>every <code>cited_fact</code> appears in that trip's row;</li>
+      <li>no list has more than three picks;</li>
+      <li>no number appears that your inventory and traveler types do not contain;</li>
+      <li>no prices, availability, ratings or generic claims slipped in.</li>
+    </ul>
+    <label for="val-input">The AI's reply <small>(a fictional example is filled in)</small></label>
+    <p class="hint" id="val-hint">Remove guest names, emails, phone numbers and payment details before pasting.</p>
+    <textarea id="val-input" class="tall" aria-describedby="val-hint" spellcheck="false"></textarea>
+    <div class="btns">
+      <button type="button" id="val-run">Check the picks</button>
+      <button type="button" class="secondary" id="val-demo">Load the fictional example reply</button>
+      <button type="button" class="ghost" id="val-clear">Clear</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+    <div id="val-result" tabindex="-1">
+      <p class="summary" id="val-summary" role="status" aria-live="polite"></p>
+      <ul class="issues" id="val-issues"></ul>
+      <div class="table-scroll narrow" id="val-table"></div>
+    </div>
+    <p class="callout"><strong>A pass is not a verdict.</strong> It means the picks match your inventory. It does not mean a trip is right for a guest. You and each partner still read every line. An AI checking its own work is not verification.</p>
+  </section>
+
+  <section class="card" aria-labelledby="s5">
+    <h2 id="s5">Step 5 · Build your "Which trip fits you?" picker</h2>
+    <p>The picker asks three questions and shows the matching list, with the "why it made the cut" line under each trip. It has no prices or availability, loads nothing from other sites, and tracks no one. If a site blocks scripts, visitors still see every list.</p>
+    <div class="grid two">
+      <div>
+        <label for="pk-title">Title</label>
+        <input type="text" id="pk-title" data-set="title">
+        <label for="pk-intro">Intro line</label>
+        <textarea id="pk-intro" data-set="intro" style="min-height:100px"></textarea>
+      </div>
+      <div>
+        <label for="pk-closing">Closing line</label>
+        <textarea id="pk-closing" data-set="closing" style="min-height:100px"></textarea>
+        <label for="pk-accent">Button and border color</label>
+        <input type="color" id="pk-accent" data-set="accent">
+      </div>
+    </div>
+    <details>
+      <summary>Optional: a link to each business</summary>
+      <p class="hint">A plain link to each business's own page for that trip, starting with https://. Leave empty for no link. Booking pages are where prices and availability belong.</p>
+      <div class="links-grid" id="pk-links"></div>
+    </details>
+    <fieldset class="approve" id="pk-approvals">
+      <legend>Approvals</legend>
+      <p class="hint" style="margin:0"><span class="lbl policy">Policy choice</span> Each business approves its own lines: trip name, duration, minimum age, reason and fact. <span class="lbl contract">Contractual</span> If you have a referral or partner agreement, check what it says about using the partner's name and content. Until every box is ticked, the picker shows a DRAFT banner.</p>
+      <div id="pk-approve-boxes"></div>
+    </fieldset>
+    <p class="summary" id="pk-summary" role="status" aria-live="polite"></p>
+
+    <h3>Live preview</h3>
+    <div class="btns" role="group" aria-label="Preview width">
+      <button type="button" class="ghost" id="pv-phone" aria-pressed="false">Phone width</button>
+      <button type="button" class="ghost" id="pv-full" aria-pressed="true">Full width</button>
+    </div>
+    <div class="frame-wrap" id="pv-wrap">
+      <iframe id="pv-frame" title="Live preview of your picker" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe>
+    </div>
+    <div class="btns">
+      <button type="button" id="pk-copy" data-needs-valid>Copy picker code</button>
+      <button type="button" class="secondary" id="pk-dl" data-needs-valid>Download picker (.html)</button>
+      <button type="button" class="secondary" id="pk-copy-txt" data-needs-valid>Copy plain-text version</button>
+      <button type="button" class="secondary" id="pk-dl-txt" data-needs-valid>Download plain text (.txt)</button>
+      <button type="button" class="ghost" id="pk-dl-json" data-needs-valid>Download checked picks (.json)</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+    <details>
+      <summary>See the picker code</summary>
+      <pre class="code" id="pk-code" tabindex="0" aria-label="Picker code"></pre>
+    </details>
+    <details>
+      <summary>See the plain-text version</summary>
+      <pre class="code" id="pk-text" tabindex="0" aria-label="Plain-text version"></pre>
+    </details>
+    <h3>Where to paste it</h3>
+    <ul class="tight">
+      <li><strong>Squarespace:</strong> edit the page, add a Code block, paste the picker code, and save. Squarespace runs scripts in Code blocks only on some plans (in October 2026 its <a href="https://support.squarespace.com/hc/en-us/articles/206543167-Code-blocks" target="_blank" rel="noopener">Code blocks help page</a> listed Core, Plus and Advanced). Without scripts, visitors see every list, without the three questions.</li>
+      <li><strong>Wix:</strong> open Add Elements, choose Embed Code, then Embed HTML. Choose Enter Code, paste the picker code, and apply. Make the frame tall enough that nothing is cut off. See Wix's <a href="https://support.wix.com/en/article/wix-editor-embedding-a-site-or-a-widget" target="_blank" rel="noopener">embedding help page</a>.</li>
+      <li><strong>No code blocks:</strong> paste the plain-text version into a normal text block, and keep the "why it made the cut" lines.</li>
+    </ul>
+    <p class="hint">Menu names change; these were written in October 2026. Test on a hidden or draft page first, on a phone too.</p>
+  </section>
+
+  <section class="card" aria-labelledby="files">
+    <h2 id="files">Downloads</h2>
+    <ul class="files">
+      <li><a href="inventory-template.csv" download>inventory-template.csv</a> <span class="hint">The ten columns, with the three fictional trips as sample rows. Open it in Excel or Google Sheets.</span></li>
+      <li><a href="picks.schema.json" download>picks.schema.json</a> <span class="hint">The JSON shape the run prompt asks for, as a JSON Schema, for anyone automating this.</span></li>
+      <li><a href="example-picks.json" download>example-picks.json</a> <span class="hint">The checked picks for the fictional data.</span></li>
+      <li><a href="picker-template.html" download>picker-template.html</a> <span class="hint">A finished sample picker built from the fictional data. Open it in any browser.</span></li>
+    </ul>
+  </section>
+
+  <section class="card note" aria-labelledby="measure">
+    <h2 id="measure">How you will know it worked</h2>
+    <ul class="tight">
+      <li><strong>From the page:</strong> page views, saves, inquiries and bookings that start on the picker page. Your site builder's own analytics shows page views. Add "Which trip fits you? page" as a choice where your inquiry or booking form asks how guests found you.</li>
+      <li><strong>Number 2, direct share of bookings:</strong> bookings on your own site or phone divided by all bookings, counted monthly.</li>
+      <li><strong>Partners:</strong> referrals each way. Agree on referral codes first (that is 3.b).</li>
+    </ul>
+    <p>Count one month before you publish, so you have something to compare against. One season is a directional read, not proof.</p>
+  </section>
+
+  <section class="card warn" aria-labelledby="safe">
+    <h2 id="safe">Before you use it</h2>
+    <p><strong>AI drafts. You approve.</strong> Every AI reply is marked DRAFT - PENDING OWNER REVIEW. The checker on this page matches text; it does not judge whether a trip is right or safe.</p>
+    <ul class="tight">
+      <li><span class="lbl policy">Policy choice</span> Each business approves its own lines before anything is published.</li>
+      <li><span class="lbl contract">Contractual</span> Check your referral or partner agreement, and each booking channel's terms, for rules on using names, content and links.</li>
+      <li><span class="lbl policy">Policy choice</span> No prices or availability in the picker. They change, and each business owns its own. Link to booking pages instead.</li>
+      <li><span class="lbl">Recommendation</span> "Runs in rain" is a published policy, not a forecast. The go/no-go call on the day, on the water, on a glacier or near wildlife belongs to the captain or lead guide.</li>
+      <li><span class="lbl legal">Legal mandate</span> If a pick is a guided hunt or sport-fishing trip, the guide's license under AS 08.54 or the ADF&amp;G sport-fishing guide and business registration stays with the guide. A referral page does not move that duty to you or to an AI.</li>
+      <li><span class="lbl">Recommendation</span> Use de-identified reviews only, and check the AI tool's data-use settings before uploading files.</li>
+    </ul>
+  </section>
+
+  <section class="card teal" aria-labelledby="next">
+    <h2 id="next">Next rung</h2>
+    <p><a href="../1c/"><strong>1.c AI answer monitoring and structured data</strong></a>: check whether AI tools name you and quote the page you just built, every week, across several models.</p>
+    <p class="hint">Came here first? <a href="../1a/">1.a Rewrite for the short list</a> builds the approved facts this page needs. Facts on this page last verified 2026-10-10.</p>
+  </section>
+</main>
+
+<footer class="kit">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates.</p>
+  <p><a href="../">All nine tools</a> · <a href="../Prompt-Kit-3x3.html">Printable prompt kit</a></p>
+</footer>
+</body>
+</html>

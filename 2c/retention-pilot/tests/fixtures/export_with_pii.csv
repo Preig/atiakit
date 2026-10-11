@@ -1,0 +1,5 @@
+Booking ID,Guest Name,Guest Email,Phone,Card Last 4,Activity Date,Created,Rate,Source,Guests,Add-ons,Special Requests,Product
+T-001,FAKE NAME A,fake.a@example.invalid,907-555-0100,4242,2026-07-14,2026-03-01,Flexible,Viator,2,0,FAKE REQUEST,4-hour wildlife and glacier cruise
+T-002,FAKE NAME B,fake.b@example.invalid,907-555-0101,4243,07/20/2026,05/01/2026,Non-Refundable,Website,4,1,,write to fake.c@example.invalid
+bad id with spaces,FAKE NAME C,fake.d@example.invalid,907-555-0102,4244,2026-08-01,2026-06-01,Flexible,Direct,1,0,,cruise
+T-004,FAKE NAME D,fake.e@example.invalid,907-555-0103,4245,not a date,2026-06-01,Flexible,Direct,1,0,,cruise

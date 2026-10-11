@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2.a The honest picture · ATIA AI Take-Home Kit</title>
+<meta name="description" content="Turn your last 50 reviews into a short, honest 'What to expect' section and a reply to every review. Works in your browser; nothing you paste leaves it.">
+<link rel="stylesheet" href="../assets/kit.css">
+<style>
+  .output pre{max-height:26em;overflow:auto}
+  .reminder{font-size:14px;line-height:1.45;color:#5c3d00;background:var(--amber-t);border-left:4px solid #d49a1a;border-radius:4px;padding:7px 11px;margin:6px 0 4px}
+  .namelist{list-style:none;padding:0;margin:6px 0}
+  .namelist li{padding:6px 0;border-bottom:1px solid var(--line)}
+  .namelist button{margin:4px 6px 0 0}
+  button.small{font-size:13px;padding:5px 10px}
+  .table-wrap{overflow-x:auto;margin:8px 0 14px}
+  .barcell{width:45%}
+  .bar{display:block;height:14px;background:var(--teal);border-radius:2px;min-width:2px}
+  .bar.low{background:#d49a1a}
+  .kw{display:block;font-weight:normal;font-size:13px;color:var(--slate-m);overflow-wrap:anywhere}
+  td.ids{font-size:13px;color:var(--slate-m);overflow-wrap:anywhere}
+  .checks{list-style:none;padding:0;margin:8px 0}
+  .checks>li{padding:9px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+  .checks>li ul{margin:6px 0 0 1.2em;padding:0;font-size:15px}
+  .radio-row{border:0;padding:0;margin:10px 0}
+  .radio-row label{display:inline-flex;align-items:center;gap:6px;font-weight:normal;margin:4px 18px 4px 0;font-size:16px}
+  input[type=file]{font-size:15px;max-width:100%;margin:4px 0}
+  .example{background:#fff;border:1px dashed var(--sage);padding:12px 16px;border-radius:4px}
+  .example ul{margin:6px 0 8px 1.1em;padding:0}
+  .calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0 16px;align-items:start}
+  .calc fieldset{margin:8px 0}
+  .calc label{margin-top:8px}
+  .files li{flex-wrap:wrap;gap:4px 12px}
+  .files li a{white-space:nowrap}
+  .obl{list-style:none;padding:0;margin:8px 0}
+  .obl>li{margin:0 0 12px}
+  .ailinks a{margin-right:12px;white-space:nowrap}
+  .src{font-size:14px;color:var(--slate-m)}
+  .figs{list-style:none;padding:0;margin:0}
+  .figs li{margin:0 0 12px}
+  .figs b.n{font-size:28px;color:var(--teal);display:block;line-height:1.1}
+  @media(max-width:640px){
+    .barcell{width:35%}.calc{grid-template-columns:1fr}
+    table.themes thead{position:absolute;left:-9999px}
+    table.themes,table.themes tbody,table.themes tr,table.themes th,table.themes td{display:block;width:auto}
+    table.themes{background:transparent}
+    table.themes tr{background:#fff;border:1px solid #ccd2c8;border-radius:4px;margin:0 0 8px}
+    table.themes th,table.themes td{border:0;padding:4px 10px;text-align:left}
+    table.themes th{background:var(--green-t)}
+    table.themes td::before{content:attr(data-label) ": ";font-weight:bold;color:var(--slate)}
+  }
+</style>
+<script src="../assets/kit.js" defer></script>
+<script src="honest.js" defer></script>
+</head>
+<body data-page="2a">
+<div class="band" aria-hidden="true"></div>
+<header class="kit">
+  <p class="crumbs"><a href="../">ATIA AI Take-Home Kit</a> › Pain 2 · Second-guessing</p>
+  <p class="kicker"><span class="rung r1" aria-hidden="true"><i></i><i></i><i></i></span>Basic rung · Tool 2.a</p>
+  <h1>The honest picture, from your reviews</h1>
+  <p class="lede">Your last 50 reviews already say what guests wish they had known. AI sorts them and drafts a short "What to expect, honestly" section and a reply to each unanswered review. You check every quote and approve every word. A person posts every reply.</p>
+  <ul class="meta">
+    <li><b>Time</b> about 2 hours</li><li><b>Cost</b> free tier</li><li><b>Skill</b> no code</li><li><b>Measure</b> reply rate · Number 4</li><li><b>Feeds</b> 2.b, 3.a</li>
+  </ul>
+  <nav class="tool-nav" data-toolnav="2a" aria-label="All tools"></nav>
+</header>
+
+<main class="kit">
+  <section class="card teal" aria-labelledby="why">
+    <h2 id="why">The pain it fixes</h2>
+    <div class="grid two">
+      <div>
+        <h3>For the traveler</h3>
+        <ul class="figs">
+          <li><b class="n">43%</b> of US travelers say second-guessing whether they chose right is a frustrating part of planning. 52% feel anxious about booking the wrong option.</li>
+          <li><b class="n">41%</b> put content from travelers who have been there in their top three sources of confidence.</li>
+          <li>Accor tested hotel pages with and without reviews. Genuine reviews, even bad ones, built more confidence than curated brand copy. No lift figure was published.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>For your business</h3>
+        <p>Doubt shows up twice: as inquiries that never book, and as changes and cancellations after booking. <span class="hint">(Our read, not a survey finding.)</span></p>
+        <p>A plain list of what to expect, flaws included, answers that doubt before it costs you. Replies show the next traveler that a person reads and answers.</p>
+        <p>The cleaned reviews and the approved section also become the knowledge for <a href="../2b/">2.b, the grounded answer assistant</a>.</p>
+      </div>
+    </div>
+    <p class="src">Source: Skift Research + McKinsey, <i>Winning Hearts in an Age of Infinite Travel Choices</i>, Sept 2026 · survey of 1,015 US travelers, data as of June 2026. US travelers, not Alaska visitors.</p>
+  </section>
+
+  <section class="card" aria-labelledby="how">
+    <h2 id="how">How to use it</h2>
+    <ol class="steps">
+      <li><b>Collect</b> your last 50 reviews from Google, Tripadvisor, Viator or your booking platform. Copy and paste them, or load a CSV. <span class="hint">About 30 minutes.</span></li>
+      <li><b>Clean</b> them here. The page removes emails, phone numbers, links and long numbers, and flags likely names for you to check.</li>
+      <li><b>Look</b> at the counts. They are keyword hints, not the analysis.</li>
+      <li><b>Copy</b> the Step 1 prompt into Claude, ChatGPT or Gemini. A free tier works.</li>
+      <li><b>Check</b> the answer here. Fix any quote that is not in your reviews.</li>
+      <li><b>Approve</b> the "What to expect, honestly" section. The owner edits and approves it, then you publish it on your website and on booking pages that allow it.</li>
+      <li><b>Reply.</b> Copy the Step 2 prompt for up to 5 unanswered reviews, check the drafts, and have a person edit and post each one. Log it.</li>
+      <li><b>Count</b> your reply rate now and every month. Refresh the section when the review mix changes.</li>
+    </ol>
+    <p class="hint">Times are estimates for a small operator with reviews on two or three platforms.</p>
+  </section>
+
+  <section class="card" aria-labelledby="stepA">
+    <h2 id="stepA">Step A. Bring your reviews</h2>
+    <label for="rv">Your reviews <small>(one per line, numbered, separated by blank lines, or a CSV with a text column)</small></label>
+    <p class="reminder" id="rv-reminder"><b>Recommendation.</b> Guest material: remove reviewer names. Never paste guest emails, phone numbers, booking or card numbers, or health details. This page cleans what it can on your device. It is a first pass, not a guarantee.</p>
+    <textarea id="rv" class="tall" spellcheck="false" aria-describedby="rv-reminder" placeholder="1. (5 stars) Saw humpbacks and the glacier calving. Cabin was warm.&#10;2. (4 stars) Wonderful crew. Wish we had known lunch was not included."></textarea>
+    <p class="hint">What you paste stays on this device: the page keeps it in this browser so you can come back to it. On a shared computer, use "Clear everything" at the bottom of the page when you finish.</p>
+    <label for="rv-file">Or load a CSV or text file <small>(read on this device; it does not upload)</small></label>
+    <input type="file" id="rv-file" accept=".csv,.txt,.tsv,text/csv,text/plain">
+    <p class="status" id="file-status" role="status" aria-live="polite"></p>
+    <div>
+      <div class="btns">
+        <button type="button" class="secondary" id="load6">Load the 6 kit reviews (fictional)</button>
+        <button type="button" class="secondary" id="load50">Load all 50 (fictional)</button>
+        <button type="button" class="ghost" id="loadMessy">Try the cleaner on a messy example</button>
+        <button type="button" class="ghost" id="rvClear">Clear</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <div class="callout green">
+      <p id="clean-report" role="status" aria-live="polite">No reviews yet.</p>
+      <div id="names"></div>
+      <div>
+        <div class="btns"><button type="button" class="ghost small" id="cleanBox">Put the cleaned text in the box</button></div>
+        <p class="status" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+    <details>
+      <summary>What the cleaner does, and does not do</summary>
+      <p>It replaces emails, phone numbers, web links, street addresses and numbers of 8 or more digits (booking or card numbers) with a label such as [PHONE REMOVED], in the prompt only. It flags capitalized words in mid-sentence and words after Captain, guide or deckhand as possible names. It does not catch everything: a name at the start of a sentence, a nickname or a home town can slip through. Read the reviews once before you copy the prompt.</p>
+      <p>If you load a CSV, columns that look like names, emails, phones, links or booking numbers are left out, and the page tells you which.</p>
+    </details>
+  </section>
+
+  <section class="card" aria-labelledby="stepB">
+    <h2 id="stepB">Step B. Look at the counts</h2>
+    <p id="stats-summary" role="status" aria-live="polite">Paste reviews or load the fictional set to see the counts.</p>
+    <div id="stats-tables" hidden>
+      <h3>By star rating</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Rating</th><th scope="col" class="num">Reviews</th><th scope="col"><span class="visually-hidden">Bar</span></th></tr></thead>
+          <tbody id="stars-body"></tbody>
+        </table>
+      </div>
+      <h3>Keyword hints</h3>
+      <p class="hint">Hints, not analysis. A review that says "no rain at all" still counts under rain. Use these to check the AI's counts, not to replace reading.</p>
+      <div class="table-wrap">
+        <table class="themes">
+          <thead><tr><th scope="col">Theme</th><th scope="col" class="num">Reviews</th><th scope="col" class="num">At 3 stars or fewer</th><th scope="col">Which reviews</th></tr></thead>
+          <tbody id="themes-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <details>
+      <summary>Expected counts for the fictional 50 (for a live demo)</summary>
+      <p>Stars: 21 five, 14 four, 8 three, 5 two, 2 one (average 3.94). Lunch 6 · seasick or rough water 5 · walk or stroller 5 · rain, cold, wind or fog 10 · pickup or third party 5 · cancellation 2 · wildlife 18 · glacier 12 · crew 16 · cabin 9. The 6 kit reviews give one each for lunch, seasick, walk, rain and pickup.</p>
+    </details>
+  </section>
+
+  <section class="card" aria-labelledby="stepC">
+    <h2 id="stepC">Step C. Sort and draft the section <span class="hint">(Step 1 prompt)</span></h2>
+    <label for="facts">Your approved facts <small>(optional, recommended: the fact sheet from <a href="../1a/">1.a</a>)</small></label>
+    <p class="hint" id="facts-hint">The AI uses these to check the section. Facts about your business only: no guest details.</p>
+    <textarea id="facts" aria-describedby="facts-hint"></textarea>
+    <div>
+      <div class="btns">
+        <button type="button" class="secondary" id="loadFacts">Load the fictional facts</button>
+        <button type="button" class="ghost" id="factsClear">Clear</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <p class="reminder" id="s1-names" role="status" aria-live="polite" hidden></p>
+    <div class="output">
+      <p class="label">Step 1 prompt</p>
+      <pre id="out-s1" tabindex="0" aria-label="Step 1 prompt"></pre>
+    </div>
+    <div>
+      <div class="btns">
+        <button type="button" data-copy="out-s1">Copy prompt</button>
+        <button type="button" class="secondary" data-download="2a-step1-prompt.txt" data-from="out-s1">Save as .txt</button>
+        <button type="button" class="secondary" id="dlClean">Save cleaned reviews (.txt)</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <p class="ailinks">Paste it into <a href="https://claude.ai/" target="_blank" rel="noopener">Claude</a> <a href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a> <a href="https://gemini.google.com/" target="_blank" rel="noopener">Gemini</a> <span class="hint">(opens a new tab; the prompt is never put in the link)</span></p>
+    <details>
+      <summary>What a good section looks like (fictional example)</summary>
+      <div class="example">
+        <p><b>What to expect, honestly</b></p>
+        <ul>
+          <li>Lunch is not included. We serve hot drinks only, and the cruise is 4 hours, so bring food, especially for children.</li>
+          <li>The water can be rough, most often on the way back and on afternoon trips. Some guests get seasick. [CAPTAIN OR OWNER TO CONFIRM]</li>
+          <li>The harbor is a 12-minute walk from the cruise ship dock. With a stroller or slower walkers, allow more time.</li>
+          <li>We run in rain. The deck is cold and windy, so bring a real rain jacket and layers.</li>
+          <li>Fog can hide the glacier.</li>
+          <li>The minimum age is 4.</li>
+          <li>If you booked through another company, meet us at the small-boat harbor, as our own email says. [CHECK WITH OWNER]</li>
+        </ul>
+        <p><b>DRAFT - PENDING OWNER REVIEW</b></p>
+      </div>
+      <p class="hint">Every line comes from a review or the fact sheet. No adjectives, no promises. Two items wait for the owner or captain.</p>
+    </details>
+    <template id="tpl-s1">Here are our last {{count|[NUMBER]}} reviews, de-identified (names, emails, phone numbers and links removed). Each line starts with the review number and the star rating.
+
+{{reviews|[PASTE REVIEWS, or load the fictional ones on the page]}}
+
+Our approved facts, for checking only:
+{{facts|None supplied. Do not state any fact about the business that is not in the reviews; write [CHECK WITH OWNER] instead.}}
+
+A keyword count made on my device, as a cross-check only (a keyword is not a complaint, and one review can mention several things):
+{{hints|[NO COUNTS YET]}}
+
+Do this:
+1. Sort the reviews into four groups with counts: (1) what guests loved, (2) what guests wished they had known before booking, (3) complaints we could fix, (4) complaints inherent to the experience (weather, sea conditions, walking distance). One review can sit in more than one group.
+2. For each item, list the review numbers and quote the supporting phrase word for word, in double quotes. Never paraphrase inside quotes. If no review supports an item, leave it out.
+3. From groups 2 and 4 only, draft a "What to expect, honestly" section under 150 words in plain language: no marketing adjectives, no promises, no reassurance that is not a fact. Use only facts from the reviews or the approved facts. Where a fact is missing, or the reviews and the facts disagree, write [CHECK WITH OWNER].
+4. For anything about sea conditions, weather, safety or health, state only what the facts say and add [CAPTAIN OR OWNER TO CONFIRM]. Give no medical advice.
+5. Do not write, invent or rewrite any review.
+
+Mark the whole answer DRAFT - PENDING OWNER REVIEW.</template>
+  </section>
+
+  <section class="card" aria-labelledby="stepD">
+    <h2 id="stepD">Step D. Draft the replies <span class="hint">(Step 2 prompt)</span></h2>
+    <div class="callout amber" role="note" aria-labelledby="rules-h">
+      <h3 id="rules-h" style="margin-top:0">Reply rules</h3>
+      <ul class="obl">
+        <li><span class="pill amber">Policy choice</span> No refunds, credits or free trips in a public reply. If the owner decides to make something right, the owner does it privately.</li>
+        <li><span class="pill red">Legal mandate</span> Never offer anything in exchange for a positive review, or for changing a negative one. FTC rule 16 CFR 465.4 bans incentives tied to a review's sentiment.</li>
+        <li><span class="pill teal">Recommendation</span> Do not dispute the guest's experience, correct them in public or confirm booking details.</li>
+        <li><span class="pill amber">Policy choice</span> A person reads, edits and posts every reply. Nothing is posted automatically.</li>
+        <li><span class="pill teal">Recommendation</span> Injury, medical emergencies, safety concerns, discrimination or legal threats go to the owner, not to an AI draft.</li>
+        <li><span class="pill">Contractual</span> Each platform has reply rules in its terms (Google, Tripadvisor, Viator). Check them before you post.</li>
+      </ul>
+    </div>
+    <label for="s2">Reviews you have not answered yet <small>(up to 5)</small></label>
+    <p class="reminder" id="s2-reminder"><b>Recommendation.</b> Guest material: no reviewer names, emails, phone numbers, booking numbers or health details. Contact details are removed in the prompt; check for names yourself.</p>
+    <textarea id="s2" spellcheck="false" aria-describedby="s2-reminder"></textarea>
+    <div>
+      <div class="btns">
+        <button type="button" class="secondary" id="s2lowest">Use the 5 lowest-rated from Step A</button>
+        <button type="button" class="secondary" id="s2kit">Use fictional reviews 2, 3, 4 and 6</button>
+        <button type="button" class="ghost" id="s2Clear">Clear</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <p class="hint" id="s2-note" role="status" aria-live="polite"></p>
+    <label for="fixes">Confirmed fixes <small>(only things already done; leave "none" if nothing has changed)</small></label>
+    <input type="text" id="fixes" value="none" autocomplete="off">
+    <label for="signoff">Sign off as <small>(for example a first name and role; optional)</small></label>
+    <input type="text" id="signoff" autocomplete="off">
+    <p class="hint">The approved facts from Step C go into this prompt too, so a reply states only facts you approved.</p>
+    <div class="output">
+      <p class="label">Step 2 prompt</p>
+      <pre id="out-s2" tabindex="0" aria-label="Step 2 prompt"></pre>
+    </div>
+    <div>
+      <div class="btns">
+        <button type="button" data-copy="out-s2">Copy prompt</button>
+        <button type="button" class="secondary" data-download="2a-step2-prompt.txt" data-from="out-s2">Save as .txt</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <p>Then a person edits each reply, posts it on the platform, and adds a row to the <a href="review-reply-log.csv" download>reply log</a>.</p>
+    <template id="tpl-s2">Draft replies to these unanswered reviews. They are de-identified.
+
+{{replies|[PASTE UP TO 5 REVIEWS, or use fictional reviews 2, 3, 4 and 6]}}
+
+Our approved facts (state no other fact about the business):
+{{facts|None supplied. Do not state any fact about the business that the review does not already say; write [CHECK WITH OWNER] instead.}}
+
+Rules for every reply:
+- Under 60 words.
+- Name the specific issue the guest raised.
+- No template apology, such as "we apologize for any inconvenience".
+- Do not offer or hint at refunds, credits, discounts, vouchers or free trips.
+- Do not dispute the guest's experience, correct them in public or blame them.
+- Do not ask the guest to change or remove the review.
+- Say a fix has been made only if it is in this list of confirmed fixes: {{fixes|none}}
+- State a fact about the business only if it is in the approved facts. If a reply needs a fact that is not there, write [CHECK WITH OWNER].
+- Do not mention names, booking details or anything about the guest that the review does not say.
+- If a review describes an injury, a medical emergency, a safety concern about the vessel or crew, discrimination or a legal threat, do not draft a reply. Write ESCALATE TO OWNER and one line on why.
+- Sign off as: {{signoff|[YOUR SIGN-OFF, for example a first name and role]}}
+
+Put each reply under its review number. Mark each reply DRAFT - PENDING OWNER REVIEW.</template>
+  </section>
+
+  <section class="card" aria-labelledby="stepE">
+    <h2 id="stepE">Step E. Check the AI's answer</h2>
+    <p>Paste what the AI wrote. The page checks it against your reviews, on this device.</p>
+    <fieldset class="radio-row">
+      <legend>This is the answer to</legend>
+      <label><input type="radio" name="mode" value="s1" checked> Step 1 (sort and section)</label>
+      <label><input type="radio" name="mode" value="s2"> Step 2 (replies)</label>
+    </fieldset>
+    <label for="ans">The AI's answer</label>
+    <p class="reminder" id="ans-reminder"><b>Recommendation.</b> If the answer repeats any guest detail, delete it here and in the AI chat.</p>
+    <textarea id="ans" class="tall" spellcheck="false" aria-describedby="ans-reminder"></textarea>
+    <div class="btns">
+      <button type="button" id="check">Check the answer</button>
+      <button type="button" class="ghost" id="ansClear">Clear</button>
+    </div>
+    <p class="status" id="check-status" role="status" aria-live="polite"></p>
+    <div id="check-out"></div>
+    <details>
+      <summary>What it checks</summary>
+      <p><b>Always:</b> every quoted phrase appears word for word in your reviews; the DRAFT marker is there; no emails, phone numbers, links or street addresses.</p>
+      <p><b>Step 1:</b> the "What to expect, honestly" section is under 150 words; marketing and promise words; numbers that are not in your reviews or facts.</p>
+      <p><b>Step 2:</b> offers of refunds, credits or freebies; asking the guest to change a review; phrases that dispute the guest; template apologies; fix claims that are not on your confirmed list; replies over 60 words; numbers that are not in your reviews or facts.</p>
+      <p>A quote can be real and still be used out of context, so read it. Passing these checks is not approval, and an AI checking its own work is not verification either.</p>
+    </details>
+  </section>
+
+  <section class="card" aria-labelledby="files">
+    <h2 id="files">Downloads</h2>
+    <ul class="files">
+      <li><a href="baylight-reviews.csv" download>baylight-reviews.csv</a> <span class="hint">50 fictional reviews of Bay Light Day Cruises: the kit's 6 plus 44 more on the same themes. Columns review_id, stars, platform, date, text. No names.</span></li>
+      <li><a href="review-reply-log.csv" download>review-reply-log.csv</a> <span class="hint">Reply log: date, platform, review_id, draft, approved_by, posted_date. Two fictional example rows. Count its rows for your reply rate.</span></li>
+      <li><a href="../Prompt-Kit-3x3.html#s2a">Prompt Kit, section 2.a</a> <span class="hint">The printable version of both prompts.</span></li>
+    </ul>
+  </section>
+
+  <section class="card note" aria-labelledby="measure">
+    <h2 id="measure">How you will know it worked</h2>
+    <ul>
+      <li><b>Review reply rate:</b> replies posted, divided by reviews received. Count it monthly from your reply log.</li>
+      <li><b>Inquiry-to-booking rate:</b> bookings from inquiries (email, phone, web form), divided by inquiries. Monthly.</li>
+      <li><b>In-window changes and cancellations (Number 4):</b> bookings changed or canceled inside the free-cancellation window, divided by bookings. Monthly in season; count flexible and non-refundable bookings separately. Judge it only after a season of data.</li>
+    </ul>
+    <p>Count a baseline before you publish the section, or there is nothing to compare. These numbers also move with weather, prices and ships in port, so do not credit a change to the section alone.</p>
+    <h3>Quick calculator <span class="hint">(saved in this browser only)</span></h3>
+    <div class="calc">
+      <fieldset><legend>Reply rate</legend>
+        <label for="m-rev">Reviews received</label><input type="number" id="m-rev" min="0" inputmode="numeric">
+        <label for="m-rep">Replies posted</label><input type="number" id="m-rep" min="0" inputmode="numeric">
+      </fieldset>
+      <fieldset><legend>Inquiry to booking</legend>
+        <label for="m-inq">Inquiries</label><input type="number" id="m-inq" min="0" inputmode="numeric">
+        <label for="m-book">Booked from them</label><input type="number" id="m-book" min="0" inputmode="numeric">
+      </fieldset>
+      <fieldset><legend>Number 4</legend>
+        <label for="m-bk">Bookings</label><input type="number" id="m-bk" min="0" inputmode="numeric">
+        <label for="m-win">Changed or canceled (free window)</label><input type="number" id="m-win" min="0" inputmode="numeric">
+      </fieldset>
+    </div>
+    <div class="output"><p class="label">Your numbers</p><pre id="m-out" role="status" aria-live="polite"></pre></div>
+    <div>
+      <div class="btns"><button type="button" class="secondary" id="copyNums">Copy these numbers</button></div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <p class="hint">This tool feeds Number 4 of the four numbers from the session. Write its baseline in week 4 of the 30-day plan, with the other three.</p>
+  </section>
+
+  <section class="card warn" aria-labelledby="safe">
+    <h2 id="safe">Before you use it</h2>
+    <p><strong>AI drafts. You approve.</strong> Every answer is marked DRAFT - PENDING OWNER REVIEW until the owner has read it.</p>
+    <ul class="obl">
+      <li><span class="pill red">Legal mandate</span> <b>No fake reviews.</b> The FTC rule on consumer reviews and testimonials, <a href="https://www.law.cornell.edu/cfr/text/16/part-465" target="_blank" rel="noopener">16 CFR Part 465</a> (in effect since October 2024), bans writing, buying or posting fake reviews, including AI-generated ones, and reviews from people who did not have the experience (465.2). It also bans rewards tied to a positive or negative review (465.4), requires staff and family reviews to disclose the connection (465.5), and bans threats to get a review removed or hiding bad reviews on your own site while implying you show all or most of them (465.7).</li>
+      <li><span class="pill teal">Recommendation</span> <b>Never write reviews, and never have AI write them</b>, for your business or anyone else's. This tool reads reviews and drafts replies; it never writes a review.</li>
+      <li><span class="pill">Contractual</span> Before you copy review text onto your website or ads, check each platform's terms of service (Google, Tripadvisor, Viator). The "What to expect" section is written in your own words, not copied from reviews.</li>
+      <li><span class="pill teal">Recommendation</span> Remove guest names and contact details before you paste anything into an AI tool, and check your AI tool's data settings. This page does a first pass only.</li>
+      <li><span class="pill teal">Recommendation</span> Anything about sea conditions, weather, seasickness or safety in the section is owned by your captain or another qualified person. AI drafts it; that person approves it. No medical advice.</li>
+      <li><span class="pill amber">Policy choice</span> The owner approves the section before it is published, and a person posts every reply.</li>
+      <li><span class="pill teal">Recommendation</span> Keep the section current. Re-run Step 1 monthly in season, or when the review mix changes.</li>
+    </ul>
+    <p>The quote checker proves only that the words exist in a review. Read each review yourself.</p>
+  </section>
+
+  <section class="card teal" aria-labelledby="next">
+    <h2 id="next">Next rung</h2>
+    <p><a href="../2b/"><b>2.b A grounded answer assistant</b></a>: load the approved section, your cleaned reviews (use "Save cleaned reviews") and your fact sheet into a custom assistant that answers only from them and says "ask us" otherwise. Staff use it first.</p>
+    <p>The section also feeds <a href="../3a/">3.a The AI trip kit</a>.</p>
+  </section>
+
+  <section class="card note" aria-labelledby="sources">
+    <h2 id="sources">Sources</h2>
+    <ul class="src">
+      <li>Skift Research and McKinsey &amp; Company, <a href="https://www.mckinsey.com/industries/travel/our-insights/winning-hearts-in-an-age-of-infinite-travel-choices" target="_blank" rel="noopener"><i>Winning Hearts in an Age of Infinite Travel Choices</i></a>, September 2026. Survey of 1,015 US travelers, data as of June 2026: 43% second-guessing (Exhibit 6, p19); 52% anxious about booking the wrong option (p25); 41% traveler content in top three sources of confidence (p14); Accor reviews test (p14, no lift figures published).</li>
+      <li>US Federal Trade Commission, Trade Regulation Rule on the Use of Consumer Reviews and Testimonials, 16 CFR Part 465 (<a href="https://www.law.cornell.edu/cfr/text/16/part-465" target="_blank" rel="noopener">text of the rule</a>).</li>
+      <li>Facts on this page last checked 2026-10-10. Internet needed for these links only; the tool itself works offline once loaded.</li>
+    </ul>
+    <div class="btns no-print">
+      <button type="button" class="ghost" id="forget">Clear everything this page saved in this browser</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+  </section>
+</main>
+
+<footer class="kit">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates.</p>
+  <p><a href="../">All nine tools</a> · <a href="../Prompt-Kit-3x3.html">Printable prompt kit</a></p>
+</footer>
+</body>
+</html>

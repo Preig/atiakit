@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>AI visibility audit · ATIA AI Take-Home Kit</title>
+<meta name="description" content="Ask AI tools what a real traveler would ask, score whether your business appears, is described right, is cited and is current, and get a fix list. Works offline. Nothing leaves your browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='10' width='4' height='5' fill='%235c8727'/%3E%3Crect x='6' y='6' width='4' height='9' fill='%235c8727'/%3E%3Crect x='11' y='1' width='4' height='14' fill='%230d92b4'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/kit.css">
+<script src="../assets/kit.js" defer></script>
+<style>
+[hidden]{display:none!important}
+.tool-total,.avgline,.notes,.hist,.fixlist,.ps p,.warnline,.status{overflow-wrap:anywhere}
+.tonight{margin:14px 0 8px}
+.tonight .kicker{color:var(--green-d);margin:0 0 4px}
+.tonight p{margin:.3em 0}
+ul.tight{margin:6px 0 10px;padding-left:22px}
+ul.tight li{margin:5px 0}
+.src{font-size:14px;color:var(--slate-m);margin:12px 0 0}
+.stat{background:#fff;border:1px solid var(--line);border-radius:4px;padding:12px 14px}
+.stat .score{font-size:34px;margin:0}
+.stat p{margin:.4em 0 0;font-size:15px;line-height:1.45}
+.prompt-list{display:grid;gap:4px}
+.prompt-box{margin:8px 0}
+.prompt-box .btns{margin:10px 0 0}
+.prompt-box .status{margin:4px 0 0;min-height:0}
+.warnline{color:var(--amber);background:var(--amber-t);border-radius:4px;padding:6px 10px;font-size:15px}
+.warnline:empty{padding:0;background:none}
+.key{background:var(--teal-t);border-radius:4px;padding:8px 12px;font-size:15px;margin:10px 0}
+.rubric-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin:8px 0 4px}
+.rubric-grid>div{background:#fbfcfa;border:1px solid var(--line);border-radius:4px;padding:8px 12px}
+.rubric-grid h3{margin:.2em 0}
+.rubric-grid p{margin:.2em 0 .4em;font-size:15px}
+.rubric-grid ul{list-style:none;padding:0;margin:4px 0;font-size:15px;line-height:1.45}
+.rubric-grid li{padding:3px 0}
+.sc{display:inline-block;min-width:22px;text-align:center;font-weight:bold;border-radius:3px;color:#fff;margin-right:6px;font-size:13px;line-height:20px}
+.sc0{background:var(--red)}.sc1{background:var(--amber)}.sc2{background:var(--green-d)}
+.tabs{display:flex;gap:6px;margin:16px 0 0;border-bottom:3px solid var(--green-d)}
+.tabs button[role=tab]{flex:1 1 0;min-width:0;background:#fff;color:var(--teal-d);border:1px solid var(--line);border-bottom:0;border-radius:4px 4px 0 0;padding:7px 10px;font-size:15px;text-align:left;line-height:1.3}
+.tabs button[role=tab]:hover{background:var(--green-t)}
+.tabs button[role=tab][aria-selected=true]{background:var(--green-d);color:#fff;border-color:var(--green-d)}
+.tab-name{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tab-score{display:block;font-weight:normal;font-size:13px}
+.panel{border:1px solid var(--line);border-top:0;border-radius:0 0 4px 4px;padding:4px 14px 12px;background:#fbfcfa}
+.panel>label:first-child{margin-top:12px}
+.prow{background:#fff;border:1px solid var(--line);border-radius:4px;padding:10px 12px;margin:10px 0}
+.prow-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:0 0 8px}
+.prow-title{font-weight:bold;color:var(--slate);flex:1 1 180px;min-width:0;overflow-wrap:anywhere}
+.prow-total{font-size:14px;color:var(--slate-m);white-space:nowrap}
+button.mini{font-size:13px;font-weight:bold;padding:5px 10px;background:#fff;color:var(--teal-d);border:1px solid var(--teal)}
+button.mini:hover{background:var(--teal-t)}
+.cells{display:grid;gap:10px 14px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.cell{min-width:0}
+.cell-head{display:flex;align-items:center;gap:6px;margin:0 0 4px}
+.cell-name{font-size:14px;font-weight:bold;color:var(--teal-d)}
+button.tip-btn{width:26px;height:26px;padding:0;border-radius:50%;background:#fff;color:var(--teal-d);border:1px solid var(--teal);font-size:14px;line-height:24px;text-align:center;flex:0 0 auto}
+button.tip-btn:hover,button.tip-btn[aria-expanded=true]{background:var(--teal-t)}
+.opts{display:flex;gap:6px}
+label.opt{position:relative;display:block;margin:0;font-size:inherit}
+label.opt input{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer}
+label.opt .face{display:flex;align-items:center;justify-content:center;width:44px;height:40px;border:2px solid #b8beb4;border-radius:6px;background:#fff;color:var(--slate);font-size:17px;font-weight:bold}
+label.opt:hover .face{border-color:var(--teal)}
+label.opt input:focus-visible+.face{outline:3px solid var(--teal);outline-offset:2px}
+label.opt.v0 input:checked+.face{background:var(--red);border-color:var(--red);color:#fff}
+label.opt.v1 input:checked+.face{background:var(--amber);border-color:var(--amber);color:#fff}
+label.opt.v2 input:checked+.face{background:var(--green-d);border-color:var(--green-d);color:#fff}
+.tip{font-size:14px;line-height:1.45;background:var(--teal-t);border-radius:4px;padding:8px 10px;margin:6px 0 0}
+.tool-total{background:#fff;border:1px solid var(--line);border-left:5px solid var(--teal);border-radius:4px;padding:10px 12px;margin:12px 0 4px;font-size:15px}
+.tool-total .score{font-size:28px;margin-right:6px}
+.tiles{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:6px 0 14px}
+.tile{background:#fff;border:1px solid var(--line);border-top:4px solid var(--teal);border-radius:4px;padding:10px 14px}
+.tile-name{margin:0 0 4px;font-weight:bold;color:var(--slate);overflow-wrap:anywhere}
+.tile .score{margin:0}
+.of{font-size:18px;color:var(--slate-m);font-weight:normal}
+.tile .hint{margin:4px 0 0}
+.avgline{font-size:16px;margin:4px 0 10px}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:8px 0}
+table.totals td{white-space:nowrap}
+table.totals thead th{overflow-wrap:anywhere;min-width:64px}
+table.totals tr.tot td,table.totals tr.tot th{background:var(--teal-t)}
+.bar{display:block;height:6px;width:100%;min-width:40px;background:var(--line);border-radius:3px;margin-top:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal)}
+.notes{margin:6px 0;padding-left:20px;font-size:15px}
+.fixlist{list-style:none;padding:0;margin:10px 0;counter-reset:fix}
+.fixlist>li,.fix-static{position:relative;background:#fff;border:1px solid var(--line);border-radius:4px;padding:12px 16px 8px 60px;margin:0 0 12px}
+.fixlist>li{counter-increment:fix}
+.fixlist>li::before{content:counter(fix);position:absolute;left:14px;top:12px;width:32px;height:32px;border-radius:50%;background:var(--green-d);color:#fff;font-weight:bold;text-align:center;line-height:32px}
+.fix-static::before{content:"+";position:absolute;left:14px;top:12px;width:32px;height:32px;border-radius:50%;background:var(--teal-d);color:#fff;font-weight:bold;text-align:center;line-height:32px}
+.fixlist>li.first{border:2px solid var(--teal)}
+.fixlist h3,.fix-static h3{margin:.35em 0 .3em}
+.fixlist ul,.fix-static ul{margin:4px 0 8px;padding-left:20px}
+.fixlist li li{margin:3px 0}
+.lbl{font-size:14px;color:var(--slate-m);margin:.4em 0}
+.legal{background:var(--amber-t);padding:6px 10px;border-radius:4px;color:var(--ink);font-size:14px}
+.lbl .pill,.legal .pill,ul.rules .pill{margin-right:4px}
+ul.rules li{margin:8px 0}
+.card.warn .pill.red{background:#fff;border:1px solid var(--red)}
+.hist{list-style:none;padding:0;margin:10px 0}
+.hist>li{background:#fff;border:1px solid var(--line);border-radius:4px;padding:10px 14px;margin:0 0 10px}
+.hist p{margin:.2em 0}
+.hist .btns{margin:8px 0 2px}
+button.small,button.secondary.small,button.danger.small{font-size:14px;padding:5px 12px}
+.print-only{display:none}
+@media (max-width:860px){.cells{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){
+  .cells{grid-template-columns:1fr;gap:8px}
+  .cell{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;border-top:1px solid var(--line);padding-top:8px}
+  .cell-head{margin:0}
+  .tip{flex-basis:100%}
+  .panel{padding:4px 8px 10px}
+  .prow{padding:10px}
+  .fixlist>li,.fix-static{padding-left:14px}
+  .fixlist>li::before,.fix-static::before{position:static;float:left;margin:0 10px 4px 0}
+  .fixlist>li>p:first-child,.fix-static>p:first-child{min-height:32px;display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+  .fixlist h3,.fix-static h3{clear:left}
+  .tiles{grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+  .tile{padding:8px 10px}
+  .tile .score{font-size:30px}
+  .of{font-size:15px}
+  .tile .hint{font-size:13px}
+  table.totals{font-size:14px}
+  table.totals th,table.totals td{padding:6px 5px}
+  table.totals td{white-space:normal}
+  table.totals thead th{min-width:0}
+}
+@media print{
+  main.kit>*:not(#print-summary),.tonight{display:none!important}
+  .print-only{display:block!important}
+  body{font-size:11pt}
+  .ps h2{font-size:16pt;margin:.6em 0 .3em}
+  .ps h3{font-size:12pt;margin:.8em 0 .3em}
+  .ps table{font-size:9.5pt;margin:4px 0 8px;break-inside:avoid}
+  .ps th,.ps td{padding:3px 6px}
+  .ps ol,.ps ul{margin:4px 0;padding-left:20px}
+  .ps p{margin:.3em 0}
+}
+</style>
+</head>
+<body data-page="audit">
+<div class="band" aria-hidden="true"></div>
+<header class="kit">
+  <p class="crumbs"><a href="../">ATIA AI Take-Home Kit</a> › Start Monday · Tool 1 of 4</p>
+  <p class="kicker"><span class="rung r1" aria-hidden="true"><i></i><i></i><i></i></span>Basic rung · Monday tool 1 · Pain 1 · Comparison overload</p>
+  <h1>AI visibility audit</h1>
+  <p class="lede">Ask AI tools what a real traveler would ask. Then score whether you show up, described correctly. You leave with a score out of 40 per AI tool and a fix list, weakest check first.</p>
+  <div class="callout green tonight">
+    <p class="kicker">If you do one thing tonight</p>
+    <p><strong>Ask one AI tool prompt 1, with your town and the month your guests come. Are you in the answer?</strong></p>
+    <p>Fill in <a href="#s1">Step 1</a>, tap <b>Copy prompt 1</b>, paste it into a fresh chat, and <a href="#s3">score</a> what comes back. About five minutes.</p>
+  </div>
+  <ul class="meta">
+    <li><b>Time</b> about 15 min per AI tool, run three</li><li><b>Cost</b> free tiers work</li><li><b>Skill</b> no code</li><li><b>Feeds</b> Number 1 · AI visibility score</li><li><b>Fixes</b> Pain 1 · comparison overload</li>
+  </ul>
+  <nav class="tool-nav" data-toolnav="audit" aria-label="All tools"></nav>
+</header>
+
+<main class="kit">
+  <noscript><div class="callout amber"><p><strong>This page needs JavaScript</strong> for the prompt builder and the scorecard. The five prompts are also in the <a href="../Prompt-Kit-3x3.html">printable prompt kit</a>.</p></div></noscript>
+
+  <section class="card teal" aria-labelledby="why">
+    <h2 id="why">The pain it fixes</h2>
+    <div class="grid three">
+      <div class="stat"><p class="score">45%</p><p>of US travelers find comparing options frustrating. It is the most-named planning frustration.</p></div>
+      <div class="stat"><p class="score">34%</p><p>of US travelers use AI during travel research, more than at any other stage of the trip.</p></div>
+      <div class="stat"><p class="score">5 tools</p><p>got the same family-hotel question from McKinsey: three AI portals and two OTA AI tools. No hotel appeared in all five answers; most appeared only once.</p></div>
+    </div>
+    <div class="grid two">
+      <div><h3>For the traveler</h3><p>An AI tool hands the traveler a short list. The traveler compares what is on that list, not everything that exists.</p></div>
+      <div><h3>For your business</h3><p>If an AI tool leaves you off, or describes you wrong, you lose the comparison before it starts, and you never find out. This audit is how you find out. Check three tools, not one, because they disagree.</p></div>
+    </div>
+    <p class="src">Source: Skift Research + McKinsey, <i>Winning Hearts in an Age of Infinite Travel Choices</i>, Sept 2026 · survey of n = 1,015 US travelers, data as of June 2026 (Exhibit 6; pages 22 and 24). US travelers, not Alaska visitors.</p>
+  </section>
+
+  <section class="card" aria-labelledby="how">
+    <h2 id="how">How to run it</h2>
+    <ol class="steps">
+      <li><strong>Fill in your details</strong> in Step 1. Public business names only.</li>
+      <li><strong>Pick three AI tools.</strong> Use whichever three are current. This kit does not recommend one. Free tiers work.</li>
+      <li><strong>Run each prompt in a fresh chat</strong> in each tool. Paste it exactly as written.</li>
+      <li><strong>Score each answer</strong> 0, 1 or 2 on four checks: Appear, Described, Cited, Current. Not in the answer at all? Score 0 on all four.</li>
+      <li><strong>Read your fix list.</strong> It starts with your weakest check.</li>
+      <li><strong>Save the result</strong> and re-run the same five prompts every quarter.</li>
+    </ol>
+    <div class="callout amber">
+      <p><strong>Answers vary by day and by tool.</strong> Ask the same question tomorrow and the answer may change. One run is a snapshot, not a ranking. Re-run quarterly, the same way each time, and compare your saved results. That is your Number 1: AI visibility score.</p>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="s1">
+    <h2 id="s1">Step 1 · Your details</h2>
+    <p class="hint">Public business names only. Do not type guest names, emails, phone numbers, card numbers or booking details. Everything stays in this browser.</p>
+    <form data-builder="audit" id="details" autocomplete="off">
+      <div class="grid two">
+        <div><label for="f-business">Your business name</label>
+          <input type="text" id="f-business" name="business" maxlength="100" spellcheck="false"></div>
+        <div><label for="f-category">Category <small>(as a traveler would say it)</small></label>
+          <input type="text" id="f-category" name="category" maxlength="80" list="dl-category" aria-describedby="h-category">
+          <p class="hint" id="h-category">For example: glacier cruise, fishing lodge, aurora tour, guide service, shore excursion.</p></div>
+        <div><label for="f-town">Town</label>
+          <input type="text" id="f-town" name="town" maxlength="60"></div>
+        <div><label for="f-competitor">Nearest competitor</label>
+          <input type="text" id="f-competitor" name="competitor" maxlength="100" spellcheck="false"></div>
+        <div><label for="f-nearby">A nearby lodge or partner</label>
+          <input type="text" id="f-nearby" name="nearby" maxlength="100" spellcheck="false" aria-describedby="h-nearby">
+          <p class="hint" id="h-nearby">A place your guests often book with you. Used in prompt 5.</p></div>
+        <div><label for="f-month">Travel month</label>
+          <input type="text" id="f-month" name="month" maxlength="40" list="dl-month" aria-describedby="h-month">
+          <p class="hint" id="h-month">The month your guests come, or a phrase like "late February".</p></div>
+        <div><label for="f-traveler">Traveler type <small>(optional)</small></label>
+          <input type="text" id="f-traveler" name="traveler" maxlength="80" list="dl-traveler" aria-describedby="h-traveler">
+          <p class="hint" id="h-traveler">Left blank, prompt 2 uses "a family with a 9-year-old".</p></div>
+      </div>
+      <datalist id="dl-category"><option value="glacier cruise"><option value="wildlife cruise"><option value="fishing charter"><option value="fishing lodge"><option value="wilderness lodge"><option value="bed and breakfast"><option value="guide service"><option value="guided glacier hike"><option value="flightseeing tour"><option value="dog sledding tour"><option value="aurora tour"><option value="shore excursion"><option value="kayak tour"><option value="bear viewing tour"></datalist>
+      <datalist id="dl-month"><option value="January"><option value="February"><option value="late February"><option value="March"><option value="April"><option value="May"><option value="June"><option value="July"><option value="August"><option value="September"><option value="October"><option value="November"><option value="December"></datalist>
+      <datalist id="dl-traveler"><option value="a family with a 9-year-old"><option value="a couple on a 10-day road trip"><option value="a cruise ship passenger with 5 hours ashore"><option value="a serious photographer"><option value="a group of four friends"><option value="a traveler over 70 who walks slowly"></datalist>
+      <p class="warnline" id="pii-warn" role="status" aria-live="polite"></p>
+      <div class="btns">
+        <button type="button" class="secondary" id="btn-example">Load the fictional example</button>
+        <button type="button" class="ghost" id="btn-clear">Clear</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </form>
+    <div class="callout amber" id="example-note" hidden>
+      <p><strong>Fictional example.</strong> Bay Light Day Cruises (Seward), its partner Harbor Kayak Co. and the competitor Kittiwake Bay Cruises are invented teaching businesses. A real AI tool will not find them, so an honest score would be 0. The scores loaded in Step 3 are imagined, to show how the scorecard and fix list work. Replace everything with your own business.</p>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="s2">
+    <h2 id="s2">Step 2 · The five prompts</h2>
+    <p>Run each prompt in a <strong>fresh chat</strong>, in <strong>three AI tools</strong>. Use whichever three are current; this kit does not recommend one.</p>
+    <ul class="tight">
+      <li>Start a new chat for every prompt, so one answer does not shape the next.</li>
+      <li>If the tool has memory or personalization, use a temporary or private chat if it offers one. It may already know you own the business.</li>
+      <li>Paste the prompt exactly. Do not add your website and do not ask follow-up questions. You are scoring what a traveler would see.</li>
+      <li>Note the sources or links the tool shows. You need them for the Cited check.</li>
+      <li>The tool may use your location. Run it the same way each quarter so the results compare.</li>
+    </ul>
+    <p class="warnline" id="blank-warn" role="status" aria-live="polite"></p>
+    <div class="prompt-list">
+      <div class="output prompt-box"><p class="label">Prompt 1 · Things to do</p>
+        <pre id="out-p1" data-render="tpl-p1" data-builder-src="audit"></pre>
+        <div class="btns"><button type="button" data-pcopy="out-p1">Copy prompt 1</button></div>
+        <p class="status" role="status" aria-live="polite"></p></div>
+      <div class="output prompt-box"><p class="label">Prompt 2 · Best in your category</p>
+        <pre id="out-p2" data-render="tpl-p2" data-builder-src="audit"></pre>
+        <div class="btns"><button type="button" data-pcopy="out-p2">Copy prompt 2</button></div>
+        <p class="status" role="status" aria-live="polite"></p></div>
+      <div class="output prompt-box"><p class="label">Prompt 3 · You against your competitor</p>
+        <pre id="out-p3" data-render="tpl-p3" data-builder-src="audit"></pre>
+        <div class="btns"><button type="button" data-pcopy="out-p3">Copy prompt 3</button></div>
+        <p class="status" role="status" aria-live="polite"></p></div>
+      <div class="output prompt-box"><p class="label">Prompt 4 · Your weather policy</p>
+        <pre id="out-p4" data-render="tpl-p4" data-builder-src="audit"></pre>
+        <div class="btns"><button type="button" data-pcopy="out-p4">Copy prompt 4</button></div>
+        <p class="status" role="status" aria-live="polite"></p></div>
+      <div class="output prompt-box"><p class="label">Prompt 5 · What to add to a trip</p>
+        <pre id="out-p5" data-render="tpl-p5" data-builder-src="audit"></pre>
+        <div class="btns"><button type="button" data-pcopy="out-p5">Copy prompt 5</button></div>
+        <p class="status" role="status" aria-live="polite"></p></div>
+    </div>
+    <p class="hint">These are traveler questions, not drafting prompts, so they carry no DRAFT marker: you are testing what a traveler sees. Do not reuse an AI answer about your business as marketing copy.</p>
+    <div class="btns"><button type="button" class="secondary" id="btn-save-prompts">Save the five prompts as .txt</button></div>
+    <p class="status" role="status" aria-live="polite"></p>
+<template id="tpl-p1">I am in {{town|[YOUR TOWN]}} for three nights in {{month|[MONTH]}}. What should I do, and who should I book with?</template>
+<template id="tpl-p2">Best {{category|[YOUR CATEGORY]}} near {{town|[YOUR TOWN]}} for {{traveler|a family with a 9-year-old}}. Give me three with prices.</template>
+<template id="tpl-p3">Compare {{business|[YOUR BUSINESS]}} and {{competitor|[YOUR NEAREST COMPETITOR]}} in {{town|[YOUR TOWN]}}. Which should I pick?</template>
+<template id="tpl-p4">If the weather cancels, what is the refund policy at {{business|[YOUR BUSINESS]}} in {{town|[YOUR TOWN]}}?</template>
+<template id="tpl-p5">I booked {{nearby|[A LODGE OR PARTNER NEAR YOU]}} in {{town|[YOUR TOWN]}} for {{month|[MONTH]}}. What should I add?</template>
+  </section>
+
+  <section class="card" aria-labelledby="s3">
+    <h2 id="s3">Step 3 · Score each answer</h2>
+    <p class="key"><span class="sc sc0">0</span>no · <span class="sc sc1">1</span>partly · <span class="sc sc2">2</span>yes. Not in the answer at all? Tap <b>Not in answer</b> to score 0 on all four checks. Tap a score again to clear it (on a keyboard, press Delete). Tap <b>?</b> for the rubric.</p>
+    <details class="rubric">
+      <summary>How to score: the four checks</summary>
+      <div class="rubric-grid" id="rubric-body"></div>
+      <p class="hint">Score only what is in the answer and the sources it shows. Do not click through to correct it.</p>
+    </details>
+    <div class="tabs" role="tablist" aria-label="AI tools you scored" id="tabs"></div>
+    <div id="panels"></div>
+    <p class="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="card teal" aria-labelledby="s4">
+    <h2 id="s4">Your results</h2>
+    <div id="tiles" class="tiles"></div>
+    <p class="avgline" id="avgline"></p>
+    <div class="table-wrap" id="totals-wrap"></div>
+    <ul class="notes" id="result-notes"></ul>
+    <p class="hint">Totals add up the answers you scored. A blank answer adds nothing, so score all 20 per tool for a fair total out of 40. The fix list ranks checks using only the answers you scored.</p>
+    <div class="grid two">
+      <div><label for="f-date">Audit date</label><input type="date" id="f-date"></div>
+      <div><label for="f-note">Note <small>(optional, no guest data)</small></label><input type="text" id="f-note" maxlength="140" placeholder="For example: before the Google profile update"></div>
+    </div>
+    <div class="btns">
+      <button type="button" id="btn-save">Save this result</button>
+      <button type="button" class="secondary" id="btn-copy-summary">Copy summary</button>
+      <button type="button" class="secondary" id="btn-print">Print</button>
+      <button type="button" class="ghost" id="btn-newrun">Start a new run</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="card" aria-labelledby="s5">
+    <h2 id="s5">Your fix list</h2>
+    <p class="hint" id="fix-intro">Ordered by your weakest check, from the answers you scored. Each item is a Recommendation unless it says otherwise.</p>
+    <ol class="fixlist" id="fixlist"></ol>
+    <div class="fix-static">
+      <p><span class="pill teal">Always</span></p>
+      <h3>Ask your booking platform about AI and metasearch feeds</h3>
+      <p>Google's Things to do and hotel price listings come from booking feeds sent by your booking platform or a connectivity partner, not from your website. Some AI assistants now show and book activities through OTAs and booking platforms too. One email finds out whether you are in those feeds.</p>
+      <div class="output"><p class="label">Question for your booking platform</p>
+<pre id="q-platform">Hello. We use your platform for our bookings. Please answer in writing:
+1. Do you send our live availability and prices to Google (Things to do, or hotel prices) or to other metasearch sites? Is it switched on for our account?
+2. Do you connect to any AI assistants or AI booking programs? Which ones, and are we included?
+3. What do we have to switch on, what does it cost, and is it covered by our current agreement?
+4. If it is not available today, is it on your roadmap, and when?</pre></div>
+      <div class="btns"><button type="button" class="secondary" data-copytext="q-platform">Copy the question</button></div>
+      <p class="status" role="status" aria-live="polite"></p>
+      <p class="lbl"><span class="pill teal">Recommendation</span> Send the question and keep the written answer.</p>
+      <p class="lbl"><span class="pill">Contractual</span> What your platform shares, and what it costs, is set by your booking platform agreement. Check it before you switch anything on.</p>
+    </div>
+    <p>Walk this list with an Alaska SBDC advisor. Advising is no-cost: <a href="https://aksbdc.org" target="_blank" rel="noopener">aksbdc.org</a>.</p>
+    <div class="btns"><button type="button" class="secondary" id="btn-copy-fixes">Copy the fix list</button></div>
+    <p class="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="card note" aria-labelledby="s6">
+    <h2 id="s6" tabindex="-1">Your saved results</h2>
+    <p>Saved results stay in this browser on this device. Nothing is sent anywhere. Download a .json copy to keep them safe or to move them to another device, and a .csv to open in a spreadsheet.</p>
+    <p class="warnline" id="storage-warn" role="status" aria-live="polite"></p>
+    <div id="history"></div>
+    <div class="btns">
+      <button type="button" class="secondary" id="btn-export-json">Download all (.json)</button>
+      <button type="button" class="secondary" id="btn-export-csv">Download all (.csv)</button>
+      <button type="button" class="secondary" id="btn-import">Import (.json)</button>
+      <button type="button" class="danger" id="btn-delete-all">Delete all saved results</button>
+    </div>
+    <input type="file" id="f-import" accept=".json,application/json" class="visually-hidden" tabindex="-1" aria-hidden="true">
+    <p class="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="card note" aria-labelledby="measure">
+    <h2 id="measure">How you will know it worked</h2>
+    <p><strong>Number 1 · AI visibility score.</strong> Add the 0 to 2 scores: 5 prompts × 4 checks, per AI tool. Maximum 40. Count it every quarter. Good direction: up.</p>
+    <ul class="tight">
+      <li>Save today's result as your baseline. There is no target on purpose: set one after a season of your own data.</li>
+      <li>Expect no change for weeks after a fix. AI tools refresh what they know on their own schedule.</li>
+      <li>A few points up or down between two runs is noise. Read the direction over two or three quarters.</li>
+      <li>Use the same five prompts, the same three tools if you can, and the same way of asking each time.</li>
+    </ul>
+    <h3>Where to go next</h3>
+    <ul class="tight">
+      <li><a href="../1a/">1.a Rewrite for the short list</a>: fixes a low Described score. Basic rung, an afternoon.</li>
+      <li><a href="../2a/">2.a The honest picture</a>: review replies and a "what to expect" section.</li>
+      <li><a href="../1c/">1.c AI answer monitoring</a>: automates the Appear and Cited checks every week. Described and Current stay scored by a person. Advanced rung.</li>
+      <li><a href="../">All nine tools</a> and the four numbers.</li>
+    </ul>
+  </section>
+
+  <section class="card warn" aria-labelledby="safe">
+    <h2 id="safe">Before you use it</h2>
+    <p><strong>AI drafts. You approve.</strong> This page only measures. Any listing text you draft to fix a low score goes through 1.a and stays marked DRAFT - PENDING OWNER REVIEW until you approve it.</p>
+    <ul class="tight rules">
+      <li><span class="pill teal">Recommendation</span> A confident wrong answer is a finding, not a fact. Do not argue with the AI tool; fix the sources it reads. Asking an AI to check its own answer is not verification.</li>
+      <li><span class="pill teal">Recommendation</span> If an answer gets your weather, water, glacier or wildlife rules wrong, fix the source. The go/no-go call stays with your qualified captain or guide, never with an AI tool.</li>
+      <li><span class="pill red">Legal mandate</span> Guide licensing and registration are yours and cannot be delegated, to staff or to an AI tool (AS 08.54 for big game guides; ADF&amp;G registration for sport fishing guides and businesses).</li>
+      <li><span class="pill teal">Recommendation</span> Type public business names only. No guest names, emails, phone numbers, card numbers or booking details, here or in the AI tools you test. Nothing on this page leaves your browser.</li>
+      <li><span class="pill">Contractual</span> Each AI tool's terms of service apply to what you type into it. Check them, and its memory and data settings, before you start.</li>
+      <li><strong>Not a ranking.</strong> No AI tool is endorsed. A result is one snapshot of what a traveler might see on one day. Time and cost figures are estimates.</li>
+    </ul>
+  </section>
+
+  <section id="print-summary" class="print-only ps" aria-hidden="true"></section>
+</main>
+
+<footer class="kit">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates.</p>
+  <p><a href="../">All nine tools</a> · <a href="../Prompt-Kit-3x3.html">Printable prompt kit</a> · Facts last verified 2026-10-10</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var NT = 3, NP = 5, NC = 4;
+  var SKEY = "atiakit:audit:scores", HKEY = "atiakit:audit:history", DKEY = "atiakit:audit:audit";
+  var FORMAT = "atiakit-ai-visibility-audit";
+  var WORDS = ["No", "Partly", "Yes"];
+  var CHECKS = [
+    { name: "Appear", q: "Are you in the answer at all?", r: [
+      "You are not in the answer, or the tool says it cannot find you.",
+      "Mentioned in passing, low in a long list, misspelled, or mixed up with another business.",
+      "Named clearly as an option, or correctly identified when the prompt names you."] },
+    { name: "Described", q: "Right category, place and promise?", r: [
+      "Wrong category, wrong town, or claims you do not make.",
+      "Generic, or one of category, place and promise is missing or off.",
+      "Right category, right place, and the promise you actually make."] },
+    { name: "Cited", q: "Are you in its sources?", r: [
+      "No source about you, or the tool shows no sources.",
+      "A third-party page about you: an OTA, review site, DMO or article.",
+      "Your own website or your Google Business Profile is a source."] },
+    { name: "Current", q: "Today's prices and policies?", r: [
+      "Wrong, outdated or invented prices, dates, hours or policies.",
+      "Some facts current, some old or missing, or too vague to check.",
+      "The prices, dates and policies it gives for you match what you sell today."] }
+  ];
+  var PSHORT = [
+    function (d) { return "Things to do" + (d.town ? " in " + d.town : ""); },
+    function (d) { return d.category ? "Best " + d.category : "Best in your category"; },
+    function (d) { return "You vs " + (d.competitor || "your competitor"); },
+    function () { return "Weather refund policy"; },
+    function (d) { return "What to add to " + (d.nearby || "a nearby booking"); }
+  ];
+  var FIXES = [
+    { title: "Get found: Google Business Profile, OTA and DMO listings",
+      why: "Appear is low: AI tools do not bring you up when a traveler asks.",
+      steps: [
+        "Claim and complete your Google Business Profile: the right category, season dates, hours, booking link and current photos. Answer its reviews and questions.",
+        "Check every OTA listing you use (for example Viator, Tripadvisor or GetYourGuide) and your DMO or visitor bureau listing. Use the same business name, category and town everywhere.",
+        "Ask your DMO or local visitor bureau how to be listed, or updated, in its guide and on its website."],
+      contract: "OTA listings are edited under each OTA's supplier agreement (for example your Viator supplier agreement). Check what you can change there." },
+    { title: "Get described right: checkable facts instead of adjectives",
+      why: "Described is low: AI tools find you but get your category, place or promise wrong.",
+      steps: [
+        'Run <a href="../1a/">1.a Rewrite for the short list</a>: swap adjectives for facts a traveler can check, then publish the same facts on every channel on the same day.',
+        "Say what you are in the first sentence everywhere: category, town and season.",
+        'Answer reviews with specifics and add an honest "what to expect" section: <a href="../2a/">2.a The honest picture</a>.'] },
+    { title: "Get cited: plain-text facts on your own site",
+      why: "Cited is low: AI tools do not use your own pages as a source.",
+      steps: [
+        "Put your key facts on your own website as plain text, not only inside images, PDFs or a booking widget: what, where, when, how long, price, minimum age, what is included, cancellation and weather policy.",
+        "Give each product its own page with a clear title, and add a short FAQ page that answers the questions in prompts 2 to 5.",
+        "Link your Google Business Profile to your website.",
+        'Later, structured data and weekly monitoring: <a href="../1c/">1.c AI answer monitoring</a> (advanced rung).'] },
+    { title: "Get current: update prices and policies everywhere",
+      why: "Current is low: AI tools repeat old prices, dates or policies.",
+      steps: [
+        "On the same day, update prices, season dates, hours, and your cancellation and weather policies on your site, your Google Business Profile, every OTA and DMO listing, and your confirmation email.",
+        "Update or remove old pages, PDFs and last year's rate sheets that still show up in search.",
+        "Add a \"last updated\" date to your policy page."],
+      legal: "For short-term lodging, the price you show has to be the total price, including mandatory fees (FTC Rule on Unfair or Deceptive Fees, 16 CFR Part 464, in effect since May 12, 2025). The rule covers short-term lodging and live-event tickets, not tours." }
+  ];
+  var EXAMPLE = {
+    details: { business: "Bay Light Day Cruises", category: "wildlife and glacier cruise", town: "Seward", competitor: "Kittiwake Bay Cruises", nearby: "Harbor Kayak Co.", month: "July", traveler: "a family with a 9-year-old" },
+    note: "Fictional example, imagined scores",
+    tools: [
+      { name: "AI tool A", s: [[1, 1, 0, 1], [2, 1, 0, 0], [2, 2, 1, 1], [2, 1, 0, 0], [0, 0, 0, 0]] },
+      { name: "AI tool B", s: [[2, 1, 1, 1], [2, 2, 1, 1], [2, 1, 1, 1], [2, 2, 0, 1], [1, 1, 0, 1]] },
+      { name: "AI tool C", s: [[0, 0, 0, 0], [1, 1, 0, 0], [2, 1, 0, 1], [1, 0, 0, 0], [0, 0, 0, 0]] }
+    ]
+  };
+  var DFIELDS = ["business", "category", "town", "competitor", "nearby", "month", "traveler"];
+
+  var state = { tools: [], date: "", note: "", tab: 0 };
+  var details = {};
+  var history = [];
+  var canStore = false;
+
+  /* ---------- helpers ---------- */
+  function $(s, root) { return (root || document).querySelector(s); }
+  function $all(s, root) { return Array.prototype.slice.call((root || document).querySelectorAll(s)); }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function todayISO() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function clean(s, max) { return String(s == null ? "" : s).replace(/[\u0000-\u001f\u007f]+/g, " ").trim().slice(0, max || 200); }
+  function stripTags(s) { return String(s).replace(/<[^>]*>/g, ""); }
+  function newId() { return "r" + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36); }
+  function lsGet(k) { try { var v = window.localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function lsSet(k, v) { try { window.localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  function lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) { } }
+  function storageWorks() { try { var k = "atiakit:audit:test"; window.localStorage.setItem(k, "1"); var ok = window.localStorage.getItem(k) === "1"; window.localStorage.removeItem(k); return ok; } catch (e) { return false; } }
+  function say(el, msg) {
+    if (window.KIT && window.KIT.say) { window.KIT.say(el, msg); return; }
+    var n = el, box = null; while (n && !box) { box = n.querySelector && n.querySelector(".status"); n = n.parentElement; }
+    if (box) box.textContent = msg;
+  }
+  function copyText(text, btn, msg) {
+    function fallback() {
+      var a = document.createElement("textarea");
+      a.value = text; a.setAttribute("readonly", ""); a.style.position = "fixed"; a.style.left = "-10000px";
+      document.body.appendChild(a); a.select();
+      var ok = false; try { ok = document.execCommand("copy"); } catch (e) { }
+      a.remove(); if (btn && btn.focus) btn.focus();
+      say(btn, ok ? msg : "Select the text and press Ctrl+C (Cmd+C on a Mac).");
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { say(btn, msg); }, fallback);
+    else fallback();
+  }
+  function download(name, text, mime) {
+    if (window.KIT && window.KIT.download) { window.KIT.download(name, text, mime); return; }
+    var blob = new Blob([text], { type: (mime || "text/plain") + ";charset=utf-8" }), a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+
+  /* ---------- data model ---------- */
+  function emptyScores() { var s = []; for (var p = 0; p < NP; p++) s.push([null, null, null, null]); return s; }
+  function resetTools() { state.tools = []; for (var i = 0; i < NT; i++) state.tools.push({ name: "", s: emptyScores() }); }
+  function normScore(v) { if (typeof v === "string" && /^[012]$/.test(v.trim())) v = +v.trim(); return (v === 0 || v === 1 || v === 2) ? v : null; }
+  function normScores(s) {
+    var out = emptyScores();
+    if (!Array.isArray(s)) return out;
+    for (var p = 0; p < NP; p++) { var row = s[p]; if (!Array.isArray(row)) continue; for (var c = 0; c < NC; c++) out[p][c] = normScore(row[c]); }
+    return out;
+  }
+  function normTools(arr, padOut) {
+    var out = [];
+    if (Array.isArray(arr)) arr.slice(0, NT).forEach(function (t) { if (t && typeof t === "object") out.push({ name: clean(t.name, 60), s: normScores(t.s || t.scores) }); });
+    if (padOut) while (out.length < NT) out.push({ name: "", s: emptyScores() });
+    return out;
+  }
+  function pickDetails(d) { var o = {}; d = d && typeof d === "object" ? d : {}; DFIELDS.forEach(function (k) { o[k] = clean(d[k], 120); }); return o; }
+  function stats(t) {
+    var r = { total: 0, n: 0, chk: [0, 0, 0, 0], chkN: [0, 0, 0, 0], pr: [], prN: [] };
+    for (var p = 0; p < NP; p++) {
+      var pt = 0, pn = 0;
+      for (var c = 0; c < NC; c++) { var v = t.s[p][c]; if (v !== null) { r.total += v; r.n++; r.chk[c] += v; r.chkN[c]++; pt += v; pn++; } }
+      r.pr.push(pt); r.prN.push(pn);
+    }
+    return r;
+  }
+  function toolLabel(t, i) { return clean(t.name, 60) || ("AI tool " + (i + 1)); }
+  /* Results, averages, the fix list and saved results all use the same set: tools with at least one scored answer.
+     A tool that is named but not scored yet is listed in the notes instead, so it cannot pull the average down. */
+  function used(tools) {
+    var o = [];
+    tools.forEach(function (t, i) { var st = stats(t); if (st.n > 0) o.push({ t: t, i: i, st: st, name: toolLabel(t, i) }); });
+    return o;
+  }
+  function namedNotScored(tools) {
+    var o = [];
+    tools.forEach(function (t, i) { if (clean(t.name) && stats(t).n === 0) o.push(toolLabel(t, i)); });
+    return o;
+  }
+  function byCheck(u) {
+    return CHECKS.map(function (k, c) {
+      var sum = 0, n = 0; u.forEach(function (x) { sum += x.st.chk[c]; n += x.st.chkN[c]; });
+      return { c: c, sum: sum, n: n, max: u.length * 10, pct: n ? sum / (2 * n) : null };
+    });
+  }
+  function ranked(bc) {
+    return bc.slice().sort(function (a, b) {
+      if (a.pct === null || b.pct === null) return ((a.pct === null) - (b.pct === null)) || (a.c - b.c);
+      return (a.pct - b.pct) || (a.c - b.c);
+    });
+  }
+  function level(pct) { if (pct === null) return ["", "not scored yet"]; if (pct < 0.5) return ["red", "weak"]; if (pct < 0.8) return ["amber", "needs work"]; return ["", "holding up"]; }
+  function average(u) { if (!u.length) return 0; var s = 0; u.forEach(function (x) { s += x.st.total; }); return s / u.length; }
+  function hasScores() { return state.tools.some(function (t) { return stats(t).n > 0; }); }
+  function hasWork() { return hasScores() || DFIELDS.some(function (k) { return clean(details[k]); }); }
+  function isExample() { return /bay light/i.test(details.business || ""); }
+
+  /* ---------- persistence ---------- */
+  function saveState() { lsSet(SKEY, { v: 1, tools: state.tools, date: state.date, note: state.note, tab: state.tab }); }
+  function loadState() {
+    var s = lsGet(SKEY);
+    if (s && typeof s === "object") {
+      state.tools = normTools(s.tools, true);
+      state.date = /^\d{4}-\d{2}-\d{2}$/.test(s.date) ? s.date : "";
+      state.note = clean(s.note, 140);
+      state.tab = (s.tab >= 0 && s.tab < NT) ? (s.tab | 0) : 0;
+    } else resetTools();
+  }
+  function normResult(r) {
+    if (!r || typeof r !== "object") return null;
+    var tools = normTools(r.tools, false).filter(function (t) { return t.name || stats(t).n > 0; });
+    if (!tools.length) return null;
+    tools.forEach(function (t, i) { if (!t.name) t.name = "AI tool " + (i + 1); });
+    return {
+      id: (typeof r.id === "string" && /^[\w-]{1,40}$/.test(r.id)) ? r.id : newId(),
+      date: (typeof r.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(r.date)) ? r.date : todayISO(),
+      savedAt: (typeof r.savedAt === "string" && !isNaN(Date.parse(r.savedAt))) ? r.savedAt : new Date().toISOString(),
+      details: pickDetails(r.details), note: clean(r.note, 140), tools: tools
+    };
+  }
+  function loadHistory() {
+    var h = lsGet(HKEY), out = [], seen = {};
+    if (Array.isArray(h)) h.forEach(function (r) { var n = normResult(r); if (n && !seen[n.id]) { seen[n.id] = 1; out.push(n); } });
+    history = out;
+  }
+  function persistHistory() {
+    if (!history.length) { lsDel(HKEY); return canStore; }
+    return lsSet(HKEY, history);
+  }
+  function cmpOld(a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : (a.savedAt < b.savedAt ? -1 : a.savedAt > b.savedAt ? 1 : 0); }
+  function sortedHistory() { return history.slice().sort(function (a, b) { return cmpOld(b, a); }); }
+  function histAvg(h) { if (!h.tools.length) return 0; var s = 0; h.tools.forEach(function (t) { s += stats(t).total; }); return s / h.tools.length; }
+  function bizKey(h) { return clean(h.details && h.details.business).toLowerCase(); }
+  function previousOf(h) {
+    var best = null, key = bizKey(h);
+    history.forEach(function (o) { if (o.id !== h.id && bizKey(o) === key && cmpOld(o, h) < 0 && (!best || cmpOld(o, best) > 0)) best = o; });
+    return best;
+  }
+
+  /* ---------- build the scorecard ---------- */
+  function tipHTML(c) {
+    var k = CHECKS[c];
+    return "<b>" + k.name + ":</b> " + esc(k.q) + k.r.map(function (r, v) { return '<br><span class="sc sc' + v + '">' + v + "</span>" + WORDS[v] + ": " + esc(r); }).join("");
+  }
+  function buildRubric() {
+    $("#rubric-body").innerHTML = CHECKS.map(function (k, c) {
+      return "<div><h3>" + k.name + "</h3><p>" + esc(k.q) + "</p><ul>" + k.r.map(function (r, v) { return '<li><span class="sc sc' + v + '">' + v + "</span>" + WORDS[v] + ": " + esc(r) + "</li>"; }).join("") + "</ul></div>";
+    }).join("");
+  }
+  function buildScorecard() {
+    var th = "", ph = "";
+    for (var i = 0; i < NT; i++) {
+      th += '<button type="button" role="tab" id="tab-' + i + '" aria-controls="panel-' + i + '" aria-selected="false" tabindex="-1">' +
+        '<span class="tab-name" id="tabname-' + i + '">AI tool ' + (i + 1) + '</span><span class="visually-hidden">, score </span><span class="tab-score" id="tabscore-' + i + '">0/40</span></button>';
+      var rows = "";
+      for (var p = 0; p < NP; p++) {
+        var cells = "";
+        for (var c = 0; c < NC; c++) {
+          var id = i + "-" + p + "-" + c, opts = "";
+          for (var v = 0; v < 3; v++) {
+            opts += '<label class="opt v' + v + '" title="' + v + " " + WORDS[v] + ": " + esc(CHECKS[c].r[v]) + '"><input type="radio" name="s-' + id + '" value="' + v + '" data-t="' + i + '" data-p="' + p + '" data-c="' + c + '">' +
+              '<span class="face" aria-hidden="true">' + v + '</span><span class="visually-hidden">' + v + ", " + WORDS[v].toLowerCase() + ": " + esc(CHECKS[c].r[v]) + "</span></label>";
+          }
+          cells += '<div class="cell"><div class="cell-head"><span class="cell-name" id="cn-' + id + '">' + CHECKS[c].name + '</span>' +
+            '<button type="button" class="tip-btn" aria-expanded="false" aria-controls="tip-' + id + '" aria-label="How to score ' + CHECKS[c].name + '">?</button></div>' +
+            '<div class="opts" role="radiogroup" aria-labelledby="pl-' + i + "-" + p + " cn-" + id + '">' + opts + "</div>" +
+            '<div class="tip" id="tip-' + id + '" hidden>' + tipHTML(c) + "</div></div>";
+        }
+        rows += '<div class="prow" role="group" aria-labelledby="pl-' + i + "-" + p + '"><div class="prow-head">' +
+          '<span class="prow-title" id="pl-' + i + "-" + p + '">Prompt ' + (p + 1) + ' · <span class="pshort" data-p="' + p + '"></span></span>' +
+          '<span class="prow-total" id="pt-' + i + "-" + p + '">not scored</span>' +
+          '<button type="button" class="mini" data-none="' + i + "," + p + '" aria-label="Not in answer: prompt ' + (p + 1) + ', score all four checks 0">Not in answer</button></div>' +
+          '<div class="cells">' + cells + "</div></div>";
+      }
+      ph += '<div role="tabpanel" class="panel" id="panel-' + i + '" aria-labelledby="tab-' + i + '" hidden>' +
+        '<label for="tool-' + i + '">Name of AI tool ' + (i + 1) + ' <small>(the tool you used)</small></label>' +
+        '<input type="text" id="tool-' + i + '" data-tool="' + i + '" maxlength="60" autocomplete="off" spellcheck="false">' +
+        rows +
+        '<div class="tool-total" id="total-' + i + '" aria-live="polite" aria-atomic="true"></div>' +
+        '<div class="btns"><button type="button" class="ghost" data-clear-tool="' + i + '">Clear the scores for this tool</button></div></div>';
+    }
+    $("#tabs").innerHTML = th;
+    $("#panels").innerHTML = ph;
+  }
+  function syncInputs() {
+    $all("#panels input[type=radio]").forEach(function (r) {
+      r.checked = state.tools[+r.dataset.t].s[+r.dataset.p][+r.dataset.c] === +r.value;
+    });
+    for (var i = 0; i < NT; i++) $("#tool-" + i).value = state.tools[i].name;
+    $("#f-date").value = state.date || todayISO();
+    $("#f-note").value = state.note;
+  }
+  function activate(i, focus) {
+    state.tab = i;
+    for (var k = 0; k < NT; k++) {
+      var tab = $("#tab-" + k), on = k === i;
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+      tab.tabIndex = on ? 0 : -1;
+      $("#panel-" + k).hidden = !on;
+    }
+    if (focus) $("#tab-" + i).focus();
+  }
+
+  /* ---------- render ---------- */
+  function updateLabels() {
+    $all(".pshort").forEach(function (s) { s.textContent = PSHORT[+s.dataset.p](details); });
+  }
+  function totalsTable(u, caption) {
+    if (!u.length) return "";
+    var bc = byCheck(u), nAll = 0;
+    var h = '<table class="totals"><caption class="visually-hidden">' + esc(caption) + '</caption><thead><tr><th scope="col">Check</th>';
+    u.forEach(function (x) { h += '<th scope="col" class="num">' + esc(x.name) + "</th>"; nAll += x.st.n; });
+    if (u.length > 1) h += '<th scope="col" class="num">All tools</th>';
+    h += "</tr></thead><tbody>";
+    CHECKS.forEach(function (k, c) {
+      h += '<tr><th scope="row">' + k.name + "</th>";
+      u.forEach(function (x) { h += '<td class="num">' + x.st.chk[c] + "/10</td>"; });
+      if (u.length > 1) h += '<td class="num">' + bc[c].sum + "/" + bc[c].max + '<span class="bar" aria-hidden="true"><i style="width:' + Math.round(100 * bc[c].sum / bc[c].max) + '%"></i></span></td>';
+      h += "</tr>";
+    });
+    h += '<tr class="tot"><th scope="row">Total</th>';
+    u.forEach(function (x) { h += '<td class="num"><b>' + x.st.total + "/40</b></td>"; });
+    if (u.length > 1) h += '<td class="num">average <b>' + average(u).toFixed(1) + "</b>/40</td>";
+    h += '</tr><tr><th scope="row">Answers scored</th>';
+    u.forEach(function (x) { h += '<td class="num">' + x.st.n + "/20</td>"; });
+    if (u.length > 1) h += '<td class="num">' + nAll + "/" + (20 * u.length) + "</td>";
+    return h + "</tr></tbody></table>";
+  }
+  function renderTools() {
+    state.tools.forEach(function (t, i) {
+      var st = stats(t), name = toolLabel(t, i);
+      $("#tabname-" + i).textContent = name;
+      $("#tabscore-" + i).textContent = st.total + "/40" + (st.n && st.n < 20 ? " · " + st.n + " of 20" : "");      for (var p = 0; p < NP; p++) $("#pt-" + i + "-" + p).textContent = st.prN[p] ? st.pr[p] + " of 8" + (st.prN[p] < 4 ? " (" + st.prN[p] + " of 4 scored)" : "") : "not scored";
+      $("#total-" + i).innerHTML = '<span class="score">' + st.total + '<span class="of"> / 40</span></span> <b>' + esc(name) + "</b> · " + st.n + " of 20 answers scored<br>" +
+        CHECKS.map(function (k, c) { return k.name + " " + st.chk[c] + "/10"; }).join(" · ");
+    });
+  }
+  function renderResults(u) {
+    var tiles = u.map(function (x) {
+      return '<div class="tile"><p class="tile-name">' + esc(x.name) + '</p><p class="score">' + x.st.total + '<span class="of"> / 40</span></p><p class="hint">' + x.st.n + " of 20 scored</p></div>";
+    }).join("");
+    $("#tiles").innerHTML = tiles || '<p class="hint">Score at least one answer in Step 3 to see your totals here.</p>';
+    $("#avgline").innerHTML = u.length ? "Number 1, AI visibility score: " + u.map(function (x) { return esc(x.name) + " <b>" + x.st.total + "/40</b>"; }).join(" · ") +
+      (u.length > 1 ? " · average <b>" + average(u).toFixed(1) + "/40</b>" : "") : "";
+    $("#totals-wrap").innerHTML = totalsTable(u, "Scores per AI tool and per check");
+    var notes = [];
+    u.forEach(function (x) { if (x.st.n < 20) notes.push(esc(x.name) + ": " + (20 - x.st.n) + " answer" + (20 - x.st.n === 1 ? "" : "s") + " not scored yet."); });
+    namedNotScored(state.tools).forEach(function (n) { notes.push(esc(n) + ": no answers scored yet, so it is not in the totals or the average."); });
+    if (u.length && u.length < 3) notes.push("Scored " + u.length + " AI tool" + (u.length === 1 ? "" : "s") + ". Three tools give a fairer picture, because they disagree.");
+    if (isExample()) notes.push("Fictional example: the scores are imagined, to show how the page works.");
+    $("#result-notes").innerHTML = notes.map(function (n) { return "<li>" + n + "</li>"; }).join("");
+  }
+  function fixItems(u) {
+    var order = ranked(byCheck(u));
+    return order.map(function (x, k) {
+      var lv = level(x.pct);
+      return { c: x.c, first: k === 0 && x.pct !== null && x.pct < 0.8, lv: lv, x: x, f: FIXES[x.c],
+        badge: CHECKS[x.c].name + ": " + lv[1] + (x.n ? " · " + x.sum + " of " + (2 * x.n) + " points" : "") };
+    });
+  }
+  function renderFixes(u) {
+    var items = fixItems(u), any = items.some(function (it) { return it.x.pct !== null; });
+    var allGood = any && items.every(function (it) { return it.x.pct === null || it.x.pct >= 0.8; });
+    $("#fix-intro").textContent = (!any ? "Score your answers in Step 3 and this list reorders itself, weakest check first."
+      : allGood ? "Every check you scored is holding up. Keep your facts current everywhere and re-run next quarter. The list is still ordered weakest first."
+      : "Ordered by your weakest check, from the answers you scored.") + " Each item is a Recommendation unless it says otherwise.";
+    $("#fixlist").innerHTML = items.map(function (it) {
+      var f = it.f;
+      return '<li class="' + (it.first ? "first" : "") + '"><p>' + (it.first ? '<span class="pill teal">Start here</span> ' : "") +
+        '<span class="pill ' + it.lv[0] + '">' + esc(it.badge) + "</span></p><h3>" + f.title + "</h3><p>" + f.why + "</p><ul>" +
+        f.steps.map(function (s) { return "<li>" + s + "</li>"; }).join("") + '</ul><p class="lbl"><span class="pill teal">Recommendation</span> Every step above.</p>' +
+        (f.contract ? '<p class="lbl"><span class="pill">Contractual</span> ' + f.contract + "</p>" : "") +
+        (f.legal ? '<p class="legal"><span class="pill red">Legal mandate</span> ' + f.legal + "</p>" : "") + "</li>";
+    }).join("");
+  }
+  function fixText(u) {
+    var L = ["FIX LIST, WEAKEST CHECK FIRST (each item a Recommendation unless labeled)"];
+    fixItems(u).forEach(function (it, k) {
+      L.push((k + 1) + ". " + it.f.title + " [" + it.badge + "]");
+      it.f.steps.forEach(function (s) { L.push("   - " + stripTags(s)); });
+      if (it.f.contract) L.push("   Contractual: " + it.f.contract);
+      if (it.f.legal) L.push("   Legal mandate: " + it.f.legal);
+    });
+    L.push("Always: ask your booking platform, in writing, whether it sends your availability and prices to Google and to AI or metasearch feeds, what it costs, and whether your agreement covers it.");
+    L.push("   Contractual: what your platform shares, and what it costs, is set by your booking platform agreement.");
+    L.push("Walk this list with an Alaska SBDC advisor (no-cost advising): aksbdc.org");
+    return L.join("\n");
+  }
+  function promptTexts() { var o = []; for (var p = 1; p <= NP; p++) { var el = $("#out-p" + p); o.push(el ? el.textContent : ""); } return o; }
+  function detailLine() {
+    var d = details, parts = [];
+    [["Category", "category"], ["Town", "town"], ["Travel month", "month"], ["Traveler", "traveler"], ["Competitor", "competitor"], ["Nearby lodge or partner", "nearby"]].forEach(function (f) { if (clean(d[f[1]])) parts.push(f[0] + ": " + clean(d[f[1]])); });
+    return parts.join(" · ");
+  }
+  function summaryText(u) {
+    var L = [];
+    L.push("AI VISIBILITY AUDIT · " + (clean(details.business) || "[your business]") + " · " + (state.date || todayISO()));
+    var dl = detailLine(); if (dl) L.push(dl);
+    if (state.note) L.push("Note: " + state.note);
+    L.push("Scoring: 0 no, 1 partly, 2 yes. 5 prompts x 4 checks (Appear, Described, Cited, Current), max 40 per AI tool.");
+    L.push("");
+    if (!u.length) L.push("No answers scored yet.");
+    u.forEach(function (x) { L.push(x.name + ": " + x.st.total + "/40 (" + x.st.n + " of 20 answers scored). " + CHECKS.map(function (k, c) { return k.name + " " + x.st.chk[c] + "/10"; }).join(", ")); });
+    if (u.length > 1) L.push("Average across tools: " + average(u).toFixed(1) + "/40 (Number 1, AI visibility score)");
+    L.push("");
+    L.push(fixText(u));
+    L.push("");
+    L.push("Answers vary by day and by tool. One run is a snapshot, not a ranking. Re-run quarterly.");
+    if (isExample()) L.push("Fictional example: Bay Light Day Cruises is an invented teaching business and the scores are imagined.");
+    return L.join("\n");
+  }
+  function renderPrint(u) {
+    var d = details, h = "<h2>AI visibility audit · " + esc(clean(d.business) || "[your business]") + "</h2>";
+    h += "<p><b>Date:</b> " + esc(state.date || todayISO()) + (detailLine() ? " · " + esc(detailLine()) : "") + (state.note ? " · <b>Note:</b> " + esc(state.note) : "") + "</p>";
+    if (isExample()) h += "<p><b>Fictional example.</b> Bay Light Day Cruises is an invented teaching business. The scores are imagined.</p>";
+    h += "<h3>The five prompts</h3><ol>" + promptTexts().map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ol>";
+    h += "<p>Scoring: 0 no, 1 partly, 2 yes, on Appear, Described, Cited and Current. Maximum 40 per AI tool.</p>";
+    h += "<h3>Totals</h3>" + (u.length ? totalsTable(u, "Totals") : "<p>No answers scored yet.</p>");
+    u.forEach(function (x) {
+      var t = '<table><caption>' + esc(x.name) + ": " + x.st.total + "/40</caption><thead><tr><th scope=\"col\">Prompt</th>" + CHECKS.map(function (k) { return '<th scope="col" class="num">' + k.name + "</th>"; }).join("") + '<th scope="col" class="num">Total</th></tr></thead><tbody>';
+      for (var p = 0; p < NP; p++) {
+        t += '<tr><th scope="row">' + (p + 1) + ". " + esc(PSHORT[p](d)) + "</th>";
+        for (var c = 0; c < NC; c++) { var v = x.t.s[p][c]; t += '<td class="num">' + (v === null ? "blank" : v) + "</td>"; }
+        t += '<td class="num">' + x.st.pr[p] + "/8</td></tr>";
+      }
+      h += t + "</tbody></table>";
+    });
+    h += "<h3>Fix list, weakest check first</h3><ol>" + fixItems(u).map(function (it) {
+      return "<li><b>" + esc(it.f.title) + "</b> (" + esc(it.badge) + ")<ul>" + it.f.steps.map(function (s) { return "<li>" + esc(stripTags(s)) + "</li>"; }).join("") + "</ul>" +
+        (it.f.contract ? "<p><b>Contractual:</b> " + esc(it.f.contract) + "</p>" : "") +
+        (it.f.legal ? "<p><b>Legal mandate:</b> " + esc(it.f.legal) + "</p>" : "") + "</li>";
+    }).join("") + "<li><b>Always: ask your booking platform about AI and metasearch feeds.</b> Get the answer in writing.<p><b>Contractual:</b> what your platform shares, and what it costs, is set by your booking platform agreement.</p></li></ol>";
+    h += "<p>Each item is a Recommendation unless labeled. Answers vary by day and by tool. One run is a snapshot, not a ranking. Re-run quarterly and compare (Number 1, AI visibility score). Printed from preig.github.io/atiakit/audit/</p>";
+    $("#print-summary").innerHTML = h;
+  }
+  function renderHistory() {
+    var box = $("#history");
+    if (!history.length) { box.innerHTML = '<p class="hint">No saved results yet. Score your answers, then tap <b>Save this result</b>.</p>'; return; }
+    var html = '<ul class="hist">';
+    sortedHistory().forEach(function (h) {
+      var d = h.details || {}, avg = histAvg(h), prev = previousOf(h), delta = "";
+      var where = [d.business || "Unnamed business", d.town, d.month].filter(Boolean).map(esc).join(" · ");
+      if (prev) {
+        var diff = Math.round((avg - histAvg(prev)) * 10) / 10;
+        delta = ' <span class="pill ' + (diff > 0 ? "" : diff < 0 ? "red" : "teal") + '">' + (diff > 0 ? "up " + diff.toFixed(1) : diff < 0 ? "down " + Math.abs(diff).toFixed(1) : "no change") + " since " + esc(prev.date) + "</span>";
+      }
+      var scores = h.tools.map(function (t) { return esc(t.name) + " <b>" + stats(t).total + "/40</b>"; }).join(" · ");
+      var aria = esc(h.date + ", " + (d.business || "unnamed business"));
+      html += '<li><p><b>' + esc(h.date) + "</b> · " + where + (h.note ? ' <span class="hint">(' + esc(h.note) + ")</span>" : "") + "</p>" +
+        "<p>" + scores + (h.tools.length > 1 ? " · average <b>" + avg.toFixed(1) + "</b>" : "") + delta + "</p>" +
+        '<div class="btns"><button type="button" class="secondary small" data-load="' + esc(h.id) + '" aria-label="Load the result from ' + aria + '">Load</button>' +
+        '<button type="button" class="danger small" data-del="' + esc(h.id) + '" aria-label="Delete the result from ' + aria + '">Delete</button></div></li>';
+    });
+    box.innerHTML = html + "</ul>";
+  }
+  function update(skipSave) {
+    if (!skipSave) saveState();
+    var u = used(state.tools);
+    renderTools(); renderResults(u); renderFixes(u); renderPrint(u);
+  }
+  function onDetails(vals) {
+    details = pickDetails(vals || {});
+    updateLabels();
+    var bad = DFIELDS.some(function (k) {
+      var v = details[k];
+      return /[^\s@]+@[^\s@]+\.[^\s@]+/.test(v) || /(?:\d[\s.()-]*){10,}/.test(v);
+    });
+    $("#pii-warn").textContent = bad ? "That looks like an email, phone or card number. Use public business names only." : "";
+    var missing = [];
+    if (!details.business) missing.push("business name");
+    if (!details.category) missing.push("category");
+    if (!details.town) missing.push("town");
+    if (!details.competitor) missing.push("competitor");
+    if (!details.nearby) missing.push("nearby lodge or partner");
+    if (!details.month) missing.push("travel month");
+    $("#blank-warn").textContent = missing.length && missing.length < 6 ? "Still blank in Step 1: " + missing.join(", ") + ". Anything in [BRACKETS] needs filling before you copy." : (missing.length === 6 ? "Fill in Step 1 first. Anything in [BRACKETS] is still a blank." : "");
+    $("#example-note").hidden = !isExample();
+    update(true);
+  }
+
+  /* ---------- actions ---------- */
+  function setScore(t, p, c, v) { state.tools[t].s[p][c] = v; update(); }
+  function loadExample(btn) {
+    if (hasWork() && !isExample() && !window.confirm("Replace what is on screen with the fictional example? Your saved results are not touched.")) return;
+    var b = window.KIT && window.KIT.builders && window.KIT.builders.audit;
+    state.tools = normTools(EXAMPLE.tools, true); state.note = EXAMPLE.note; state.date = todayISO();
+    syncInputs(); activate(0);
+    if (b) b.set(EXAMPLE.details); else onDetails(EXAMPLE.details);
+    update();
+    say(btn, "Fictional example loaded: Bay Light Day Cruises, Seward, July. The scores are imagined.");
+  }
+  function clearAll(btn) {
+    if (hasWork() && !window.confirm("Clear your details and every score on screen? Saved results are not touched.")) return;
+    var b = window.KIT && window.KIT.builders && window.KIT.builders.audit;
+    resetTools(); state.note = ""; state.date = todayISO();
+    syncInputs(); activate(0);
+    if (b) { b.form.reset(); lsDel(DKEY); b.refresh(); } else onDetails({});
+    update();
+    say(btn, "Cleared. Your saved results are still in Your saved results.");
+  }
+  function newRun(btn) {
+    if (hasScores() && !window.confirm("Clear every score on screen and keep your details and tool names? Save this result first if you want to keep it.")) return;
+    state.tools.forEach(function (t) { t.s = emptyScores(); });
+    state.note = ""; state.date = todayISO();
+    syncInputs(); activate(0); update();
+    say(btn, "New run started. Your details and tool names are kept.");
+  }
+  function saveResult(btn) {
+    var u = used(state.tools).filter(function (x) { return x.st.n > 0; });
+    if (!u.length) { say(btn, "Score at least one answer before you save."); return; }
+    var item = { id: newId(), date: state.date || todayISO(), savedAt: new Date().toISOString(), details: pickDetails(details), note: state.note,
+      tools: u.map(function (x) { return { name: x.name, s: normScores(x.t.s) }; }) };
+    history.push(item);
+    var ok = persistHistory();
+    renderHistory();
+    say(btn, ok ? "Saved in this browser. Download a .json copy under Your saved results to keep it safe."
+      : "Kept for this visit only: this browser is not saving data. Use Download all (.json) to keep it.");
+  }
+  function loadResult(id, btn) {
+    var h = history.filter(function (x) { return x.id === id; })[0];
+    if (!h) return;
+    if (hasScores() && !window.confirm("Replace the scores on screen with the result from " + h.date + "?")) return;
+    state.tools = normTools(h.tools, true); state.note = h.note; state.date = h.date;
+    syncInputs(); activate(0);
+    var b = window.KIT && window.KIT.builders && window.KIT.builders.audit;
+    if (b) b.set(h.details); else onDetails(h.details);
+    update();
+    say(btn, "Loaded the result from " + h.date + ". It is in Steps 1 to 3 and the fix list.");
+  }
+  function deleteResult(id, btn) {
+    var h = history.filter(function (x) { return x.id === id; })[0];
+    if (!h || !window.confirm("Delete the saved result from " + h.date + "? This cannot be undone.")) return;
+    history = history.filter(function (x) { return x.id !== id; });
+    persistHistory(); renderHistory();
+    $("#s6").focus(); /* the button that was clicked no longer exists */
+    say($("#history"), "Deleted the result from " + h.date + ".");
+  }
+  function deleteAll(btn) {
+    if (!history.length) { say(btn, "Nothing saved yet."); return; }
+    if (!window.confirm("Delete all " + history.length + " saved results in this browser? This cannot be undone. Download a .json copy first if you want to keep them.")) return;
+    history = []; persistHistory(); renderHistory();
+    say(btn, "Deleted all saved results in this browser.");
+  }
+  function csvCell(v) {
+    if (v === null || v === undefined) return "";
+    var s = String(v);
+    if (typeof v === "string" && /^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  function buildCSV(list) {
+    var head = ["date", "business", "category", "town", "travel_month", "traveler_type", "competitor", "nearby_lodge_or_partner", "note", "ai_tool", "appear", "described", "cited", "current", "total", "max", "answers_scored"];
+    for (var p = 0; p < NP; p++) for (var c = 0; c < NC; c++) head.push("p" + (p + 1) + "_" + CHECKS[c].name.toLowerCase());
+    var rows = [head];
+    list.forEach(function (h) {
+      var d = h.details || {};
+      h.tools.forEach(function (t) {
+        var st = stats(t), r = [h.date, d.business, d.category, d.town, d.month, d.traveler, d.competitor, d.nearby, h.note, t.name];
+        for (var c = 0; c < NC; c++) r.push(st.chkN[c] ? st.chk[c] : "");
+        r.push(st.total, 40, st.n);
+        for (var p = 0; p < NP; p++) for (var c2 = 0; c2 < NC; c2++) r.push(t.s[p][c2] === null ? "" : t.s[p][c2]);
+        rows.push(r);
+      });
+    });
+    return "\uFEFF" + rows.map(function (r) { return r.map(csvCell).join(","); }).join("\r\n") + "\r\n";
+  }
+  function exportJSON(btn) {
+    if (!history.length) { say(btn, "Nothing saved yet. Save a result first."); return; }
+    download("ai-visibility-audit-" + todayISO() + ".json", JSON.stringify({ format: FORMAT, version: 1, exported: new Date().toISOString(), note: "AI visibility audit results from preig.github.io/atiakit/audit/. No guest data.", results: sortedHistory().reverse() }, null, 2), "application/json");
+    say(btn, "Saved the .json file to your downloads. Import it here on any device.");
+  }
+  function exportCSV(btn) {
+    if (!history.length) { say(btn, "Nothing saved yet. Save a result first."); return; }
+    download("ai-visibility-audit-" + todayISO() + ".csv", buildCSV(sortedHistory().reverse()), "text/csv");
+    say(btn, "Saved the .csv file to your downloads: one row per AI tool per saved result.");
+  }
+  function importFile(file, btn) {
+    if (!file) return;
+    if (file.size > 2000000) { say(btn, "That file is too large to be an audit history."); return; }
+    var reader = new FileReader();
+    reader.onload = function () {
+      var data;
+      try { data = JSON.parse(String(reader.result).replace(/^\uFEFF/, "")); } catch (e) { say(btn, "That file is not valid JSON. Use a .json file downloaded from this page."); return; }
+      var arr = Array.isArray(data) ? data : (data && Array.isArray(data.results) ? data.results : null);
+      if (!arr) { say(btn, "No audit results found in that file."); return; }
+      var ids = {}, added = 0, dup = 0, bad = 0;
+      history.forEach(function (h) { ids[h.id] = 1; });
+      arr.slice(0, 1000).forEach(function (r) {
+        var n = normResult(r);
+        if (!n) { bad++; return; }
+        if (ids[n.id]) { dup++; return; }
+        ids[n.id] = 1; history.push(n); added++;
+      });
+      var ok = added ? persistHistory() : true;
+      renderHistory();
+      say(btn, "Imported " + added + " result" + (added === 1 ? "" : "s") + (dup ? ", skipped " + dup + " already here" : "") + (bad ? ", ignored " + bad + " unreadable" : "") + "." + (ok ? "" : " This browser is not saving data; keep the file."));
+    };
+    reader.onerror = function () { say(btn, "Could not read that file."); };
+    reader.readAsText(file);
+  }
+  function savePrompts(btn) {
+    var t = promptTexts(), L = [];
+    L.push("AI VISIBILITY AUDIT · THE FIVE PROMPTS");
+    L.push((clean(details.business) || "[your business]") + (detailLine() ? " · " + detailLine() : ""));
+    L.push("");
+    L.push("Run each prompt in a fresh chat, in three AI tools (whichever are current). Paste it exactly. Score each answer 0 (no), 1 (partly) or 2 (yes) on Appear, Described, Cited and Current. Max 40 per AI tool.");
+    L.push("");
+    t.forEach(function (x, i) { L.push((i + 1) + ". " + x); L.push(""); });
+    L.push("Answers vary by day and by tool. One run is a snapshot. Re-run quarterly. Score at preig.github.io/atiakit/audit/");
+    download("ai-visibility-audit-prompts.txt", L.join("\r\n"), "text/plain");
+    say(btn, "Saved the five prompts to your downloads.");
+  }
+
+  /* ---------- wire up ---------- */
+  function init() {
+    canStore = storageWorks();
+    if (!canStore) $("#storage-warn").textContent = "This browser is not keeping saved data (a private window, or storage is blocked). Your work lasts until you close the page. Use Download all (.json) to keep it.";
+    loadState(); loadHistory();
+    buildRubric(); buildScorecard(); syncInputs(); activate(state.tab);
+    var form = $("#details");
+    form.addEventListener("kit:change", function (e) { onDetails(e.detail); });
+    onDetails(lsGet(DKEY) || {});
+    renderHistory();
+
+    var panels = $("#panels");
+    panels.addEventListener("click", function (e) {
+      var r = e.target.closest("input[type=radio]");
+      if (r) {
+        var t = +r.dataset.t, p = +r.dataset.p, c = +r.dataset.c, v = +r.value;
+        if (r.checked && state.tools[t].s[p][c] === v) { r.checked = false; setScore(t, p, c, null); }
+        return;
+      }
+      var b = e.target.closest("button");
+      if (!b) return;
+      if (b.dataset.none) {
+        var tp = b.dataset.none.split(","), ti = +tp[0], pi = +tp[1];
+        state.tools[ti].s[pi] = [0, 0, 0, 0];
+        $all('input[type=radio][data-t="' + ti + '"][data-p="' + pi + '"]').forEach(function (x) { x.checked = x.value === "0"; });
+        update(); say(b, "Prompt " + (pi + 1) + ": scored 0 on all four checks.");
+      } else if (b.classList.contains("tip-btn")) {
+        var tip = document.getElementById(b.getAttribute("aria-controls")), open = b.getAttribute("aria-expanded") !== "true";
+        b.setAttribute("aria-expanded", open ? "true" : "false"); tip.hidden = !open;
+      } else if (b.dataset.clearTool) {
+        var k = +b.dataset.clearTool;
+        if (stats(state.tools[k]).n && !window.confirm("Clear all 20 scores for " + toolLabel(state.tools[k], k) + "?")) return;
+        state.tools[k].s = emptyScores(); syncInputs(); update();
+        say(b, "Cleared the scores for " + toolLabel(state.tools[k], k) + ".");
+      }
+    });
+    panels.addEventListener("change", function (e) {
+      var r = e.target;
+      if (r.type === "radio" && r.checked) setScore(+r.dataset.t, +r.dataset.p, +r.dataset.c, +r.value);
+    });
+    panels.addEventListener("keydown", function (e) {
+      var r = e.target;
+      if (r.type !== "radio" || (e.key !== "Delete" && e.key !== "Backspace")) return;
+      e.preventDefault();
+      var t = +r.dataset.t, p = +r.dataset.p, c = +r.dataset.c;
+      if (state.tools[t].s[p][c] === null) return;
+      $all('input[name="' + r.name + '"]').forEach(function (x) { x.checked = false; });
+      setScore(t, p, c, null);
+      say(r, "Cleared prompt " + (p + 1) + ", " + CHECKS[c].name + ".");
+    });
+    panels.addEventListener("input", function (e) {
+      if (e.target.dataset.tool !== undefined) { state.tools[+e.target.dataset.tool].name = clean(e.target.value, 60); update(); }
+    });
+    var tabs = $("#tabs");
+    tabs.addEventListener("click", function (e) { var b = e.target.closest("[role=tab]"); if (b) activate(+b.id.split("-")[1]); saveState(); });
+    tabs.addEventListener("keydown", function (e) {
+      var i = state.tab, n = null;
+      if (e.key === "ArrowRight") n = (i + 1) % NT; else if (e.key === "ArrowLeft") n = (i + NT - 1) % NT;
+      else if (e.key === "Home") n = 0; else if (e.key === "End") n = NT - 1;
+      if (n !== null) { e.preventDefault(); activate(n, true); saveState(); }
+    });
+    function onDate() { state.date = /^\d{4}-\d{2}-\d{2}$/.test(this.value) ? this.value : ""; update(); }
+    $("#f-date").addEventListener("input", onDate);
+    $("#f-date").addEventListener("change", onDate); /* some mobile date pickers fire only change */
+    $("#f-note").addEventListener("input", function () { state.note = clean(this.value, 140); update(); });
+    $("#f-import").addEventListener("change", function () { importFile(this.files && this.files[0], $("#btn-import")); this.value = ""; });
+
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      var id = b.id;
+      if (b.dataset.pcopy) copyText($("#" + b.dataset.pcopy).textContent, b, "Copied. Paste it into a fresh chat in the AI tool you are testing.");
+      else if (b.dataset.copytext) copyText($("#" + b.dataset.copytext).textContent, b, "Copied. Paste it into an email to your booking platform.");
+      else if (b.dataset.load) loadResult(b.dataset.load, b);
+      else if (b.dataset.del) deleteResult(b.dataset.del, b);
+      else if (id === "btn-example") loadExample(b);
+      else if (id === "btn-clear") clearAll(b);
+      else if (id === "btn-save-prompts") savePrompts(b);
+      else if (id === "btn-save") saveResult(b);
+      else if (id === "btn-copy-summary") copyText(summaryText(used(state.tools)), b, "Copied the summary. Paste it into an email or a note.");
+      else if (id === "btn-copy-fixes") copyText(fixText(used(state.tools)), b, "Copied the fix list.");
+      else if (id === "btn-print") { renderPrint(used(state.tools)); window.print(); }
+      else if (id === "btn-newrun") newRun(b);
+      else if (id === "btn-export-json") exportJSON(b);
+      else if (id === "btn-export-csv") exportCSV(b);
+      else if (id === "btn-import") $("#f-import").click();
+      else if (id === "btn-delete-all") deleteAll(b);
+    });
+    window.addEventListener("beforeprint", function () { renderPrint(used(state.tools)); });
+    update(true);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
+
+  /* exposed for tests only */
+  window.AUDIT = { stats: stats, used: used, byCheck: byCheck, ranked: ranked, buildCSV: buildCSV, normResult: normResult, state: state, summaryText: function () { return summaryText(used(state.tools)); } };
+})();
+</script>
+</body>
+</html>

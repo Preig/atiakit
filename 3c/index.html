@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; frame-src 'none'">
+<title>3.c Agent-ready trip record · ATIA AI Take-Home Kit</title>
+<meta name="description" content="AI agents will shop for travelers. An agent that cannot place a reversible hold will not place a high-consideration Alaska trip. For a small operator this rung is one question to the booking platform; for a larger operator or ATIA it is a build and a policy decision. The question, a policy checklist, a trip-record checker and an MCP server scaffold.">
+<link rel="stylesheet" href="../assets/kit.css">
+<script src="../assets/kit.js" defer></script>
+<script src="trip-record-check.js" defer></script>
+<style>
+/* Page-specific styles for tool 3.c. Shared styles live in ../assets/kit.css. */
+.onpage{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;margin:10px 0 0;padding:0;list-style:none}
+.onpage a{color:var(--teal-d)}
+.who{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));margin:12px 0 0}
+.who>div{background:#fbfcfa;border:1px solid var(--line);border-top:4px solid var(--green);border-radius:4px;padding:4px 18px 12px}
+.who>div.big{border-top-color:var(--teal)}
+.who h3{margin-top:12px}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0}
+.tablewrap table{min-width:560px}
+@media(max-width:640px){
+  .tablewrap table.stack{min-width:0}
+  table.stack thead{position:absolute;left:-10000px}
+  table.stack,table.stack tbody,table.stack tr,table.stack td{display:block;width:100%}
+  table.stack tr{border:1px solid #ccd2c8;border-radius:4px;margin:0 0 10px;padding:4px 0}
+  table.stack td{border:0;padding:4px 12px}
+  table.stack td::before{content:attr(data-label);display:block;font-size:12px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;color:var(--green-d)}
+}
+.drivers{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));margin:14px 0}
+.driver{background:#fff;border:1px solid var(--line);border-top:4px solid var(--teal);border-radius:4px;padding:12px 14px}
+.driver .score{font-size:34px}
+.driver p{margin:6px 0 0;font-size:15px;line-height:1.4}
+.driver .hint{display:block;margin-top:4px}
+.radios label,.chk{display:flex;gap:9px;align-items:flex-start;font-weight:normal;font-size:15px;margin:9px 0;color:var(--ink)}
+.radios input,.chk input{width:18px;height:18px;margin:3px 0 0;flex:none}
+.tag{display:inline-block;font-size:12px;font-weight:bold;letter-spacing:.04em;border-radius:3px;padding:1px 7px;margin:0 4px 0 0;vertical-align:1px;background:#eef1ec;color:var(--slate)}
+.tag.law{background:var(--red-t);color:var(--red)}
+.tag.con{background:var(--amber-t);color:var(--amber)}
+.tag.pol{background:var(--teal-t);color:var(--teal-d)}
+.tag.rec{background:var(--green-t);color:var(--green-d)}
+.fgrid{display:grid;gap:0 18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))}
+.fgrid>div{min-width:0}
+.fgrid.end{align-items:end}
+.privacy{font-size:14px;color:#8a2a2a;margin:4px 0 0}
+textarea.code{font:14px/1.5 Consolas,"Courier New",monospace;min-height:300px;white-space:pre;overflow-wrap:normal;overflow-x:auto;tab-size:2}
+.verdict{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0 4px;font-size:16px}
+.verdict .pill{font-size:13px;padding:4px 12px}
+.issues{list-style:none;padding:0;margin:6px 0 10px}
+.issues li{border-top:1px solid var(--line);padding:8px 0;font-size:15px;line-height:1.45}
+.issues li code{word-break:break-all}
+.issues .pill{margin-right:6px}
+.rv{background:#fff;border:1px solid var(--line);border-radius:4px;padding:6px 16px 14px;margin:12px 0}
+.rv h4{margin:14px 0 4px;color:var(--teal-d);font-size:16px}
+.rv ul{margin:4px 0;padding-left:20px}
+.rv li{margin:4px 0}
+.rv .facts{display:block;font-size:14px;color:var(--slate-m)}
+.rv .kv{display:grid;grid-template-columns:max-content 1fr;gap:2px 14px;font-size:15px;margin:4px 0}
+.rv .kv dt{color:var(--slate-m)}
+.rv .kv dd{margin:0}
+.rv:empty{display:none}
+.flow{list-style:none;padding:0;margin:12px 0;display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));counter-reset:flow}
+.flow li{counter-increment:flow;background:#fff;border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:4px;padding:10px 12px;font-size:15px;line-height:1.4}
+.flow li::before{content:counter(flow) ". ";font-weight:bold;color:var(--teal-d)}
+.flow li b{color:var(--slate)}
+.flow li span{display:block;font-size:13px;color:var(--slate-m);margin-top:4px}
+code.cmd{display:block;white-space:pre-wrap;overflow-wrap:anywhere;padding:10px 12px;margin:8px 0;background:#1e293b;color:#f1f5f9;border-radius:4px;font-size:14.5px;line-height:1.55}
+pre.screen{white-space:pre;overflow-x:auto;font:13px/1.5 Consolas,"Courier New",monospace;background:#1e293b;color:#e2e8f0;border-radius:4px;padding:12px 14px;margin:8px 0}
+.src{font-size:15px;padding-left:20px}
+.src li{margin:6px 0}
+.lbl-list{list-style:none;padding:0;margin:8px 0}
+.lbl-list li{padding:8px 0;border-top:1px solid var(--line);font-size:15px;line-height:1.5}
+.output pre{max-height:none}
+button.small{font-size:14px;padding:6px 12px}
+.sr{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+@media print{.who>div,.driver{break-inside:avoid}}
+</style>
+</head>
+<body data-page="3c">
+<div class="band" aria-hidden="true"></div>
+<header class="kit">
+  <p class="crumbs"><a href="../">ATIA AI Take-Home Kit</a> › Pain 3 · Coordinating the trip</p>
+  <p class="kicker"><span class="rung r3" aria-hidden="true"><i></i><i></i><i></i></span>Advanced rung · Tool 3.c</p>
+  <h1>An agent-ready trip record</h1>
+  <p class="lede">AI agents are starting to shop for travelers. To place a high-consideration Alaska trip, an agent needs your live availability and a hold it can undo. For a six-person operator, this rung is one question to your booking platform, not a build. For a larger operator or for ATIA, it is a build and a policy decision. This page has the question, the policy checklist, a trip-record checker and a working scaffold for a developer.</p>
+  <ul class="meta">
+    <li><b>Time</b> 15 minutes to ask · months to build</li><li><b>Cost</b> free to ask · developer or vendor to build</li><li><b>Skill</b> none to ask · developer to build</li><li><b>Needs</b> 3.a, 3.b</li><li><b>Measure</b> bookings through AI channels, hold-to-book rate</li>
+  </ul>
+  <nav class="tool-nav" data-toolnav="3c" aria-label="All tools"></nav>
+  <ul class="onpage" aria-label="On this page">
+    <li><a href="#which">Which one are you</a></li><li><a href="#ask">The question</a></li><li><a href="#policy">Policy before code</a></li><li><a href="#checker">Trip record checker</a></li><li><a href="#build">The build</a></li><li><a href="#files">Downloads</a></li><li><a href="#measure">Measure</a></li><li><a href="#safe">Before you use it</a></li>
+  </ul>
+</header>
+
+<main class="kit">
+  <section class="card teal" aria-labelledby="why">
+    <h2 id="why">The pain it fixes</h2>
+    <div class="grid two">
+      <div>
+        <h3>For the traveler</h3>
+        <p>39% of US travelers find coordinating the different parts of a trip frustrating. In the report's diary study, the worst moments came at the handoffs between platforms: every new site or app starts from zero.</p>
+        <p>A <b>trip record</b> keeps the minimum trip state in one structured place: the party (as counts and age bands, never names), dates, budget band, preferences, the short list, rejected options with the reason, holds and open questions. The next visit, or the next AI agent, starts closer to a decision.</p>
+      </div>
+      <div>
+        <h3>For your business</h3>
+        <p>Agents already book hotels. Google's AI Mode began booking US hotels on August 27, 2026, through large online travel agencies and chains; independents were not on the launch list. The checkout layer agents use is being built now, and whether you are reachable through it is being decided now, often by your platform, possibly by default.</p>
+        <p>An agent that cannot place a <b>reversible hold</b> will not put a family's four seats on hold while they think it over. It books something it can hold.</p>
+      </div>
+    </div>
+    <div class="callout green"><b>Agents hold and ask. People confirm.</b> 74% of US travelers still prefer to make the final booking themselves rather than through an AI, and only 16% used an AI tool to book anything. A hold that expires on its own, plus a person who confirms, fits how travelers buy today.</div>
+    <p class="hint">Skift Research + McKinsey, Sept 2026, n = 1,015 US travelers (data as of June 2026); US travelers, not Alaska visitors. Google AI Mode: see Sources.</p>
+  </section>
+
+  <section class="card" aria-labelledby="which">
+    <h2 id="which">Which one are you?</h2>
+    <div class="who">
+      <div>
+        <h3>A small operator (about six people)</h3>
+        <p><b>One question, not a build.</b> Send your booking platform (FareHarbor, Peek, Checkfront, Cloudbeds, Rezdy or similar) the question below. Get the answer in writing. Share it with ATIA so members can compare.</p>
+        <p class="hint">About 15 minutes. Free.</p>
+        <p>Being bookable by an agent today usually means being in a network and paying its commission. That is a margin decision, not a technology decision. <span class="hint">(Presenter's read.)</span></p>
+        <p><a class="button secondary" href="#ask">Go to the question</a></p>
+      </div>
+      <div class="big">
+        <h3>A larger operator, a group of members, or ATIA</h3>
+        <p><b>A build and a policy decision.</b> Decide the four hold policies first. Then a developer connects your platform's API to an MCP server (the open protocol Claude, ChatGPT and Gemini agents use to call outside tools). The scaffold on this page shows the rules working on fictional data.</p>
+        <p class="hint">Months, mostly platform integration, hold-expiry rules and policy, not code. Developer or vendor time. Estimates.</p>
+        <p><a class="button secondary" href="#policy">Go to the policy checklist</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="ask">
+    <h2 id="ask">The question for your booking platform</h2>
+    <p>Copy it as is, or build the email below. Ask for the answer in writing.</p>
+    <div class="output">
+      <p class="label">The question</p>
+      <pre id="q-platform">Does your platform expose (1) live availability through an API, (2) time-limited, reversible holds that expire automatically, and (3) confirmation and cancellation through the same API? Are you participating in any agent checkout protocol, such as Google's Universal Commerce Protocol? If yes, what do I have to switch on, and what does it cost? If no, is it on your roadmap, and when? Please answer in writing so I can share it with our association.</pre>
+    </div>
+    <div class="btns">
+      <button type="button" data-copy-local="q-platform" data-msg="Copied. Paste it into an email or support ticket to your booking platform.">Copy question</button>
+      <button type="button" class="secondary" data-download="3c-platform-question.txt" data-from="q-platform">Save as .txt</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+
+    <h3>Make it an email</h3>
+    <div>
+    <form data-builder="ask" id="f-ask">
+      <div class="fgrid">
+        <div><label for="a-platform">Booking platform</label><input type="text" id="a-platform" name="platform" autocomplete="off" placeholder="for example FareHarbor"></div>
+        <div><label for="a-biz">What you run <small>(no guest data)</small></label><input type="text" id="a-biz" name="biz_type" autocomplete="off" placeholder="for example day cruises in Seward, Alaska"></div>
+      </div>
+      <fieldset>
+        <legend>Add follow-up questions <small class="hint">(optional)</small></legend>
+        <label class="chk"><input type="checkbox" name="followups" value="How long can a hold last, and can I set the length per product?" checked> How long can a hold last, and can I set it?</label>
+        <label class="chk"><input type="checkbox" name="followups" value="While a hold is active, do the seats come off sale on every channel at once?" checked> Do held seats come off sale on every channel?</label>
+        <label class="chk"><input type="checkbox" name="followups" value="Can a person on my staff confirm or decline each booking an agent requests, or is it automatic?" checked> Can my staff confirm or decline each agent booking?</label>
+        <label class="chk"><input type="checkbox" name="followups" value="What traveler data does an agent channel pass to me, and what does it keep?"> What traveler data does the agent channel pass and keep?</label>
+        <label class="chk"><input type="checkbox" name="followups" value="What commission or fee applies to bookings that come through AI agents?" checked> What commission or fee applies?</label>
+        <label class="chk"><input type="checkbox" name="followups" value="Can I switch it on for some products only, and switch it off again?"> Can I switch it on for some products only?</label>
+      </fieldset>
+      <div class="btns">
+        <button type="button" class="secondary" data-fill="ask" data-example="ask-demo">Load the fictional example</button>
+        <button type="button" class="ghost" data-reset="ask">Clear</button>
+      </div>
+    </form>
+      <div class="output">
+        <p class="label">Your email</p>
+        <pre id="out-ask"></pre>
+      </div>
+      <div class="btns">
+        <button type="button" data-copy-local="out-ask" data-msg="Copied. Paste it into an email to your booking platform and add your name.">Copy email</button>
+        <button type="button" class="secondary" data-download="3c-email-to-platform.txt" data-from="out-ask">Save as .txt</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <script type="application/json" id="ask-demo">{"platform":"Example Booking Platform","biz_type":"day cruises in Seward, Alaska (Bay Light Day Cruises, a fictional teaching business)","followups":"How long can a hold last, and can I set the length per product?\nWhile a hold is active, do the seats come off sale on every channel at once?\nCan a person on my staff confirm or decline each booking an agent requests, or is it automatic?\nWhat commission or fee applies to bookings that come through AI agents?"}</script>
+
+    <h3>Read the answer</h3>
+    <div class="tablewrap">
+      <table class="stack">
+        <thead><tr><th scope="col">They say</th><th scope="col">What it means</th><th scope="col">Your next step</th></tr></thead>
+        <tbody>
+          <tr><td data-label="They say">Yes to all three, and an agent protocol you can switch on</td><td data-label="What it means">Agents can find you, hold and request confirmation through your platform</td><td data-label="Your next step">Get the cost and commission in writing. Set the four policies below before you switch it on.</td></tr>
+          <tr><td data-label="They say">Live availability yes, holds no</td><td data-label="What it means">Agents can see you but cannot hold. They will hold somewhere else.</td><td data-label="Your next step">Ask for holds on the roadmap, with a date. Tell ATIA.</td></tr>
+          <tr><td data-label="They say">Not yet, on the roadmap</td><td data-label="What it means">Common in 2026</td><td data-label="Your next step">Get the date in writing. Ask again next quarter.</td></tr>
+          <tr><td data-label="They say">No API</td><td data-label="What it means">Agents cannot reach you through this platform</td><td data-label="Your next step">Weigh it at your next platform renewal. <span class="tag con">Contractual</span> check your contract term and exit terms.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details>
+      <summary>Log the answer to share with ATIA</summary>
+      <p class="hint">Stays in this browser until you copy or save it. Business facts only; no guest data.</p>
+      <form data-builder="log" id="f-log">
+        <div class="fgrid">
+          <div><label for="l-platform">Platform</label><input type="text" id="l-platform" name="platform" autocomplete="off"></div>
+          <div><label for="l-asked">Date asked</label><input type="date" id="l-asked" name="asked"></div>
+          <div><label for="l-answered">Date answered</label><input type="date" id="l-answered" name="answered"></div>
+        </div>
+        <div class="fgrid end">
+          <div><label for="l-api">(1) Live availability through an API</label><select id="l-api" name="api"><option>No answer yet</option><option>Yes</option><option>No</option><option>Not yet, on the roadmap</option></select></div>
+          <div><label for="l-holds">(2) Reversible holds that expire</label><select id="l-holds" name="holds"><option>No answer yet</option><option>Yes</option><option>No</option><option>Not yet, on the roadmap</option></select></div>
+          <div><label for="l-confirm">(3) Confirm and cancel through the API</label><select id="l-confirm" name="confirm"><option>No answer yet</option><option>Yes</option><option>No</option><option>Not yet, on the roadmap</option></select></div>
+          <div><label for="l-proto">Agent checkout protocol</label><select id="l-proto" name="protocol"><option>No answer yet</option><option>Yes</option><option>No</option><option>Not yet, on the roadmap</option></select></div>
+        </div>
+        <label for="l-cost">Cost or commission, as they stated it</label>
+        <input type="text" id="l-cost" name="cost" autocomplete="off">
+        <label for="l-when">Roadmap date, if any</label>
+        <input type="text" id="l-when" name="when" autocomplete="off">
+        <div class="btns"><button type="button" class="ghost" data-reset="log">Clear</button></div>
+      </form>
+      <div class="output"><p class="label">Summary</p><pre id="out-log"></pre></div>
+      <div class="btns">
+        <button type="button" data-copy-local="out-log" data-msg="Copied. Paste it into an email to ATIA. Business facts only.">Copy summary</button>
+        <button type="button" class="secondary" id="log-csv">Save as .csv</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </details>
+  </section>
+
+  <section class="card" aria-labelledby="policy">
+    <h2 id="policy">Policy before code</h2>
+    <p>Before anyone writes code, decide four things: who may place a hold, how long it lasts, what happens to inventory while it is held, and how a person steps in. The survey asked travelers what would make them more confident letting AI book. Their answers are the design spec.</p>
+    <div class="drivers" role="list">
+      <div class="driver" role="listitem"><span class="score">52%</span><p><b>Review and change before confirming.</b><span class="hint">Holds that are reversible and expire. Decisions 1 and 2.</span></p></div>
+      <div class="driver" role="listitem"><span class="score">30%</span><p><b>A track record.</b><span class="hint">The seats they reviewed are still there; you publish how holds work. Decision 3.</span></p></div>
+      <div class="driver" role="listitem"><span class="score">20%</span><p><b>A human who can step in.</b><span class="hint">A person confirms every agent booking. Decision 4.</span></p></div>
+    </div>
+    <p class="hint">Skift Research + McKinsey, Sept 2026, Exhibit 9, n = 1,015 US travelers.</p>
+
+    <form data-builder="policy" id="f-policy">
+      <label for="p-biz">Business name</label>
+      <input type="text" id="p-biz" name="biz" autocomplete="organization">
+
+      <fieldset class="radios">
+        <legend>1. Who may place a hold? <span class="tag pol">Policy choice</span></legend>
+        <label><input type="radio" name="who" value="any" checked> Any agent that reaches us through our booking platform's agent channel</label>
+        <label><input type="radio" name="who" value="approved"> Only agents from channels we have approved in writing</label>
+        <label><input type="radio" name="who" value="ownsite"> Only agents continuing a trip the traveler started on our own website</label>
+        <label><input type="radio" name="who" value="none"> No agent holds yet: agents send the traveler to us</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>2. How long does a hold last? <span class="tag pol">Policy choice</span></legend>
+        <div class="fgrid">
+          <div><label for="p-ttl">Hold length</label>
+            <select id="p-ttl" name="ttl"><option value="2">2 hours</option><option value="24" selected>24 hours</option><option value="48">48 hours</option><option value="72">72 hours</option></select></div>
+          <div><label for="p-cutoff">Free-cancellation cutoff <small>(hours before departure)</small></label>
+            <input type="number" id="p-cutoff" name="cutoff" min="0" max="720" step="1" value="48"></div>
+        </div>
+        <label class="chk"><input type="checkbox" name="cutoff_rule" value="yes" checked> Every hold also ends before the cutoff, so it never runs into the no-refund window <span class="tag rec">Recommendation</span></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>3. What happens to inventory while it is held? <span class="tag pol">Policy choice</span></legend>
+        <div class="radios">
+          <label><input type="radio" name="inventory" value="off" checked> Held seats come off sale on every channel</label>
+          <label><input type="radio" name="inventory" value="on"> Held seats stay on sale; the first to confirm wins (the traveler may lose the seats they reviewed)</label>
+        </div>
+        <div class="fgrid">
+          <div><label for="p-maxholds">Active holds per agent, at most</label><input type="number" id="p-maxholds" name="max_holds" min="1" max="20" value="3"></div>
+          <div><label for="p-maxseats">Seats per hold, at most <small>(larger groups go to a person)</small></label><input type="number" id="p-maxseats" name="max_seats" min="1" max="60" value="12"></div>
+        </div>
+        <p class="hint"><span class="tag con">Contractual</span> Check parity, allotment and cancellation terms in your booking platform terms and each OTA or reseller agreement.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>4. How does a person step in? <span class="tag pol">Policy choice</span></legend>
+        <div class="fgrid">
+          <div><label for="p-role">Who confirms <small>(a role, not a name)</small></label><input type="text" id="p-role" name="role" autocomplete="off" value="the office manager"></div>
+          <div><label for="p-resp">Answer time in season</label>
+            <select id="p-resp" name="response"><option>within 1 hour</option><option selected>within 4 hours</option><option>the same day</option><option>by the next morning</option></select></div>
+          <div><label for="p-after">After hours</label>
+            <select id="p-after" name="after"><option value="wait" selected>Requests wait until we open</option><option value="oncall">An on-call person answers</option><option value="decline">Requests are declined with a note to call us</option></select></div>
+        </div>
+        <label class="chk"><input type="checkbox" name="contact" value="yes" checked> The traveler can reach a person by phone or chat while the hold is active</label>
+        <label class="chk"><input type="checkbox" name="publish" value="yes" checked> We publish how holds work on our website and count holds placed, confirmed, expired and declined every month <span class="tag rec">Recommendation</span></label>
+      </fieldset>
+      <div class="btns">
+        <button type="button" class="secondary" data-fill="policy" data-example="policy-demo">Load the fictional example</button>
+        <button type="button" class="ghost" data-reset="policy">Reset</button>
+      </div>
+    </form>
+    <div class="output">
+      <p class="label">Your hold policy</p>
+      <pre id="out-policy"></pre>
+    </div>
+    <div class="btns">
+      <button type="button" data-copy-local="out-policy" data-msg="Copied. It is a draft: the owner reviews it before anyone acts on it.">Copy policy</button>
+      <button type="button" class="secondary" data-download="3c-hold-policy-DRAFT.md" data-from="out-policy" data-mime="text/markdown">Save as .md</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+    <script type="application/json" id="policy-demo">{"biz":"Bay Light Day Cruises, Seward (FICTIONAL)","who":"approved","ttl":"24","cutoff":"48","cutoff_rule":"yes","inventory":"off","max_holds":"3","max_seats":"12","role":"the office manager","response":"within 4 hours","after":"wait","contact":"yes","publish":"yes"}</script>
+  </section>
+
+  <section class="card" aria-labelledby="checker">
+    <h2 id="checker">Trip record checker</h2>
+    <p>A trip record is a small JSON file an agent and your staff can both read. Paste one to check it against <a href="trip-record.schema.json">the schema</a>. The page checks three things: the schema rules, anything that looks like personal data, and rules the schema cannot express (age bands add up, dates in order, holds that have expired). These are the same checks as <code>validate_record.py</code> and the MCP server's <code>put_trip_record</code>.</p>
+    <label for="rec-input">Trip record (JSON)</label>
+    <p class="privacy" id="rec-privacy">Fictional or de-identified records only. Never paste guest names, emails, phone numbers, card numbers, ID numbers or health details. The check runs in this browser; nothing is sent or saved.</p>
+    <textarea id="rec-input" class="code" spellcheck="false" autocomplete="off" aria-describedby="rec-privacy" placeholder='{ "record_id": "TR-DEMO-0714", ... }'></textarea>
+    <div class="btns">
+      <button type="button" id="rec-example">Load the fictional example</button>
+      <button type="button" class="secondary" id="rec-bad">Load a bad example</button>
+      <button type="button" class="secondary" id="rec-check">Check</button>
+      <button type="button" class="ghost" id="rec-format">Tidy the JSON</button>
+      <button type="button" class="ghost" id="rec-clear">Clear</button>
+      <button type="button" class="ghost" id="rec-save">Save as .json</button>
+    </div>
+    <p class="status" role="status" aria-live="polite" id="rec-status"></p>
+    <div id="rec-result" aria-live="polite"></div>
+    <div id="rec-view" class="rv" aria-label="Readable view of the trip record"></div>
+    <details>
+      <summary>What is in a trip record</summary>
+      <ul>
+        <li><b>party</b>: a count and age bands (for example 6-7 and 8-9), because minimum ages decide what fits. Never names or birth dates.</li>
+        <li><b>dates</b>, <b>budget_band</b> (a band, never a card) and <b>preferences</b>.</li>
+        <li><b>shortlisted</b>: options still in play, each with a reason that cites approved fact ids (from your 1.a fact sheet).</li>
+        <li><b>rejected</b>: options set aside with the reason, so nobody offers them again.</li>
+        <li><b>holds</b>: reversible holds with <code>expires_at</code> and status.</li>
+        <li><b>open_questions</b>: gaps stay questions, for the owner, a partner, staff or the traveler. Nobody fills them with a guess.</li>
+        <li><b>consent</b>: what the traveler agreed to. <code>agent_may_confirm</code> is always false: a person confirms.</li>
+        <li><b>version</b> and <b>updated_at</b>, so two agents cannot overwrite each other.</li>
+      </ul>
+      <p class="hint">The example is the fictional family from <a href="../3a/">3.a</a>: July 14 to 16, two adults and two children aged 6 and 9. The 3.a trip kit is the first draft of this record.</p>
+    </details>
+    <script type="application/json" id="trip-schema">{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://preig.github.io/atiakit/3c/trip-record.schema.json","title":"Agent-ready trip record","description":"Minimum viable trip state for one traveler party: party as counts and age bands, dates, budget band, preferences, short list, rejected options with reasons, reversible holds, open questions and consent. There are no fields for names, contact details or payment data, and free text that looks like an email, phone, card or ID number is rejected. Teaching scaffold from the ATIA AI Take-Home Kit, tool 3.c (Alaska SBDC). Bay Light Day Cruises, Seward is a fictional teaching business. Schema version 0.1, 2026-10-10.","type":"object","additionalProperties":false,"required":["record_id","version","updated_at","party","dates","budget_band","preferences","shortlisted","rejected","holds","open_questions","consent"],"properties":{"$schema":{"description":"Optional link to this schema, for editors.","type":"string","maxLength":200},"record_id":{"description":"Opaque id for this trip record. Never built from a name, email, phone or booking reference.","type":"string","pattern":"^TR-[A-Z0-9]+(-[A-Z0-9]+)*$","maxLength":40},"version":{"description":"Revision number. It goes up by 1 on every change. A server rejects a write whose version is not the stored version plus 1, so two agents cannot overwrite each other silently.","type":"integer","minimum":1},"updated_at":{"description":"When this revision was written, as an ISO 8601 date-time with a time zone. A server may replace it with its own clock.","$ref":"#/$defs/dateTime"},"notes":{"description":"Short free text for staff. No personal data.","$ref":"#/$defs/safeText","maxLength":500},"party":{"description":"Who is traveling, as counts only. No names, no birth dates.","type":"object","additionalProperties":false,"required":["count","age_bands"],"properties":{"count":{"type":"integer","minimum":1,"maximum":60},"age_bands":{"description":"Counts per age band. The counts add up to party.count. Bands are narrow for children because minimum ages decide what fits.","type":"array","minItems":1,"maxItems":11,"items":{"type":"object","additionalProperties":false,"required":["band","count"],"properties":{"band":{"enum":["0-1","2-3","4-5","6-7","8-9","10-11","12-13","14-15","16-17","18-64","65+"]},"count":{"type":"integer","minimum":1,"maximum":60}}}}}},"dates":{"description":"Arrival and departure in the destination. depart is on or after arrive.","type":"object","additionalProperties":false,"required":["arrive","depart"],"properties":{"arrive":{"$ref":"#/$defs/date"},"depart":{"$ref":"#/$defs/date"},"flexible_days":{"type":"integer","minimum":0,"maximum":14}}},"budget_band":{"description":"Activities budget for the whole party, in US dollars, as a band. Never a card, an account or an exact spend.","enum":["not_stated","under_500_usd","500_to_1000_usd","1000_to_2500_usd","2500_to_5000_usd","over_5000_usd"]},"preferences":{"description":"What the party wants and wants to avoid. Record questions about the business (for example step-free access) in open_questions, never a person's health details.","type":"object","additionalProperties":false,"properties":{"interests":{"type":"array","maxItems":10,"items":{"$ref":"#/$defs/safeText","minLength":2,"maxLength":60}},"avoid":{"type":"array","maxItems":10,"items":{"$ref":"#/$defs/safeText","minLength":2,"maxLength":60}},"pace":{"enum":["relaxed","moderate","full"]},"time_of_day":{"enum":["morning","afternoon","either"]},"has_car":{"type":"boolean"},"max_drive_minutes":{"type":"integer","minimum":0,"maximum":600}}},"shortlisted":{"description":"Options still in play. Every reason cites at least one approved fact by id.","type":"array","maxItems":20,"items":{"type":"object","additionalProperties":false,"required":["product_id","reason","source_fact_ids"],"properties":{"product_id":{"$ref":"#/$defs/code"},"date":{"$ref":"#/$defs/date"},"departure":{"$ref":"#/$defs/time"},"reason":{"$ref":"#/$defs/safeText","minLength":3,"maxLength":280},"source_fact_ids":{"type":"array","minItems":1,"maxItems":10,"uniqueItems":true,"items":{"$ref":"#/$defs/code"}}}}},"rejected":{"description":"Options set aside, with the reason, so the next visit or the next agent does not offer them again.","type":"array","maxItems":30,"items":{"type":"object","additionalProperties":false,"required":["product_id","reason"],"properties":{"product_id":{"$ref":"#/$defs/code"},"date":{"$ref":"#/$defs/date"},"departure":{"$ref":"#/$defs/time"},"rule":{"enum":["min_age","time_conflict","weather_rule","season","availability","budget","preference","other"]},"reason":{"$ref":"#/$defs/safeText","minLength":3,"maxLength":280},"source_fact_ids":{"type":"array","maxItems":10,"uniqueItems":true,"items":{"$ref":"#/$defs/code"}}}}},"holds":{"description":"Reversible, time-limited holds. A hold is not a booking. It expires on the server even if the agent disappears. Only a person at the business confirms.","type":"array","maxItems":20,"items":{"type":"object","additionalProperties":false,"required":["hold_id","product_id","date","departure","seats","status","expires_at"],"properties":{"hold_id":{"type":"string","pattern":"^[A-Za-z0-9][A-Za-z0-9_-]{2,63}$"},"product_id":{"$ref":"#/$defs/code"},"date":{"$ref":"#/$defs/date"},"departure":{"$ref":"#/$defs/time"},"seats":{"type":"integer","minimum":1,"maximum":60},"status":{"enum":["active","pending_staff_confirmation","confirmed","released","expired","declined"]},"placed_at":{"$ref":"#/$defs/dateTime"},"expires_at":{"$ref":"#/$defs/dateTime"},"confirmation_id":{"type":"string","pattern":"^[A-Za-z0-9][A-Za-z0-9_-]{2,63}$"}}}},"open_questions":{"description":"Missing facts and decisions, with who should answer. A gap stays a question; nobody fills it with a guess.","type":"array","maxItems":30,"items":{"type":"object","additionalProperties":false,"required":["question","for","status"],"properties":{"id":{"type":"string","pattern":"^Q[0-9]{1,3}$"},"question":{"$ref":"#/$defs/safeText","minLength":3,"maxLength":280},"for":{"enum":["owner","partner","staff","traveler"]},"status":{"enum":["open","answered"]},"answer":{"$ref":"#/$defs/safeText","maxLength":280}}}},"consent":{"description":"What the traveler agreed to for this record. agent_may_confirm is always false: an agent may hold and ask, and a person at the business confirms.","type":"object","additionalProperties":false,"required":["purpose","traveler_reviewed","agent_may_place_holds","agent_may_confirm","retention_days"],"properties":{"purpose":{"enum":["trip_planning"]},"traveler_reviewed":{"type":"boolean"},"agent_may_place_holds":{"type":"boolean"},"agent_may_confirm":{"const":false},"human_contact_offered":{"type":"boolean"},"retention_days":{"type":"integer","minimum":1,"maximum":400},"recorded_at":{"$ref":"#/$defs/dateTime"}}}},"$defs":{"date":{"type":"string","format":"date","pattern":"^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"},"time":{"description":"Local departure time, 24-hour HH:MM.","type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$"},"dateTime":{"type":"string","format":"date-time","pattern":"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2}([.][0-9]+)?)?(Z|[+-][0-9]{2}:[0-9]{2})$"},"code":{"description":"Product or fact id from the business's own catalog, for example BL-CRUISE-4H or BL-MIN-AGE.","type":"string","pattern":"^[A-Z0-9]+(-[A-Z0-9]+)*$","maxLength":40},"safeText":{"description":"Free text that does not look like personal data.","type":"string","not":{"$ref":"#/$defs/looksLikePersonalData"}},"looksLikePersonalData":{"description":"Email address, North American phone number, 13 to 19 digit card or account number, or US Social Security number pattern.","anyOf":[{"pattern":"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+[.][A-Za-z]{2,}"},{"pattern":"(^|[^0-9A-Za-z])([+]?1[ .-]?)?[(]?[2-9][0-9]{2}[)]?[ .-]?[0-9]{3}[ .-]?[0-9]{4}([^0-9A-Za-z]|$)"},{"pattern":"(^|[^0-9])([0-9][ -]?){12,18}[0-9]([^0-9]|$)"},{"pattern":"(^|[^0-9])[0-9]{3}-[0-9]{2}-[0-9]{4}([^0-9]|$)"}]}}}</script>
+    <script type="application/json" id="trip-example">{"$schema":"https://preig.github.io/atiakit/3c/trip-record.schema.json","record_id":"TR-DEMO-0714","version":3,"updated_at":"2026-10-10T18:30:00Z","notes":"FICTIONAL TEACHING RECORD. Bay Light Day Cruises, Seward is a fictional business. Same family as tool 3.a. The record has no names, contact details or payment data, by design. DRAFT - PENDING STAFF REVIEW.","party":{"count":4,"age_bands":[{"band":"18-64","count":2},{"band":"6-7","count":1},{"band":"8-9","count":1}]},"dates":{"arrive":"2027-07-14","depart":"2027-07-16","flexible_days":0},"budget_band":"500_to_1000_usd","preferences":{"interests":["wildlife","glaciers","sled dogs"],"avoid":["long drives"],"pace":"relaxed","time_of_day":"morning","has_car":true,"max_drive_minutes":30},"shortlisted":[{"product_id":"BL-CRUISE-4H","date":"2027-07-15","departure":"09:00","reason":"4-hour wildlife and glacier cruise. Minimum age 4 fits children aged 6 and 9. Heated enclosed cabin, and it runs in rain.","source_fact_ids":["BL-DURATION","BL-MIN-AGE","BL-CABIN","BL-RAIN"]},{"product_id":"MK-CART-90","date":"2027-07-14","reason":"Sled-dog cart ride, 90 minutes, ages 2 and up, runs in rain, 15 minutes by car from the harbor. Fits the open afternoon on arrival day.","source_fact_ids":["MK-OFFER","MK-MIN-AGE","MK-RAIN","MK-DRIVE"]}],"rejected":[{"product_id":"HK-PADDLE-3H","rule":"min_age","reason":"Minimum age 12. The children are 6 and 9.","source_fact_ids":["HK-MIN-AGE"]},{"product_id":"BL-CRUISE-4H","date":"2027-07-15","departure":"14:00","rule":"preference","reason":"The family changed to the morning departure after reviewing the plan. The 14:00 hold was released.","source_fact_ids":["BL-DEPARTURES"]}],"holds":[{"hold_id":"H-DEMOAFTERNOON","product_id":"BL-CRUISE-4H","date":"2027-07-15","departure":"14:00","seats":4,"status":"released","placed_at":"2026-10-10T18:05:00Z","expires_at":"2026-10-11T18:05:00Z"},{"hold_id":"H-DEMOMORNING","product_id":"BL-CRUISE-4H","date":"2027-07-15","departure":"09:00","seats":4,"status":"pending_staff_confirmation","placed_at":"2026-10-10T18:25:00Z","expires_at":"2026-10-11T18:25:00Z","confirmation_id":"C-DEMOMORNING"}],"open_questions":[{"id":"Q1","question":"Lunch is not included. Where can a family eat near the small-boat harbor when the 9:00 cruise returns at 13:00?","for":"owner","status":"open"},{"id":"Q2","question":"Mile 12 Kennel: which departure times run on July 14, and how do guests without a car get there?","for":"partner","status":"open"},{"id":"Q3","question":"Is there space on board for a folded stroller? The walk from the cruise ship dock is 12 minutes.","for":"owner","status":"open"},{"id":"Q4","question":"If the 9:00 departure is not confirmed, should the agent hold the 14:00 departure again?","for":"traveler","status":"answered","answer":"No. Mornings only. Ask a person at Bay Light for other dates."}],"consent":{"purpose":"trip_planning","traveler_reviewed":true,"agent_may_place_holds":true,"agent_may_confirm":false,"human_contact_offered":true,"retention_days":30,"recorded_at":"2026-10-10T18:00:00Z"}}</script>
+  </section>
+
+  <section class="card" aria-labelledby="build">
+    <h2 id="build">The build: for a larger operator or ATIA</h2>
+    <p>The flow an agent follows, and the confidence driver each step serves:</p>
+    <ol class="flow">
+      <li><b>Search</b> products and live availability. <span>Facts cite ids. No invented prices.</span></li>
+      <li><b>Hold</b> seats. The hold expires on its own. <span>Review and change (52%)</span></li>
+      <li><b>Review and change</b> with the traveler: release and hold again. <span>Review and change (52%)</span></li>
+      <li><b>Request confirmation</b>. Nothing is booked yet. <span>A human who can step in (20%)</span></li>
+      <li><b>A person confirms</b> or declines, before the hold expires. <span>Track record (30%): every call logged</span></li>
+    </ol>
+
+    <h3>Build brief for a developer or a coding agent</h3>
+    <p class="hint">For Claude Code, OpenAI Codex or Gemini CLI, or for your platform vendor. Builds on the Prompt Kit brief.</p>
+    <div class="output">
+      <p class="label">Build brief</p>
+      <pre id="brief">Design a minimum viable trip record and an MCP server over the [BOOKING PLATFORM] API.
+
+Trip record (JSON Schema 2020-12, closed to unknown fields): party as a count and age bands (no names), dates, budget band, preferences, short-listed options with a reason that cites approved fact ids, rejected options with the reason, holds, open questions, consent, version and updated_at. No names, contact details, payment data, ID numbers or health details anywhere in the record. Reject free text that looks like an email, phone, card or ID number.
+
+MCP tools: search_products; check_availability(product, date, party); place_hold(product, date, departure, seats) returning a hold id and expires_at (24 hours by default, configurable, and never past the free-cancellation cutoff); get_hold; release_hold; request_confirmation(hold id), which creates a pending confirmation for a person at the business and never confirms by itself; get_trip_record; put_trip_record, validated against the schema with a version check.
+
+Rules: every hold expires on the platform even if the caller disappears. Held seats count against capacity. Limit active holds, seats per hold and new holds per day for each caller so an agent cannot create phantom inventory. Take the caller identity from authentication, never from a tool argument. Log every tool call. Serve on localhost only until authentication and HTTPS are in place.
+
+Tests: a scripted agent runs search, hold, review, change (release and re-hold) and request confirmation; a hold expires with a 2-second TTL; the per-caller limit blocks phantom inventory; a record with personal data is rejected and nothing is saved.
+
+Document what a Claude, ChatGPT or Gemini agent needs to connect, and what a person at the business sees when a hold is placed and when confirmation is requested. Mark generated documents DRAFT - PENDING OWNER REVIEW.
+
+Reference scaffold with fictional data: https://preig.github.io/atiakit/3c/trip-record-mcp.zip</pre>
+    </div>
+    <div class="btns">
+      <button type="button" data-copy-local="brief" data-msg="Copied. Paste it into Claude Code, Codex or Gemini CLI, or send it to your platform vendor.">Copy brief</button>
+      <button type="button" class="secondary" data-download="3c-build-brief.txt" data-from="brief">Save as .txt</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+
+    <h3>The reference scaffold</h3>
+    <p>A small Python MCP server over a mock SQLite inventory for the fictional Bay Light Day Cruises (9:00 and 14:00 departures, capacity 40) and two fictional partners. It runs on your computer with no keys and no internet, and works with Claude Desktop, Claude Code, Gemini CLI and other local MCP clients. The business rules need only the Python standard library, so the tests run without the MCP package.</p>
+    <div class="tablewrap">
+      <table class="stack">
+        <thead><tr><th scope="col">Tool the agent sees</th><th scope="col">What it does</th><th scope="col">Guard rail</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Tool the agent sees"><code>search_products</code></td><td data-label="What it does">Products, facts with ids, minimum ages, seats free</td><td data-label="Guard rail">No prices: they are not in the approved facts</td></tr>
+          <tr><td data-label="Tool the agent sees"><code>check_availability</code></td><td data-label="What it does">Seats free per departure</td><td data-label="Guard rail">Held seats count against capacity</td></tr>
+          <tr><td data-label="Tool the agent sees"><code>place_hold</code></td><td data-label="What it does">Reversible hold with <code>hold_id</code> and <code>expires_at</code></td><td data-label="Guard rail">Expires after 24 h (configurable) or at the cutoff; per-caller limits; minimum age checked</td></tr>
+          <tr><td data-label="Tool the agent sees"><code>get_hold</code>, <code>release_hold</code></td><td data-label="What it does">Status; give seats back</td><td data-label="Guard rail">Callers see only their own holds</td></tr>
+          <tr><td data-label="Tool the agent sees"><code>request_confirmation</code></td><td data-label="What it does">Ask a person to confirm</td><td data-label="Guard rail">Pending only. There is no confirm tool for agents.</td></tr>
+          <tr><td data-label="Tool the agent sees"><code>get_trip_record</code>, <code>put_trip_record</code></td><td data-label="What it does">Read and save the trip record</td><td data-label="Guard rail">Schema check, personal-data scan, version check</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>What a person at the business sees</h3>
+    <pre class="screen" tabindex="0" aria-label="Sample staff console output">&gt; python admin.py pending
+Holds waiting for a person (FICTIONAL MOCK DATA). Confirm or decline before they expire.
+
+confirmation_id  hold_id       product_id    date        departure  seats  minutes_left  record_id     note
+---------------  ------------  ------------  ----------  ---------  -----  ------------  ------------  ------------------------------------------
+C-UPDZHWDDBF     H-JXVKXXCUTW  BL-CRUISE-4H  2027-07-15  09:00      4      1439          TR-DEMO-0714  Reviewed with the traveler. Mornings only.
+
+&gt; python admin.py confirm C-UPDZHWDDBF --by KR
+C-UPDZHWDDBF confirmed by KR (hold H-JXVKXXCUTW).
+Mock only. In a real system, create the booking in your booking platform now; it takes payment in its own checkout.</pre>
+    <h3>Try it</h3>
+    <p>Unzip <a href="trip-record-mcp.zip" download>trip-record-mcp.zip</a>, open a terminal in the folder and type (on a Mac, <code>python3</code>):</p>
+    <div>
+      <code class="cmd" id="cmd-demo">python demo.py</code>
+      <div class="btns"><button type="button" class="secondary small" data-copy-local="cmd-demo" data-msg="Copied. Paste it into a terminal opened in the unzipped folder.">Copy command</button></div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <p>To connect a real client, the <a href="mcp-server/README.md">README</a> walks you through <code>pip install -r requirements.txt</code>, <code>python server.py --dry-run</code> and the settings for Claude Desktop, Claude Code and Gemini CLI.</p>
+    <div class="callout amber"><b>No authentication.</b> Run the scaffold on your own computer only. It refuses to serve anything but 127.0.0.1. Never put it on the internet or a shared network: anyone who can reach it can place and release holds. <span class="tag rec">Recommendation</span> ChatGPT and Claude on the web need a remote server with HTTPS and sign-in, which is a developer job and out of scope here.</div>
+  </section>
+
+  <section class="card" aria-labelledby="files">
+    <h2 id="files">Downloads</h2>
+    <ul class="files">
+      <li><a href="trip-record-mcp.zip" download>trip-record-mcp.zip</a> <span class="hint">MCP server scaffold, mock inventory, staff console, scripted demo, tests. Python 3.10 or newer. <span id="zip-size">About 48 KB.</span></span></li>
+      <li><a href="mcp-server/README.md">mcp-server/README.md</a> <span class="hint">Start here. Plain steps, client settings, limits.</span></li>
+      <li><a href="trip-record.schema.json" download>trip-record.schema.json</a> <span class="hint">JSON Schema 2020-12. Closed to unknown fields; no personal-data fields.</span></li>
+      <li><a href="trip-record.example.json" download>trip-record.example.json</a> <span class="hint">The fictional 3.a family, with a released and a pending hold.</span></li>
+      <li><a href="validate_record.py" download>validate_record.py</a> <span class="hint">Command-line checker, standard library only: <code>python validate_record.py my-record.json</code></span></li>
+      <li><a href="../Prompt-Kit-3x3.html#s3c">Prompt-Kit-3x3.html, section 3.c</a> <span class="hint">The original question and brief in the printable kit.</span></li>
+    </ul>
+  </section>
+
+  <section class="card note" aria-labelledby="measure">
+    <h2 id="measure">How you will know it worked</h2>
+    <ul>
+      <li><b>Small operator:</b> you have your platform's answer in writing, and ATIA has it too.</li>
+      <li><b>Bookings through AI channels</b>, counted monthly by channel. Record your current bookings by channel before you switch anything on, or there is nothing to compare.</li>
+      <li><b>Hold-to-book rate</b>: holds confirmed divided by holds placed (<code>python admin.py stats</code> in the scaffold).</li>
+      <li><b>Share of holds that expire</b>, and <b>staff answer time</b> on confirmation requests. Both tell you whether your hold length and staffing fit.</li>
+    </ul>
+  </section>
+
+  <section class="card warn" aria-labelledby="safe">
+    <h2 id="safe">Before you use it</h2>
+    <p><strong>AI drafts. You approve.</strong> An agent can search, hold and ask. A person at the business confirms every booking. A model checking its own work is not verification.</p>
+    <ul class="lbl-list">
+      <li><span class="tag pol">Policy choice</span> Agents never confirm, book or charge. The scaffold has no confirm tool for agents, and the schema fixes <code>agent_may_confirm</code> to false.</li>
+      <li><span class="tag law">Legal mandate</span> Guide licensing (AS 08.54, Big Game Commercial Services Board; ADF&amp;G sport-fishing guide and business registration) stays with the licensed person. It cannot be handed to an agent.</li>
+      <li><span class="tag law">Legal mandate</span> Lodges: wherever a price appears, agent channels included, show the total price with mandatory fees (FTC 16 CFR Part 464, short-term lodging; it does not cover tours).</li>
+      <li><span class="tag con">Contractual</span> Holds, parity, allotments and cancellation terms may already be set by your booking platform terms and your OTA or reseller agreements. Check them before you switch anything on.</li>
+      <li><span class="tag rec">Recommendation</span> Safety calls (weather and sea-state go or no-go, glacier, wildlife, aviation, first aid) stay with a qualified person. A hold never overrides them.</li>
+      <li><span class="tag rec">Recommendation</span> Trip records hold no names, contact details, payment data, ID numbers or health details. The checker's personal-data scan is a guard rail, not a guarantee.</li>
+      <li><span class="tag rec">Recommendation</span> Keep the scaffold on your own computer. It has no authentication.</li>
+      <li><span class="tag rec">Recommendation</span> Nothing on this page books, holds, charges or sends anything. This page is not legal advice.</li>
+    </ul>
+  </section>
+
+  <section class="card teal" aria-labelledby="next">
+    <h2 id="next">Where this rung sits</h2>
+    <p>This is the top rung of Pain 3. It builds on <a href="../3a/"><b>3.a</b> The AI trip kit</a> (the kit is the first draft of the trip record) and <a href="../3b/"><b>3.b</b> A partner circle with shared facts</a> (shared facts with owners become the fact ids a record cites). Skip those and an agent has nothing reliable to read.</p>
+    <p><a href="../">Back to all nine tools</a></p>
+  </section>
+
+  <section class="card note" aria-labelledby="sources">
+    <h2 id="sources">Sources</h2>
+    <ul class="src">
+      <li>Skift Research and McKinsey &amp; Company, <a href="https://www.mckinsey.com/industries/travel/our-insights/winning-hearts-in-an-age-of-infinite-travel-choices" target="_blank" rel="noopener"><i>Winning Hearts in an Age of Infinite Travel Choices</i></a>, September 2026. Survey of 1,015 US travelers, data as of June 2026: 39% find coordinating the parts of a trip frustrating (Exhibit 6, p19); 74% prefer to make the final booking themselves rather than through an AI, and 16% used an AI tool to book anything (Exhibit 8, p24); 52% want to review and change before confirming, 30% a track record, 20% a human who can step in (Exhibit 9). Google added hotel booking to its Universal Commerce Protocol in May 2026 (p23); the report calls the structured trip state a minimum viable trip state (p29). Diary study, 26 travelers and 211 sessions, July 2026, directional: handoffs between platforms are the most frequent source of negative sentiment (p18).</li>
+      <li>Google AI Mode hotel booking, live in the US from August 27, 2026, with ten large OTA and chain partners: coverage in <a href="https://www.hotel-online.com/news/google-just-started-booking-hotels-inside-ai-independent-hotels-were-not-on-the-list" target="_blank" rel="noopener">Hotel-Online</a> and <a href="https://www.travolution.com/news/travel-sectors/accommodation/google-officially-integrates-hotel-booking-into-ai-mode/" target="_blank" rel="noopener">Travolution</a>.</li>
+      <li>Model Context Protocol: <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">modelcontextprotocol.io</a> · Python SDK: <a href="https://github.com/modelcontextprotocol/python-sdk" target="_blank" rel="noopener">github.com/modelcontextprotocol/python-sdk</a> · JSON Schema 2020-12: <a href="https://json-schema.org/draft/2020-12" target="_blank" rel="noopener">json-schema.org</a>.</li>
+      <li>FTC <a href="https://www.law.cornell.edu/cfr/text/16/part-464" target="_blank" rel="noopener">16 CFR Part 464</a> (fees; short-term lodging and live-event tickets). Alaska: AS 08.54 (Big Game Commercial Services Board); ADF&amp;G sport-fishing guide and business registration. This page is not legal advice.</li>
+      <li>Facts on this page last checked 2026-10-10. Internet is needed for these links only; the tools on this page work offline once loaded.</li>
+    </ul>
+    <div class="btns no-print">
+      <button type="button" class="ghost" id="forget">Clear everything this page saved in this browser</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+  </section>
+</main>
+
+<footer class="kit">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates.</p>
+  <p><a href="../">All nine tools</a> · <a href="../Prompt-Kit-3x3.html">Printable prompt kit</a></p>
+</footer>
+
+<script>
+/* Tool 3.c page logic. Runs before kit.js wires the builders, so the kit:change listeners see the first render. */
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  function $(id) { return document.getElementById(id); }
+  function readJSON(id) { try { return JSON.parse($(id).textContent); } catch (e) { return null; } }
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { if (k === "text") n.textContent = attrs[k]; else n.setAttribute(k, attrs[k]); });
+    (kids || []).forEach(function (c) { if (c !== null && c !== undefined) n.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function say(fromEl, msg) { if (window.KIT && KIT.say) KIT.say(fromEl, msg); }
+  function on(form, fn) { if (form) form.addEventListener("kit:change", function (e) { fn(e.detail || {}); }); }
+
+  /* ---------- copy with a message that fits the destination (most text here is not an AI prompt) ---------- */
+  function copyText(text, btn, msg) {
+    function done(ok) { say(btn, ok ? msg : "Select the text and press Ctrl+C (Cmd+C on a Mac)."); }
+    function fallback() {
+      var area = document.createElement("textarea");
+      area.value = text; area.setAttribute("readonly", ""); area.style.position = "fixed"; area.style.left = "-10000px";
+      document.body.appendChild(area); area.select();
+      var ok = false; try { ok = document.execCommand("copy"); } catch (e) { }
+      area.remove(); btn.focus();
+      done(ok);
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+    else fallback();
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("button[data-copy-local]") : null;
+    if (!b) return;
+    e.preventDefault();
+    var src = $(b.getAttribute("data-copy-local"));
+    copyText(src ? (window.KIT && KIT.textOf ? KIT.textOf(src) : src.textContent) : "", b, b.getAttribute("data-msg") || "Copied.");
+  });
+
+  /* ---------- email to the platform ---------- */
+  var QUESTION = $("q-platform").textContent.trim();
+  on($("f-ask"), function (v) {
+    var p = (v.platform || "").trim() || "[BOOKING PLATFORM]";
+    var biz = (v.biz_type || "").trim() || "[WHAT YOU RUN, for example day cruises in Seward, Alaska]";
+    var fu = (v.followups || "").split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
+    var t = "Subject: AI agent bookings: live availability, holds and confirmation\n\n" +
+      "Hello " + p + " team,\n\n" +
+      "We run " + biz + " and take our bookings through " + p + ". AI agents are starting to book travel for travelers, and we want to know where we stand.\n\n" +
+      QUESTION + "\n";
+    if (fu.length) t += "\nA few follow-up questions:\n" + fu.map(function (q, i) { return (i + 1) + ". " + q; }).join("\n") + "\n";
+    t += "\nThank you,\n[YOUR NAME AND ROLE]";
+    $("out-ask").textContent = t;
+  });
+
+  /* ---------- answer log ---------- */
+  var LOG_FIELDS = [["platform", "Platform"], ["asked", "Date asked"], ["answered", "Date answered"], ["api", "Live availability API"],
+    ["holds", "Reversible holds"], ["confirm", "Confirm and cancel by API"], ["protocol", "Agent checkout protocol"], ["cost", "Cost or commission"], ["when", "Roadmap date"]];
+  var lastLog = {};
+  on($("f-log"), function (v) {
+    lastLog = v;
+    $("out-log").textContent = "BOOKING PLATFORM ANSWER, for ATIA (business facts only)\n" +
+      LOG_FIELDS.map(function (f) { return f[1] + ": " + ((v[f[0]] || "").trim() || "[not filled in]"); }).join("\n");
+  });
+  function csvCell(s) {
+    s = String(s || "");
+    if (/^[=+\-@]/.test(s)) s = "'" + s;          /* keeps spreadsheets from running it as a formula */
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  $("log-csv").addEventListener("click", function (e) {
+    var csv = LOG_FIELDS.map(function (f) { return csvCell(f[0]); }).join(",") + "\r\n" +
+      LOG_FIELDS.map(function (f) { return csvCell(lastLog[f[0]]); }).join(",") + "\r\n";
+    KIT.download("3c-platform-answer.csv", csv, "text/csv");
+    say(e.target, "Saved 3c-platform-answer.csv to your downloads.");
+  });
+
+  /* ---------- hold policy ---------- */
+  var WHO = {
+    any: "Any agent that reaches us through our booking platform's agent channel may place a hold.",
+    approved: "Only agents from channels we have approved in writing may place a hold.",
+    ownsite: "Only agents continuing a trip the traveler started on our own website may place a hold.",
+    none: "No agent holds yet. Agents send the traveler to us, and we hold by hand."
+  };
+  var AFTER = {
+    wait: "After hours, requests wait until we open.",
+    oncall: "After hours, an on-call person answers.",
+    decline: "After hours, requests are declined with a note to call us."
+  };
+  var RESPONSE_HOURS = { "within 1 hour": 1, "within 4 hours": 4, "the same day": 12, "by the next morning": 18 };
+  function num(v, d) { var n = parseInt(v, 10); return isNaN(n) ? d : n; }
+  on($("f-policy"), function (v) {
+    var ttl = num(v.ttl, 24), cutoff = num(v.cutoff, 48), maxH = num(v.max_holds, 3), maxS = num(v.max_seats, 12);
+    var role = (v.role || "").trim() || "[ROLE]";
+    var none = v.who === "none", pre = none ? "When we switch agent holds on: " : "";
+    var L = [];
+    L.push("# Hold policy for AI agents" + ((v.biz || "").trim() ? ": " + v.biz.trim() : ""));
+    L.push("");
+    L.push("DRAFT - PENDING OWNER REVIEW. Not legal advice.");
+    L.push("");
+    L.push("## 1. Who may place a hold");
+    L.push(WHO[v.who] || WHO.any);
+    L.push("- Label: Policy choice. Contractual: check your booking platform terms and each channel agreement.");
+    L.push("- Confidence driver: review and change before confirming (52%).");
+    L.push("");
+    L.push("## 2. How long a hold lasts");
+    L.push(pre + "A hold lasts up to " + ttl + " hour" + (ttl === 1 ? "" : "s") + "." + (v.cutoff_rule ? " It always ends at least " + cutoff + " hours before departure, so it never runs into the no-refund window." : "") + " It expires on its own; nobody has to remember to release it.");
+    L.push("- Label: Policy choice" + (v.cutoff_rule ? " (the cutoff rule is a Recommendation)." : "."));
+    L.push("- Confidence driver: review and change before confirming (52%).");
+    L.push("");
+    L.push("## 3. Inventory while a hold is active");
+    L.push(pre + (v.inventory === "on" ? "Held seats stay on sale. The first booking to be confirmed wins, so a traveler may lose the seats they reviewed." : "Held seats come off sale on every channel until the hold ends."));
+    L.push(pre + "Each agent may hold at most " + maxH + " departure" + (maxH === 1 ? "" : "s") + " at a time and " + maxS + " seats per hold. Larger groups go to a person.");
+    L.push("- Label: Policy choice. Contractual: check parity, allotment and cancellation terms in your platform and OTA or reseller agreements.");
+    L.push("- Confidence driver: a track record (30%): the seats a traveler reviewed are still there when they say yes.");
+    L.push("");
+    L.push("## 4. How a person steps in");
+    L.push("Agents never confirm, book or charge. " + role.charAt(0).toUpperCase() + role.slice(1) + " confirms or declines every agent request " + (v.response || "within 4 hours") + " in season. " + (AFTER[v.after] || AFTER.wait));
+    L.push(v.contact ? "The traveler can reach a person by phone or chat while the hold is active." : "CHECK: the traveler has no way to reach a person while the hold is active.");
+    L.push("- Label: Policy choice.");
+    L.push("- Confidence driver: a human who can step in (20%).");
+    if (v.publish) {
+      L.push("");
+      L.push("## Track record");
+      L.push("We publish how holds work on our website, and we count holds placed, confirmed, expired and declined every month.");
+      L.push("- Label: Recommendation. Confidence driver: a track record (30%).");
+    }
+    var checks = [];
+    if (!none && v.after === "wait" && ttl < 16) checks.push("A " + ttl + "-hour hold can expire overnight before anyone answers. Lengthen the hold or add an on-call person.");
+    if (!none && RESPONSE_HOURS[v.response] >= ttl) checks.push("Your answer time (" + v.response + ") is as long as the hold (" + ttl + " hours). Requests can expire before anyone answers. Lengthen the hold or answer faster.");
+    if (v.cutoff_rule && cutoff > 0 && ttl > cutoff) checks.push("The hold is longer than the cutoff; for departures soon, the cutoff will end it first. That is intended.");
+    if (v.inventory === "on") checks.push("Seats that stay on sale while held undercut review before confirming (52%).");
+    if (checks.length) { L.push(""); L.push("## Checks"); checks.forEach(function (c) { L.push("- " + c); }); }
+    L.push("");
+    L.push("## Fixed rules");
+    L.push("- Legal mandate: guide licensing (AS 08.54, Big Game Commercial Services Board; ADF&G sport-fishing guide and business registration) stays with the licensed person. It cannot be handed to an agent.");
+    L.push("- Legal mandate (lodging only): wherever a price appears, agent channels included, show the total price with mandatory fees (FTC 16 CFR Part 464). It does not cover tours.");
+    L.push("- Recommendation: safety calls (weather and sea-state go or no-go, glacier, wildlife, aviation, first aid) stay with a qualified person. A hold never overrides them.");
+    L.push("- Recommendation: trip records hold no names, contact details, payment data, ID numbers or health details.");
+    $("out-policy").textContent = L.join("\n");
+  });
+
+  /* ---------- trip record checker ---------- */
+  var SCHEMA = readJSON("trip-schema"), EXAMPLE = readJSON("trip-example");
+  var PRODUCTS = {
+    "BL-CRUISE-4H": "Bay Light Day Cruises: wildlife and glacier cruise, 4 hours (fictional)",
+    "MK-CART-90": "Mile 12 Kennel: summer sled-dog cart ride, 90 minutes (fictional partner)",
+    "HK-PADDLE-3H": "Harbor Kayak Co.: guided paddle, 3 hours (fictional partner)"
+  };
+  var FACTS = {
+    "BL-DURATION": "4-hour wildlife and glacier cruise.", "BL-DEPARTURES": "Departs 9:00 and 14:00, May 15 to September 15.",
+    "BL-CAPACITY": "Capacity 40.", "BL-MIN-AGE": "Minimum age 4.", "BL-CABIN": "Heated enclosed cabin, two restrooms, hot drinks included.",
+    "BL-LUNCH": "Lunch not included.", "BL-MEETING": "Meeting point: small-boat harbor, a 12-minute walk from the cruise ship dock.",
+    "BL-RAIN": "Runs in rain. Cancels only for a marine warning, with a full refund.",
+    "BL-CANCEL": "Free cancellation until 48 hours before departure; inside 48 hours, no refund.",
+    "MK-OFFER": "Summer sled-dog cart ride, 90 minutes.", "MK-DRIVE": "15 minutes by car from the harbor.", "MK-MIN-AGE": "Ages 2 and up.",
+    "MK-RAIN": "Runs in rain.", "MK-CODE": "Referral code BAYLIGHT-K.", "HK-OFFER": "3-hour guided paddle. Departs 8:00 and 13:00.",
+    "HK-MIN-AGE": "Minimum age 12.", "HK-WIND": "Cancels in wind over 15 knots.", "HK-CODE": "Referral code BAYLIGHT-P."
+  };
+  var BUDGET = { "not_stated": "not stated", "under_500_usd": "under $500", "500_to_1000_usd": "$500 to $1,000", "1000_to_2500_usd": "$1,000 to $2,500",
+    "2500_to_5000_usd": "$2,500 to $5,000", "over_5000_usd": "over $5,000" };
+  var KIND = { "schema": ["Schema", "teal"], "personal-data": ["Personal data", "red"], "rule": ["Record rule", "amber"] };
+  var input = $("rec-input"), result = $("rec-result"), view = $("rec-view"), status = $("rec-status");
+
+  /* The example file was written on 2026-10-10, so its holds expire on 2026-10-11. On the page, move every
+     time in it to the last minute so the pending hold is live. The downloadable file keeps its own times. */
+  function freshExample() {
+    var r = JSON.parse(JSON.stringify(EXAMPLE)), base = Date.parse(r.updated_at);
+    if (isNaN(base)) return r;
+    var shift = Date.now() - 60000 - base;
+    function mv(o, k) {
+      if (!o || typeof o[k] !== "string") return;
+      var t = Date.parse(o[k]);
+      if (!isNaN(t)) o[k] = new Date(Math.floor((t + shift) / 1000) * 1000).toISOString().replace(/\.\d{3}Z$/, "Z");
+    }
+    mv(r, "updated_at"); mv(r.consent, "recorded_at");
+    (r.holds || []).forEach(function (h) { mv(h, "placed_at"); mv(h, "expires_at"); });
+    return r;
+  }
+  function badExample() {
+    var r = freshExample();
+    r.notes = "Lead guest: someone@example.com, cell 907-555-0142. Card on file 4111 1111 1111 1111.";
+    r.party.guest_name = "FICTIONAL NAME";
+    r.party.count = 5;
+    r.consent.agent_may_confirm = true;
+    r.open_questions[0].question = "Mrs. Example asked about lunch near the harbor.";
+    return r;
+  }
+  function parseError(text, err) {
+    var msg = String(err && err.message || err), m = /position (\d+)/.exec(msg), lc = /line (\d+) column (\d+)/.exec(msg);
+    if (lc) return "Not valid JSON: line " + lc[1] + ", column " + lc[2] + ".";
+    if (m) {
+      var pos = +m[1], before = text.slice(0, pos).split("\n");
+      return "Not valid JSON: line " + before.length + ", column " + (before[before.length - 1].length + 1) + ".";
+    }
+    return "Not valid JSON. Check for a missing comma, quote or bracket.";
+  }
+  function when(iso) {
+    var t = Date.parse(iso);
+    if (isNaN(t)) return iso;
+    var d = new Date(t);
+    return d.toISOString().replace("T", " ").replace(/:\d\d(\.\d+)?Z$/, " UTC");
+  }
+  function left(iso) {
+    var t = Date.parse(iso) - Date.now();
+    if (isNaN(t)) return "";
+    if (t <= 0) return "expired by now";
+    var h = Math.floor(t / 3600000), m = Math.floor((t % 3600000) / 60000);
+    return h >= 48 ? Math.round(h / 24) + " days left" : h > 0 ? h + " h " + m + " min left" : m + " min left";
+  }
+  function pill(text, cls) { return el("span", { "class": "pill " + (cls || ""), text: text }); }
+
+  function renderResult(res) {
+    result.textContent = "";
+    var ok = res.ok, e = res.errors.length, w = res.warnings.length;
+    var head = el("div", { "class": "verdict" }, [
+      pill(ok ? "Valid" : "Not valid", ok ? "" : "red"),
+      el("span", { text: e + " error" + (e === 1 ? "" : "s") + ", " + w + " warning" + (w === 1 ? "" : "s") + (ok ? ". Ready for a person to review." : ". Fix the errors; nothing with errors should be saved or shared.") })
+    ]);
+    result.appendChild(head);
+    if (e + w) {
+      var ul = el("ul", { "class": "issues" });
+      res.errors.concat(res.warnings).forEach(function (i) {
+        var k = KIND[i.kind] || [i.kind, ""];
+        ul.appendChild(el("li", null, [pill(i.level === "error" ? k[0] : k[0] + " warning", i.level === "error" ? k[1] : "amber"),
+          el("code", { text: i.path || "/" }), " ", i.message]));
+      });
+      result.appendChild(ul);
+    }
+  }
+
+  function renderView(r) {
+    view.textContent = "";
+    if (!r || typeof r !== "object" || Array.isArray(r)) return;
+    var arr = function (x) { return Array.isArray(x) ? x : []; };
+    view.appendChild(el("h4", { text: "Readable view" + (r.record_id ? ": " + r.record_id : "") + (r.version ? ", version " + r.version : "") }));
+    var party = r.party || {}, dates = r.dates || {}, pref = r.preferences || {};
+    var bands = arr(party.age_bands).map(function (b) { return (b && b.count) + " in " + (b && b.band); }).join(", ");
+    var kv = el("dl", { "class": "kv" });
+    function row(k, v) { if (v !== undefined && v !== null && v !== "") { kv.appendChild(el("dt", { text: k })); kv.appendChild(el("dd", { text: String(v) })); } }
+    row("Party", (party.count !== undefined ? party.count + " people" : "") + (bands ? " (" + bands + ")" : ""));
+    row("Dates", (dates.arrive || "?") + " to " + (dates.depart || "?") + (dates.flexible_days ? ", flexible by " + dates.flexible_days + " days" : ""));
+    row("Budget band", BUDGET[r.budget_band] || r.budget_band);
+    row("Interests", arr(pref.interests).join(", "));
+    row("Avoid", arr(pref.avoid).join(", "));
+    row("Pace", pref.pace);
+    row("Time of day", pref.time_of_day);
+    if (typeof pref.has_car === "boolean") row("Has a car", pref.has_car ? "yes" : "no");
+    row("Updated", r.updated_at ? when(r.updated_at) : "");
+    row("Notes", r.notes);
+    view.appendChild(kv);
+
+    function product(id) { return PRODUCTS[id] ? PRODUCTS[id] : id + " (not in the demo catalog)"; }
+    function slot(it) { return [it.date, it.departure].filter(Boolean).join(" at "); }
+    function factsLine(ids) {
+      ids = arr(ids);
+      if (!ids.length) return null;
+      return el("span", { "class": "facts", text: "Cites: " + ids.map(function (f) { return f + (FACTS[f] ? " (" + FACTS[f] + ")" : " (not in the demo fact sheet)"); }).join("; ") });
+    }
+    function list(title, items, fn) {
+      view.appendChild(el("h4", { text: title + " (" + items.length + ")" }));
+      if (!items.length) { view.appendChild(el("p", { "class": "hint", text: "None." })); return; }
+      var ul = el("ul");
+      items.forEach(function (it) { if (it && typeof it === "object") ul.appendChild(fn(it)); });
+      view.appendChild(ul);
+    }
+    list("Short list", arr(r.shortlisted), function (it) {
+      return el("li", null, [el("b", { text: product(it.product_id) }), slot(it) ? ", " + slot(it) : "", ". " + (it.reason || ""), factsLine(it.source_fact_ids)]);
+    });
+    list("Rejected", arr(r.rejected), function (it) {
+      return el("li", null, [el("b", { text: product(it.product_id) }), slot(it) ? ", " + slot(it) : "", it.rule ? " [" + it.rule.replace(/_/g, " ") + "]" : "", ". " + (it.reason || ""), factsLine(it.source_fact_ids)]);
+    });
+    list("Holds", arr(r.holds), function (h) {
+      var live = h.status === "active" || h.status === "pending_staff_confirmation";
+      var cls = h.status === "confirmed" ? "" : live ? "teal" : "amber";
+      return el("li", null, [pill(String(h.status || "?").replace(/_/g, " "), cls), " ", el("b", { text: h.hold_id || "?" }), ": " + product(h.product_id) + ", " + slot(h) + ", " + h.seats + " seats",
+        el("span", { "class": "facts", text: (live ? "Expires " : "Was set to expire ") + when(h.expires_at) + (live ? " (" + left(h.expires_at) + ")" : "") + (h.confirmation_id ? ". Confirmation " + h.confirmation_id : "") })]);
+    });
+    list("Open questions", arr(r.open_questions), function (q) {
+      return el("li", null, [pill(q.status === "answered" ? "answered" : "open", q.status === "answered" ? "" : "amber"), " ", (q.id ? q.id + " " : "") + "for the " + (q.for || "?") + ": " + (q.question || ""),
+        q.answer ? el("span", { "class": "facts", text: "Answer: " + q.answer }) : null]);
+    });
+    var c = r.consent || {};
+    view.appendChild(el("h4", { text: "Consent" }));
+    var ckv = el("dl", { "class": "kv" });
+    [["Purpose", c.purpose ? String(c.purpose).replace(/_/g, " ") : undefined], ["Traveler reviewed", c.traveler_reviewed], ["Agent may place holds", c.agent_may_place_holds],
+     ["Agent may confirm", c.agent_may_confirm], ["A person offered", c.human_contact_offered], ["Keep for", c.retention_days !== undefined ? c.retention_days + " days" : undefined]
+    ].forEach(function (p) {
+      if (p[1] === undefined) return;
+      ckv.appendChild(el("dt", { text: p[0] }));
+      ckv.appendChild(el("dd", { text: p[1] === true ? "yes" : p[1] === false ? "no" : String(p[1]) }));
+    });
+    view.appendChild(ckv);
+  }
+
+  function check(quiet) {
+    var text = input.value;
+    if (!text.trim()) { result.textContent = ""; view.textContent = ""; if (!quiet) status.textContent = "Paste a trip record or load the example first."; return null; }
+    var rec;
+    try { rec = JSON.parse(text); } catch (err) {
+      result.textContent = "";
+      result.appendChild(el("div", { "class": "verdict" }, [pill("Not valid", "red"), el("span", { text: parseError(text, err) })]));
+      view.textContent = "";
+      if (!quiet) status.textContent = parseError(text, err);
+      return null;
+    }
+    if (!SCHEMA || !window.TripRecord) { status.textContent = "The checker did not load. Reload the page."; return null; }
+    var res = TripRecord.validate(rec, SCHEMA);
+    renderResult(res);
+    renderView(rec);
+    if (!quiet) status.textContent = "Checked in this browser: " + res.summary() + ".";
+    return { rec: rec, res: res };
+  }
+  var timer = null;
+  input.addEventListener("input", function () { status.textContent = ""; clearTimeout(timer); timer = setTimeout(function () { check(true); }, 350); });
+  $("rec-check").addEventListener("click", function () { check(false); });
+  $("rec-example").addEventListener("click", function () {
+    input.value = JSON.stringify(freshExample(), null, 2);
+    var out = check(true);
+    status.textContent = "Fictional example loaded and checked: " + (out ? out.res.summary() : "") + ". Its times are moved to now so the hold is live.";
+  });
+  $("rec-bad").addEventListener("click", function () {
+    input.value = JSON.stringify(badExample(), null, 2);
+    var out = check(true);
+    status.textContent = "Bad example loaded (all fictional): " + (out ? out.res.summary() : "") + ". See what the checker catches.";
+  });
+  $("rec-format").addEventListener("click", function () {
+    try { input.value = JSON.stringify(JSON.parse(input.value), null, 2); status.textContent = "Tidied."; check(true); }
+    catch (err) { status.textContent = parseError(input.value, err); }
+  });
+  $("rec-clear").addEventListener("click", function () { input.value = ""; result.textContent = ""; view.textContent = ""; status.textContent = "Cleared."; input.focus(); });
+  $("rec-save").addEventListener("click", function () {
+    if (!input.value.trim()) { status.textContent = "Nothing to save yet."; return; }
+    var out = check(true);
+    KIT.download("trip-record.json", input.value, "application/json");
+    status.textContent = out && out.res.ok ? "Saved trip-record.json to your downloads." : "Saved trip-record.json, but it is not valid yet.";
+  });
+
+  /* ---------- forget ---------- */
+  $("forget").addEventListener("click", function (e) {
+    try {
+      Object.keys(localStorage).forEach(function (k) { if (k.indexOf("atiakit:3c") === 0) localStorage.removeItem(k); });
+    } catch (err) { }
+    ["ask", "log", "policy"].forEach(function (k) { var b = KIT.builders[k]; if (b) { b.form.reset(); b.refresh(); } });
+    try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf("atiakit:3c") === 0) localStorage.removeItem(k); }); } catch (err) { }
+    say(e.target, "Cleared everything this page saved in this browser.");
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+[
+  {
+    "traveler_type": "Family with children under 10",
+    "picks": [
+      {
+        "product_id": "MK-CART-90",
+        "business": "Mile 12 Kennel",
+        "reason": "Children aged 2 and up can ride, and the ride takes 90 minutes. It runs in rain, so bring rain gear for everyone.",
+        "cited_fact": "Minimum age 2"
+      },
+      {
+        "product_id": "BL-CRUISE-4H",
+        "business": "Bay Light Day Cruises",
+        "reason": "Children aged 4 and up can come, and the heated enclosed cabin has two restrooms. Lunch is not included, so pack food for the 4 hours.",
+        "cited_fact": "Heated enclosed cabin, two restrooms, hot drinks included, lunch not included"
+      }
+    ],
+    "note_if_fewer_than_three": "Only two trips fit. Harbor Kayak Co. has a minimum age of 12. If a child is under 4, only the sled-dog cart ride fits."
+  },
+  {
+    "traveler_type": "Serious photographer",
+    "picks": [
+      {
+        "product_id": "BL-CRUISE-4H",
+        "business": "Bay Light Day Cruises",
+        "reason": "Four hours on a cruise built around wildlife and the glacier. It runs in rain, so bring rain cover for your camera.",
+        "cited_fact": "Wildlife and glacier cruise"
+      },
+      {
+        "product_id": "HK-PADDLE-3H",
+        "business": "Harbor Kayak Co.",
+        "reason": "A 3-hour guided paddle with departures at 8:00 and 13:00. It cancels in wind over 15 knots, so keep a spare day in your plan.",
+        "cited_fact": "Departures 8:00 and 13:00"
+      }
+    ],
+    "note_if_fewer_than_three": "Only two trips fit. The facts do not say how much time the sled-dog cart ride allows for photos. Ask Mile 12 Kennel."
+  },
+  {
+    "traveler_type": "Cruise ship day visitor with 5 hours ashore",
+    "picks": [
+      {
+        "product_id": "BL-CRUISE-4H",
+        "business": "Bay Light Day Cruises",
+        "reason": "The harbor is a 12-minute walk from the cruise ship dock and the cruise takes 4 hours. Check that the 9:00 or 14:00 departure fits your ship's hours.",
+        "cited_fact": "a 12-minute walk from the cruise ship dock"
+      },
+      {
+        "product_id": "MK-CART-90",
+        "business": "Mile 12 Kennel",
+        "reason": "The ride takes 90 minutes and the kennel is 15 minutes by car from the harbor. Arrange your ride there first: ask Mile 12 Kennel how guests without a car get there.",
+        "cited_fact": "15 minutes by car from the harbor"
+      }
+    ],
+    "note_if_fewer_than_three": "Only two trips fit. Harbor Kayak Co. is left out until we know its meeting point and the travel time from the dock."
+  },
+  {
+    "traveler_type": "Couple on a 10-day road trip",
+    "picks": [
+      {
+        "product_id": "BL-CRUISE-4H",
+        "business": "Bay Light Day Cruises",
+        "reason": "A 4-hour wildlife and glacier cruise that runs from May 15 to September 15, with a heated cabin and hot drinks included.",
+        "cited_fact": "May 15 to September 15"
+      },
+      {
+        "product_id": "HK-PADDLE-3H",
+        "business": "Harbor Kayak Co.",
+        "reason": "A 3-hour guided paddle for ages 12 and up. It cancels in wind over 15 knots, so pick a day early in your 10 days and keep a backup plan.",
+        "cited_fact": "Minimum age 12"
+      },
+      {
+        "product_id": "MK-CART-90",
+        "business": "Mile 12 Kennel",
+        "reason": "A 90-minute sled-dog cart ride, 15 minutes by car from the harbor, that runs in rain. It fits between drives.",
+        "cited_fact": "Summer sled-dog cart ride"
+      }
+    ],
+    "note_if_fewer_than_three": ""
+  }
+]

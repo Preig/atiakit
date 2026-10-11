@@ -1,0 +1,225 @@
+{
+ "_note": "Fictional recorded responses for teaching and tests. Shapes follow each API's documented response format; names, sites and numbers are invented (Bay Light Day Cruises is a fictional teaching business; .example domains are reserved and never resolve).",
+ "_week": "week2",
+ "responses": {
+  "P02": {
+   "_style": "interactions",
+   "id": "int_mock_P02",
+   "model": "mock-gemini",
+   "status": "completed",
+   "steps": [
+    {
+     "type": "google_search_call",
+     "arguments": {
+      "queries": [
+       "half-day glacier cruise Seward family",
+       "Seward cruise prices kids"
+      ]
+     }
+    },
+    {
+     "type": "google_search_result",
+     "search_suggestions": "<div>MOCK search suggestions</div>"
+    },
+    {
+     "type": "model_output",
+     "content": [
+      {
+       "type": "text",
+       "text": "[MOCK ANSWER, FICTIONAL] Sample Fjord Tours runs a fjord trip that takes children. A travel blog compares half-day cruises by age limits.",
+       "annotations": [
+        {
+         "type": "url_citation",
+         "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/MOCK-P02-B",
+         "title": "samplefjord.example",
+         "start_index": 0,
+         "end_index": 83
+        },
+        {
+         "type": "url_citation",
+         "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/MOCK-P02-C",
+         "title": "travelblog.example",
+         "start_index": 83,
+         "end_index": 137
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "usage": {
+    "total_input_tokens": 5200,
+    "total_output_tokens": 760
+   }
+  },
+  "P03": {
+   "_style": "interactions",
+   "id": "int_mock_P03",
+   "model": "mock-gemini",
+   "status": "completed",
+   "steps": [
+    {
+     "type": "google_search_call",
+     "arguments": {
+      "queries": [
+       "Seward rainy day 5 hours"
+      ]
+     }
+    },
+    {
+     "type": "google_search_result",
+     "search_suggestions": "<div>MOCK search suggestions</div>"
+    },
+    {
+     "type": "model_output",
+     "content": [
+      {
+       "type": "text",
+       "text": "[MOCK ANSWER, FICTIONAL] Mile 12 Kennel is a short drive from the harbor and runs in rain.",
+       "annotations": [
+        {
+         "type": "url_citation",
+         "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/MOCK-P03-A",
+         "title": "visitseward.example",
+         "start_index": 0,
+         "end_index": 90
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "usage": {
+    "total_input_tokens": 4800,
+    "total_output_tokens": 610
+   }
+  },
+  "P06": {
+   "_style": "interactions",
+   "id": "int_mock_P06",
+   "model": "mock-gemini",
+   "status": "completed",
+   "steps": [
+    {
+     "type": "google_search_call",
+     "arguments": {
+      "queries": [
+       "beginner sea kayak Seward"
+      ]
+     }
+    },
+    {
+     "type": "google_search_result",
+     "search_suggestions": "<div>MOCK search suggestions</div>"
+    },
+    {
+     "type": "model_output",
+     "content": [
+      {
+       "type": "text",
+       "text": "[MOCK ANSWER, FICTIONAL] Harbor Kayak Co. offers guided trips for beginners.",
+       "annotations": [
+        {
+         "type": "url_citation",
+         "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/MOCK-P06-A",
+         "title": "harborkayak.example",
+         "start_index": 0,
+         "end_index": 76
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "usage": {
+    "total_input_tokens": 4700,
+    "total_output_tokens": 540
+   }
+  },
+  "P07": {
+   "_style": "generate_content",
+   "model_version": "mock-gemini",
+   "candidates": [
+    {
+     "content": {
+      "role": "model",
+      "parts": [
+       {
+        "text": "[MOCK ANSWER, FICTIONAL] Mile 12 Kennel runs summer cart rides for ages 2 and up."
+       }
+      ]
+     },
+     "finish_reason": "STOP",
+     "grounding_metadata": {
+      "web_search_queries": [
+       "Seward summer sled dog cart ride kids"
+      ],
+      "grounding_chunks": [
+       {
+        "web": {
+         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/MOCK-P07-A",
+         "title": "mile12kennel.example"
+        }
+       }
+      ],
+      "grounding_supports": [
+       {
+        "grounding_chunk_indices": [
+         0
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "usage_metadata": {
+    "prompt_token_count": 4500,
+    "candidates_token_count": 520,
+    "tool_use_prompt_token_count": 0
+   }
+  },
+  "_default": {
+   "_style": "interactions",
+   "id": "int_mock__default",
+   "model": "mock-gemini",
+   "status": "completed",
+   "steps": [
+    {
+     "type": "google_search_call",
+     "arguments": {
+      "queries": [
+       "Alaska trip ideas",
+       ""
+      ]
+     }
+    },
+    {
+     "type": "google_search_result",
+     "search_suggestions": "<div>MOCK search suggestions</div>"
+    },
+    {
+     "type": "model_output",
+     "content": [
+      {
+       "type": "text",
+       "text": "[MOCK ANSWER, FICTIONAL] Generic recorded answer for teaching. It names no watched business.",
+       "annotations": [
+        {
+         "type": "url_citation",
+         "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/MOCK-DEF",
+         "title": "visitseward.example",
+         "start_index": 0,
+         "end_index": 92
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "usage": {
+    "total_input_tokens": 4100,
+    "total_output_tokens": 480
+   }
+  }
+ }
+}

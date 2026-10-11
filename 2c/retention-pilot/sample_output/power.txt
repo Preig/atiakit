@@ -1,0 +1,15 @@
+Sample size: two-proportion test, alpha 0.05 (two-sided), power 0.8
+Holdout rate 15.0% (no messages)  vs  treatment rate 12.0% (with messages)
+
+Split (treatment/holdout)    Holdout  Treatment     Total  vs 50/50
+50/50                          2,036      2,036     4,072     1.00x  <- yours
+70/30                          1,432      3,341     4,773     1.17x
+80/20                          1,243      4,969     6,212     1.53x
+
+Rule of thumb: an 80/20 split needs about 1 / (4 x 0.80 x 0.20) = 1.56x the bookings of 50/50.
+The exact figure in the table is 1.53x. Either way: for a pilot, 50/50 gets an answer soonest.
+
+Your season: 1,500 bookings x 10% eligible = 150 eligible bookings per operator
+At your split you would need about 27.1 season(s) of data. Operators needed to finish in one season: about 28.
+Verdict: DIRECTIONAL READ ONLY. Worth having; not evidence to scale on.
+To get a firmer answer: use 50/50, run across seasons, or pool the same design through ATIA.

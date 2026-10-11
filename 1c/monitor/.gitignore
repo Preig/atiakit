@@ -1,0 +1,6 @@
+# Keys live here. Never commit it.
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+output_mock/

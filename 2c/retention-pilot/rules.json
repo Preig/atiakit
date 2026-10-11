@@ -1,0 +1,58 @@
+{
+  "about": "Rules for the Bay Light Day Cruises retention pilot (FICTIONAL TEACHING BUSINESS). Plain JSON so it opens in any text editor. Change a number, save, and rerun. Each change is a Policy choice: note who changed what, and when, in changes_log.",
+
+  "scoring": {
+    "about": "Exposure score. More points means the booking is more likely to be changed or cancelled inside the free-cancellation window. These weights are a starting guess to test, not a prediction model.",
+    "rules": [
+      {"id": "long_lead", "label": "Booked more than 60 days before the trip", "field": "lead_time_days", "op": ">", "value": 60, "points": 2},
+      {"id": "flexible", "label": "Flexible (free-cancellation) rate", "field": "rate_type", "op": "==", "value": "flexible", "points": 2},
+      {"id": "ota", "label": "Booked through an online travel agency", "field": "channel", "op": "==", "value": "ota", "points": 1},
+      {"id": "no_addons", "label": "No add-ons on the booking", "field": "addons_count", "op": "==", "value": 0, "points": 1},
+      {"id": "price_alert", "label": "Platform shows a price-alert flag (turn on only if your platform has one)", "field": "price_alert_flag", "op": "==", "value": 1, "points": 1, "enabled": false}
+    ]
+  },
+
+  "eligibility": {
+    "about": "Only the top share of open bookings by score enter the pilot. 0.10 means the top 10 percent.",
+    "top_share": 0.10,
+    "skip_status": ["cancelled", "canceled", "completed", "no_show"]
+  },
+
+  "holdout": {
+    "about": "Share of eligible bookings that get no pilot messages. 0.5 (50/50) is the recommendation for a pilot: an 80/20 split needs about 1.5 times as many bookings for the same answer. The seed makes the draw repeatable. Assignments are stored once in state/assignments.csv and never redrawn.",
+    "share": 0.5,
+    "seed": "baylight-pilot-2027"
+  },
+
+  "messages": {
+    "about": "Confidence first, discount last. Every treatment booking gets message A. At most one follow-up: B or C, tried in the order listed. B and C are promotional, so by default they go only to direct bookings (Contractual: check your OTA and hotel-desk agreements before sending promotions to their guests). Holdout bookings get no pilot messages but keep every normal service message (confirmation, safety, weather).",
+    "first": {"type": "A", "days_after_booking": 1, "min_days_before_trip": 3},
+    "followups": [
+      {"type": "B", "when": [{"field": "addons_count", "op": "==", "value": 0}], "channels": ["direct"], "needs": "matching_addon"},
+      {"type": "C", "when": [{"field": "rate_type", "op": "==", "value": "flexible"}, {"field": "price_alert_flag", "op": "==", "value": 1}], "channels": ["direct"], "needs": "lockin_terms"}
+    ],
+    "followup_days_after_first": 14,
+    "followup_min_days_before_trip": 10,
+    "lockin_terms": "",
+    "lockin_terms_about": "Message C is only drafted when the owner writes the exact terms here. Leave empty to never offer a lock-in. Never a competitor price match. For lodging, show the total price including mandatory fees (Legal mandate: 16 CFR Part 464).",
+    "max_words": 160
+  },
+
+  "checks": {
+    "about": "Local checks on every draft. A phrase is flagged only when it is not already in the approved facts, add-ons or owner terms.",
+    "banned_phrases": ["price match", "match the price", "match any", "beat any", "lowest price", "best price", "cheaper", "competitor", "guarantee", "discount", "% off", "coupon", "credit", "refund", "free", "upgrade", "exception"],
+    "promise_phrases": ["will see", "you'll see", "guaranteed", "definitely", "always see", "100%", "perfectly safe", "completely safe", "no risk", "never cancel"]
+  },
+
+  "power": {
+    "about": "Used by the report and the power command. Baseline = in-window change and cancellation rate without messages. Target = the rate you hope to reach.",
+    "baseline_rate": 0.15,
+    "target_rate": 0.12,
+    "alpha": 0.05,
+    "power": 0.8
+  },
+
+  "changes_log": [
+    {"date": "2026-10-10", "who": "ATIA session kit", "what": "Starting rules for the fictional Bay Light pilot."}
+  ]
+}

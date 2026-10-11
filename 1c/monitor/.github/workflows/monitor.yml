@@ -1,0 +1,67 @@
+# Weekly AI answer monitor. Use in a PRIVATE repository only (the job refuses to run in a public one).
+# Keys come from repository secrets. Prices, models and names come from settings.env (committed, no keys).
+name: weekly-ai-answer-monitor
+
+on:
+  schedule:
+    - cron: "17 16 * * 1"   # Mondays 16:17 UTC, about 7 to 8 AM in Alaska
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ai-answer-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      # Scheduled runs carry no event payload (github.event.repository is empty), so the
+      # visibility is read from the GitHub API instead. Public or unknown = stop here.
+      - name: Refuse to run in a public repository
+        id: private_only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          private="$(gh api "repos/${GITHUB_REPOSITORY}" --jq .private || echo unknown)"
+          if [ "$private" != "true" ]; then
+            echo "::error::This repository is public, or its visibility could not be read. The AI answer monitor runs in a private repository only."
+            exit 1
+          fi
+          echo "Private repository confirmed."
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install provider libraries
+        run: pip install -r requirements.txt
+      - name: Check models and tools
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python monitor.py check
+      - name: Run, diff and cost
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set +e
+          python monitor.py run
+          status=$?
+          python monitor.py diff
+          python monitor.py cost
+          # 3 = budget stop: keep the partial results, mark the job as failed so you notice.
+          exit $status
+      - name: Save results to this private repository
+        if: ${{ always() && steps.private_only.outcome == 'success' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/ || true
+          git commit -m "Weekly AI answer monitor run" || echo "Nothing new to commit"
+          git push

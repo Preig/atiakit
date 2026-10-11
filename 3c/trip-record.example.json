@@ -1,0 +1,94 @@
+{
+  "$schema": "https://preig.github.io/atiakit/3c/trip-record.schema.json",
+  "record_id": "TR-DEMO-0714",
+  "version": 3,
+  "updated_at": "2026-10-10T18:30:00Z",
+  "notes": "FICTIONAL TEACHING RECORD. Bay Light Day Cruises, Seward is a fictional business. Same family as tool 3.a. The record has no names, contact details or payment data, by design. DRAFT - PENDING STAFF REVIEW.",
+  "party": {
+    "count": 4,
+    "age_bands": [
+      {"band": "18-64", "count": 2},
+      {"band": "6-7", "count": 1},
+      {"band": "8-9", "count": 1}
+    ]
+  },
+  "dates": {"arrive": "2027-07-14", "depart": "2027-07-16", "flexible_days": 0},
+  "budget_band": "500_to_1000_usd",
+  "preferences": {
+    "interests": ["wildlife", "glaciers", "sled dogs"],
+    "avoid": ["long drives"],
+    "pace": "relaxed",
+    "time_of_day": "morning",
+    "has_car": true,
+    "max_drive_minutes": 30
+  },
+  "shortlisted": [
+    {
+      "product_id": "BL-CRUISE-4H",
+      "date": "2027-07-15",
+      "departure": "09:00",
+      "reason": "4-hour wildlife and glacier cruise. Minimum age 4 fits children aged 6 and 9. Heated enclosed cabin, and it runs in rain.",
+      "source_fact_ids": ["BL-DURATION", "BL-MIN-AGE", "BL-CABIN", "BL-RAIN"]
+    },
+    {
+      "product_id": "MK-CART-90",
+      "date": "2027-07-14",
+      "reason": "Sled-dog cart ride, 90 minutes, ages 2 and up, runs in rain, 15 minutes by car from the harbor. Fits the open afternoon on arrival day.",
+      "source_fact_ids": ["MK-OFFER", "MK-MIN-AGE", "MK-RAIN", "MK-DRIVE"]
+    }
+  ],
+  "rejected": [
+    {
+      "product_id": "HK-PADDLE-3H",
+      "rule": "min_age",
+      "reason": "Minimum age 12. The children are 6 and 9.",
+      "source_fact_ids": ["HK-MIN-AGE"]
+    },
+    {
+      "product_id": "BL-CRUISE-4H",
+      "date": "2027-07-15",
+      "departure": "14:00",
+      "rule": "preference",
+      "reason": "The family changed to the morning departure after reviewing the plan. The 14:00 hold was released.",
+      "source_fact_ids": ["BL-DEPARTURES"]
+    }
+  ],
+  "holds": [
+    {
+      "hold_id": "H-DEMOAFTERNOON",
+      "product_id": "BL-CRUISE-4H",
+      "date": "2027-07-15",
+      "departure": "14:00",
+      "seats": 4,
+      "status": "released",
+      "placed_at": "2026-10-10T18:05:00Z",
+      "expires_at": "2026-10-11T18:05:00Z"
+    },
+    {
+      "hold_id": "H-DEMOMORNING",
+      "product_id": "BL-CRUISE-4H",
+      "date": "2027-07-15",
+      "departure": "09:00",
+      "seats": 4,
+      "status": "pending_staff_confirmation",
+      "placed_at": "2026-10-10T18:25:00Z",
+      "expires_at": "2026-10-11T18:25:00Z",
+      "confirmation_id": "C-DEMOMORNING"
+    }
+  ],
+  "open_questions": [
+    {"id": "Q1", "question": "Lunch is not included. Where can a family eat near the small-boat harbor when the 9:00 cruise returns at 13:00?", "for": "owner", "status": "open"},
+    {"id": "Q2", "question": "Mile 12 Kennel: which departure times run on July 14, and how do guests without a car get there?", "for": "partner", "status": "open"},
+    {"id": "Q3", "question": "Is there space on board for a folded stroller? The walk from the cruise ship dock is 12 minutes.", "for": "owner", "status": "open"},
+    {"id": "Q4", "question": "If the 9:00 departure is not confirmed, should the agent hold the 14:00 departure again?", "for": "traveler", "status": "answered", "answer": "No. Mornings only. Ask a person at Bay Light for other dates."}
+  ],
+  "consent": {
+    "purpose": "trip_planning",
+    "traveler_reviewed": true,
+    "agent_may_place_holds": true,
+    "agent_may_confirm": false,
+    "human_contact_offered": true,
+    "retention_days": 30,
+    "recorded_at": "2026-10-10T18:00:00Z"
+  }
+}

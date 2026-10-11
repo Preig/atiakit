@@ -1,0 +1,6 @@
+booking_ref,booked_on,arrival,departure,send_date,party,ages,product,status,drafted_on,draft_link,approved_by,sent_date,notes
+TEST-001,2027-02-10,2027-06-14,2027-06-16,2027-05-15,4,2 adults; children 6 and 9,"Wildlife and glacier cruise, 9:00 on 2027-06-15",queued,,,,,FICTIONAL TEST. Children under 12 rule out the kayak. The 9:00 cruise ends at 13:00.
+TEST-002,2027-03-02,2027-06-14,2027-06-15,2027-05-15,2,2 adults,"Wildlife and glacier cruise, 14:00 on 2027-06-14",queued,,,,,FICTIONAL TEST. Same send date as TEST-001: two kits on one run.
+TEST-003,2027-04-18,2027-07-08,2027-07-11,2027-06-08,3,2 adults; teen 13,"Wildlife and glacier cruise, 9:00 on 2027-07-09",queued,,,,,FICTIONAL TEST. July: the month note exists.
+TEST-004,2027-08-01,2027-08-09,2027-08-11,2027-07-10,2,2 adults,"Wildlife and glacier cruise, 14:00 on 2027-08-10",queued,,,,,"FICTIONAL TEST. Booked 8 days out: send_date has already passed, so the next daily run picks it up."
+TEST-005,2027-03-20,2027-07-20,2027-07-22,2027-06-20,5,"3 adults; children 4, 7 and 10","Wildlife and glacier cruise, 9:00 on 2027-07-21",canceled,,,,,FICTIONAL TEST. Canceled: the daily run skips it.

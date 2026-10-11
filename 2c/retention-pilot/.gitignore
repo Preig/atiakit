@@ -1,0 +1,9 @@
+# Keys and local state never leave your computer.
+# Leading slashes: only the folders next to pilot.py, so sample_output/ stays in the repo.
+.env
+/state/
+/output/
+/logs/
+/demo_output/
+__pycache__/
+.pytest_cache/

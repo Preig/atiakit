@@ -1,0 +1,7 @@
+# Only needed for real runs. Mock mode and the tests use the standard library only.
+# Install the ones for the providers you use.
+anthropic
+openai
+google-genai
+# Optional, for running the tests with pytest (python -m unittest works without it)
+# pytest

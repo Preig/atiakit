@@ -1,0 +1,7 @@
+segment,arm,assigned,with_outcome,operator_cancelled_excluded,n,changed_in_window,cancelled_in_window,events,rate,ci95_low,ci95_high,value_of_in_window_cancellations_usd,read
+All eligible bookings,treatment,14,14,0,14,1,1,2,0.1429,0.0401,0.3994,149.0,TOO SMALL TO READ: counts only
+All eligible bookings,holdout,16,16,3,13,3,2,5,0.3846,0.1771,0.6448,1043.0,TOO SMALL TO READ: counts only
+Flexible rate,treatment,14,14,0,14,1,1,2,0.1429,0.0401,0.3994,149.0,TOO SMALL TO READ: counts only
+Flexible rate,holdout,16,16,3,13,3,2,5,0.3846,0.1771,0.6448,1043.0,TOO SMALL TO READ: counts only
+Non-refundable rate,treatment,0,0,0,0,0,0,0,,,,0,NO DATA
+Non-refundable rate,holdout,0,0,0,0,0,0,0,,,,0,NO DATA

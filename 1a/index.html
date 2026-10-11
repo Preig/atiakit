@@ -1,0 +1,1219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; frame-src 'none'">
+<title>1.a Rewrite for the short list · ATIA AI Take-Home Kit</title>
+<meta name="description" content="Swap generic adjectives for facts a traveler can check, publish the same facts on every channel, and check each channel in your browser. Free tier, about an hour, no code.">
+<link rel="stylesheet" href="../assets/kit.css">
+<script src="../assets/kit.js" defer></script>
+<style>
+/* Page-specific styles for tool 1.a. Shared styles live in ../assets/kit.css. */
+.onpage{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;margin:10px 0 0;padding:0;list-style:none}
+.onpage a{color:var(--teal-d)}
+.facts-grid{display:grid;gap:0 22px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.field{min-width:0}
+.field textarea{min-height:72px}
+.field input:disabled,.field textarea:disabled{background:#eef1ec;color:var(--slate-m);border-style:dashed}
+.field.is-ns>label:first-child{color:var(--slate-m)}
+label.ns{display:inline-flex;align-items:center;gap:8px;font-weight:normal;font-size:14px;color:var(--slate-m);margin:6px 0 2px;cursor:pointer;min-height:28px}
+label.ns input{width:18px;height:18px;margin:0;flex:none}
+.hl{white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;border:1px solid var(--line);border-radius:4px;padding:12px 14px;margin:8px 0;min-height:3em}
+mark.gen{background:#ffe08a;color:#3a2a00;border-radius:2px;padding:0 2px}
+mark.promise{background:#f9c9c9;color:#7a1010;border-radius:2px;padding:0 2px}
+span.fact{background:var(--teal-t);color:var(--teal-d);border-bottom:2px solid var(--teal);padding:0 1px}
+span.fillmark{background:#eef1ec;color:var(--slate);border:1px dashed var(--slate-m);border-radius:2px;padding:0 2px;font-weight:bold}
+.legend{font-size:14px;color:var(--slate-m);display:flex;flex-wrap:wrap;gap:6px 14px;margin:6px 0}
+.counts{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;padding:0;list-style:none}
+.counts li{font-size:14px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+.privacy{font-size:14px;color:#8a2a2a;margin:4px 0 0}
+.pii{font-size:14px;font-weight:bold;color:var(--red);margin:4px 0 0}
+.pii:empty{display:none}
+.sugg{list-style:none;padding:0;margin:8px 0}
+.sugg li{border-top:1px solid var(--line);padding:10px 0}
+.sugg .from{display:block;font-size:14px;color:var(--teal-d);margin-top:4px}
+.checks{list-style:none;padding:0;margin:8px 0}
+.checks li{padding:6px 0;border-top:1px solid var(--line)}
+.tablewrap{position:relative;overflow-x:auto;margin:10px 0;-webkit-overflow-scrolling:touch}
+.st,label.ns,.yn-opts label{position:relative}
+table.matrix{font-size:14px}
+table.matrix td.c,table.matrix th.c{text-align:center;white-space:nowrap}
+table.matrix th.c{white-space:normal;font-size:13px;min-width:4.8em;overflow-wrap:normal;word-break:normal}
+table.matrix td.c,table.matrix th.c{padding:8px 5px}
+table.matrix td:first-child{min-width:8.5em}
+table.matrix tr.bad td:first-child{box-shadow:inset 4px 0 0 #d49a1a}
+table.matrix th[scope=rowgroup]{background:#f4f6f4;color:var(--slate)}
+.st{display:inline-block;min-width:3.4em;font-size:12px;font-weight:bold;border-radius:999px;padding:2px 7px;text-align:center;line-height:1.5}
+.st-ok{background:var(--green-t);color:var(--green-d)}
+.st-part{background:var(--teal-t);color:var(--teal-d)}
+.st-diff{background:var(--amber-t);color:var(--amber)}
+.st-miss{background:var(--red-t);color:var(--red)}
+.st-fill{background:#eef1ec;color:var(--slate-m)}
+.chan{border:1px solid var(--line);border-left:5px solid #d49a1a;border-radius:4px;padding:12px 16px;margin:12px 0;background:#fff}
+.chan.okk{border-left-color:var(--green)}
+.chan h4{margin:0 0 6px}
+.chan ul{margin:6px 0 0;padding-left:20px}
+.chan-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:0 16px}
+.chanslot{border:1px solid var(--line);border-radius:4px;padding:2px 14px 12px;margin:12px 0;background:#fbfcfa;min-width:0}
+.chanslot textarea{min-height:170px}
+.files li{flex-wrap:wrap;gap:4px 12px}
+.files li a{white-space:nowrap}
+.share-out.empty{font-size:15px;font-weight:normal;color:var(--slate-m)}
+h4{font-size:16px;line-height:1.3;color:var(--teal-d);margin:1em 0 .3em}
+.olt-q{margin:12px 0}
+.olt-q legend{color:var(--slate)}
+.olt-q p{margin:2px 0 6px;font-size:15px;color:var(--slate-m)}
+.yn-opts{display:flex;gap:10px;flex-wrap:wrap}
+.yn-opts label{display:inline-flex;align-items:center;gap:8px;margin:0;border:1px solid #b8beb4;border-radius:4px;padding:8px 16px;background:#fff;cursor:pointer;font-weight:bold}
+.yn-opts input{width:18px;height:18px;margin:0}
+.scorebox{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;background:var(--teal-t);border-radius:4px;padding:14px 18px;margin:14px 0}
+.history{font-size:15px;padding-left:20px}
+.tag{display:inline-block;font-size:12px;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:1px 7px;margin-right:6px;background:var(--green-t);color:var(--green-d)}
+.tag.legal{background:#fff;color:var(--red);border:1px solid var(--red)}
+.tag.contract{background:var(--amber-t);color:var(--amber)}
+.tag.policy{background:var(--teal-t);color:var(--teal-d)}
+.rules{padding-left:18px}
+.rules li{margin:8px 0}
+.ba-label{margin:0 0 4px}
+.share-out{font-size:20px;font-weight:bold;color:var(--teal-d)}
+.scroll-hint{display:none}
+@media(max-width:640px){.scroll-hint{display:block;margin:4px 0 0}}
+.inline-fields{display:grid;gap:0 16px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.chk-ver{display:inline-flex;align-items:center;gap:8px;font-weight:normal;margin:6px 16px 0 0}
+.chk-ver input{width:18px;height:18px;margin:0}
+@media print{.chanslot,.olt-q .yn-opts{break-inside:avoid}}
+</style>
+</head>
+<body data-page="1a">
+<div class="band" aria-hidden="true"></div>
+<header class="kit">
+  <p class="crumbs"><a href="../">ATIA AI Take-Home Kit</a> › Pain 1 · Comparison overload</p>
+  <p class="kicker"><span class="rung r1" aria-hidden="true"><i></i><i></i><i></i></span>Basic rung · Tool 1.a</p>
+  <h1>Rewrite for the short list</h1>
+  <p class="lede">Take out the words every competitor uses. Put in facts a traveler can check. Publish the same facts on every channel, then let this page check that they match.</p>
+  <ul class="meta">
+    <li><b>Time</b> about 1 hour</li><li><b>Cost</b> free tier</li><li><b>Skill</b> no code</li><li><b>Pain 1</b> 45% of US travelers</li><li><b>Feeds</b> 1.b, 1.c, 2.b</li>
+  </ul>
+  <nav class="tool-nav" data-toolnav="1a" aria-label="All tools"></nav>
+  <ul class="onpage" aria-label="On this page">
+    <li><a href="#facts">Fact sheet</a></li><li><a href="#step1">Step 1 · Adjectives out</a></li><li><a href="#step2">Step 2 · Every channel</a></li><li><a href="#check">Channel check</a></li><li><a href="#listing-test">One-listing test</a></li><li><a href="#measure">Measure</a></li><li><a href="#safe">Before you use it</a></li>
+  </ul>
+</header>
+
+<main class="kit">
+  <noscript><div class="callout amber"><p><strong>This page needs JavaScript</strong> for the fact sheet, the prompt builders and the channel checker. The Step 1 and Step 2 prompts are also in the <a href="../Prompt-Kit-3x3.html#s1a">printable prompt kit</a>, and a blank fact sheet is in <a href="fact-sheet-template.md">fact-sheet-template.md</a>.</p></div></noscript>
+  <div class="callout green">
+    <p><strong>AI drafts. You approve.</strong> Every prompt on this page asks the AI to mark its answer DRAFT - PENDING OWNER REVIEW. What you type stays in this browser: nothing is sent anywhere, and it is saved here only so you can come back. The examples use <strong>Bay Light Day Cruises, Seward, a fictional teaching business</strong>.</p>
+  </div>
+
+  <section class="card teal" aria-labelledby="why">
+    <h2 id="why">The pain it fixes</h2>
+    <div class="grid two">
+      <div>
+        <h3>For the traveler</h3>
+        <p><strong>45%</strong> of US travelers name comparing multiple options as a frustrating moment in planning, the most-cited pain in the survey. When every listing says "unforgettable" and "family-friendly", there is nothing to compare.</p>
+      </div>
+      <div>
+        <h3>For your business</h3>
+        <p>More of the short list now comes from AI tools: <strong>34%</strong> of US travelers use AI while researching a trip. In the report's test, one hotel question went to five AI tools and no hotel appeared in all five answers. Hotels with specific, documented amenities tended to come up more consistently than those described as "family friendly". Specific facts, published the same way everywhere, are the part you control.</p>
+      </div>
+    </div>
+    <p class="hint">Source: Skift Research + McKinsey, <em>Winning Hearts in an Age of Infinite Travel Choices</em>, Sept 2026 · survey of 1,015 US travelers, data as of June 2026 · US travelers, not Alaska visitors. The five-tool test is described in the same report. Figures last verified 2026-10-10.</p>
+    <p><strong>Also fits:</strong> any listing on any channel. A lodge room page, a B&amp;B listing, a fishing charter, a flightseeing tour, a DMO member page.</p>
+  </section>
+
+  <section class="card" aria-labelledby="ba">
+    <h2 id="ba">Before and after</h2>
+    <p>Same business, same facts. Left: what most listings say. Right: an AI draft written only from the fact sheet below. <span class="hint">Prepared example, not live AI output. Fictional business.</span></p>
+    <div class="grid two">
+      <div>
+        <p class="ba-label"><span class="pill amber">Before · generic</span></p>
+        <p class="hl" id="ba-before">Unforgettable scenery, friendly crew, perfect for families. Alaska's best half-day cruise!</p>
+        <ul class="counts" id="ba-before-c"></ul>
+      </div>
+      <div>
+        <p class="ba-label"><span class="pill teal">After · checkable facts</span> <span class="hint">DRAFT - PENDING OWNER REVIEW</span></p>
+        <p class="hl" id="ba-after">Bay Light Day Cruises runs a 4-hour wildlife and glacier cruise from Seward, May 15 to September 15, departing at 9:00 and 14:00. Up to 40 guests; minimum age 4. The cabin is heated and enclosed, with two restrooms. Hot drinks are included; lunch is not. Meet at the small-boat harbor, a 12-minute walk from the cruise ship dock. The cruise runs in rain and cancels only for a marine warning, with a full refund. Free cancellation until 48 hours before departure; inside 48 hours, no refund. Price: [FILL]. Vessel accessibility: [FILL].</p>
+        <ul class="counts" id="ba-after-c"></ul>
+      </div>
+    </div>
+    <p class="legend" aria-hidden="true"><span><mark class="gen">generic word</mark></span><span><mark class="promise">promise to check</mark></span><span><span class="fact">checkable number, time or date</span></span><span><span class="fillmark">[FILL]</span> not supplied yet</span></p>
+    <p class="hint">The two [FILL] items are facts the teaching data does not supply. The owner fills them from records before anything is published.</p>
+  </section>
+
+  <section class="card" aria-labelledby="how">
+    <h2 id="how">How to use it</h2>
+    <ol class="steps">
+      <li>Fill the <a href="#facts">fact sheet</a>, or load the fictional example to see how it works. Tick <em>Not supplied</em> for anything you cannot confirm today. The prompt then says [FILL] instead of letting the AI guess.</li>
+      <li>Paste your current listing in <a href="#step1">Step 1</a>. The page highlights generic words and suggests a checkable fact for each.</li>
+      <li>Copy the Step 1 prompt into Claude, ChatGPT or Gemini (a free account works). Check every line of the numbered fact list it gives you against your records.</li>
+      <li>In the same chat, paste the <a href="#step2">Step 2</a> prompt. You get one version per channel.</li>
+      <li>Paste each version into the <a href="#check">channel checker</a>. Fix anything missing or different.</li>
+      <li>Fill every [FILL] from your records, publish all versions the same day, and fix your website to match <span class="tag">Recommendation</span></li>
+      <li>Run the <a href="#listing-test">one-listing test</a>, keep the score, and rescore in 30 days.</li>
+    </ol>
+    <p><strong>Where to run it:</strong> one chat in <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>, <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a> or <a href="https://gemini.google.com" target="_blank" rel="noopener">Gemini</a>, free tier. No files needed. <span class="hint">These are plain links; nothing from this page goes with them.</span></p>
+  </section>
+
+  <section class="card" aria-labelledby="facts">
+    <h2 id="facts">Your fact sheet</h2>
+    <p>List only facts you have checked against your own records: your booking system, your published terms, your captain or lead guide. Tick <em>Not supplied</em> for anything you cannot confirm today. Empty fields also become [FILL], so the AI never has to guess.</p>
+    <p class="privacy">This sheet is about your product. No guest names, emails, phone numbers or other guest details go here <span class="tag">Recommendation</span></p>
+    <form data-builder="facts" id="form-facts" autocomplete="off">
+      <div class="facts-grid">
+        <div class="field">
+          <label for="f-business">Business name and town</label>
+          <input type="text" id="f-business" name="business" placeholder="e.g. Your Business, Seward">
+        </div>
+        <div class="field">
+          <label for="f-checked">Facts last checked on</label>
+          <input type="date" id="f-checked" name="checked">
+        </div>
+        <div class="field">
+          <label for="f-offer">Offer <small>what you sell, in one line</small></label>
+          <input type="text" id="f-offer" name="offer" placeholder="e.g. Wildlife and glacier cruise">
+          <label class="ns"><input type="checkbox" name="ns_offer" value="1"> <span>Not supplied<span class="visually-hidden"> (offer)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-duration">Duration</label>
+          <input type="text" id="f-duration" name="duration" placeholder="e.g. 4 hours, or 3 nights">
+          <label class="ns"><input type="checkbox" name="ns_duration" value="1"> <span>Not supplied<span class="visually-hidden"> (duration)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-departures">Departures <small>times, or check-in and check-out</small></label>
+          <input type="text" id="f-departures" name="departures" placeholder="e.g. 9:00 and 14:00">
+          <label class="ns"><input type="checkbox" name="ns_departures" value="1"> <span>Not supplied<span class="visually-hidden"> (departures)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-season">Season</label>
+          <input type="text" id="f-season" name="season" placeholder="e.g. May 15 to September 15">
+          <label class="ns"><input type="checkbox" name="ns_season" value="1"> <span>Not supplied<span class="visually-hidden"> (season)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-price">Price <small>per person or per room, and what it covers</small></label>
+          <input type="text" id="f-price" name="price" placeholder="e.g. $000 per adult, taxes included">
+          <label class="ns"><input type="checkbox" name="ns_price" value="1"> <span>Not supplied<span class="visually-hidden"> (price)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-capacity">Capacity</label>
+          <input type="text" id="f-capacity" name="capacity" placeholder="e.g. 40 guests">
+          <label class="ns"><input type="checkbox" name="ns_capacity" value="1"> <span>Not supplied<span class="visually-hidden"> (capacity)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-minage">Minimum age</label>
+          <input type="text" id="f-minage" name="minage" placeholder="e.g. 4">
+          <label class="ns"><input type="checkbox" name="ns_minage" value="1"> <span>Not supplied<span class="visually-hidden"> (minimum age)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-included">Included</label>
+          <input type="text" id="f-included" name="included" placeholder="e.g. Heated cabin, two restrooms, hot drinks">
+          <label class="ns"><input type="checkbox" name="ns_included" value="1"> <span>Not supplied<span class="visually-hidden"> (included)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-notincluded">Not included</label>
+          <input type="text" id="f-notincluded" name="notincluded" placeholder="e.g. Lunch">
+          <label class="ns"><input type="checkbox" name="ns_notincluded" value="1"> <span>Not supplied<span class="visually-hidden"> (not included)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-meeting">Meeting point and distance</label>
+          <input type="text" id="f-meeting" name="meeting" placeholder="e.g. Harbor office, a 12-minute walk from the dock">
+          <label class="ns"><input type="checkbox" name="ns_meeting" value="1"> <span>Not supplied<span class="visually-hidden"> (meeting point)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-weather">Weather policy</label>
+          <textarea id="f-weather" name="weather" placeholder="e.g. Runs in rain. Cancels only for a marine warning, with a full refund."></textarea>
+          <label class="ns"><input type="checkbox" name="ns_weather" value="1"> <span>Not supplied<span class="visually-hidden"> (weather policy)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-cancel">Cancellation terms <small>exact wording</small></label>
+          <textarea id="f-cancel" name="cancel" placeholder="e.g. Free cancellation until 48 hours before departure; inside 48 hours, no refund."></textarea>
+          <label class="ns"><input type="checkbox" name="ns_cancel" value="1"> <span>Not supplied<span class="visually-hidden"> (cancellation terms)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-access">Accessibility <small>what you have measured</small></label>
+          <textarea id="f-access" name="access" placeholder="e.g. Two steps to board, no ramp; restroom door 28 inches"></textarea>
+          <label class="ns"><input type="checkbox" name="ns_access" value="1"> <span>Not supplied<span class="visually-hidden"> (accessibility)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-channels">Channels <small>where this listing appears</small></label>
+          <textarea id="f-channels" name="channels" placeholder="e.g. Own website, Viator, Google Business Profile, two hotel desks"></textarea>
+          <label class="ns"><input type="checkbox" name="ns_channels" value="1"> <span>Not supplied<span class="visually-hidden"> (channels)</span>: insert [FILL]</span></label>
+        </div>
+        <div class="field">
+          <label for="f-other">Other checkable facts <small>one per line</small></label>
+          <textarea id="f-other" name="other" placeholder="One fact per line"></textarea>
+        </div>
+        <div class="field">
+          <label for="f-open">Still open: ask the owner <small>comma or one per line</small></label>
+          <textarea id="f-open" name="open" placeholder="e.g. Group discounts, pet policy"></textarea>
+        </div>
+      </div>
+      <div class="btns">
+        <button type="button" class="secondary" data-fill="facts" data-example="ex-facts">Load the fictional example</button>
+        <button type="button" class="ghost" data-reset="facts">Clear the fact sheet</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </form>
+    <div class="output">
+      <p class="label">Your fact sheet</p>
+      <pre id="out-facts"></pre>
+    </div>
+    <p class="hint" id="facts-gaps"></p>
+    <div>
+      <div class="btns">
+        <button type="button" data-copy="out-facts">Copy fact sheet</button>
+        <button type="button" class="secondary" data-download="fact-sheet.md" data-from="out-facts" data-mime="text/markdown">Save as .md</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <p class="hint">This sheet feeds 1.b (your curated ten), 1.c (structured data) and 2.b (the grounded assistant). Keep one copy as your single source. A blank version is in <a href="fact-sheet-template.md" download>fact-sheet-template.md</a>.</p>
+  </section>
+
+  <section class="card" aria-labelledby="step1">
+    <h2 id="step1">Step 1 · Adjectives out, facts in</h2>
+    <form data-builder="listing" autocomplete="off">
+      <label for="f-listing">Your current listing <small>paste the text from your busiest page or OTA listing</small></label>
+      <textarea id="f-listing" name="listing"></textarea>
+      <p class="privacy">Paste your own marketing text only. No guest names, emails, phone numbers, card numbers, IDs or medical details <span class="tag">Recommendation</span></p>
+      <p class="pii" id="listing-pii" role="alert"></p>
+      <div class="btns">
+        <button type="button" class="secondary" data-fill="listing" data-example="ex-listing">Load the fictional listing</button>
+        <button type="button" class="ghost" data-reset="listing">Clear</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </form>
+
+    <h3>What the page found</h3>
+    <ul class="counts" id="listing-counts"></ul>
+    <div class="hl" id="listing-hl"></div>
+    <p class="legend" aria-hidden="true"><span><mark class="gen">generic word</mark></span><span><mark class="promise">promise to check</mark></span><span><span class="fact">checkable number, time or date</span></span></p>
+    <ul class="sugg" id="listing-sugg" aria-label="Words to replace, with a checkable fact for each"></ul>
+    <p class="hint">The checker runs in your browser with a fixed word list. It does not judge tone, and a word it misses is still worth replacing.</p>
+
+    <h3>Your Step 1 prompt</h3>
+    <div class="output">
+      <p class="label">Step 1 prompt</p>
+      <pre id="out-step1"></pre>
+    </div>
+    <div>
+      <div class="btns">
+        <button type="button" data-gcopy="out-step1">Copy prompt</button>
+        <button type="button" class="secondary" data-download="1a-step1-prompt.txt" data-from="out-step1">Save as .txt</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+
+    <details>
+      <summary>Paste the AI's answer back to check it</summary>
+      <label for="draft1">The AI's answer to Step 1 (or Step 2)</label>
+      <textarea id="draft1" class="tall"></textarea>
+      <p class="privacy">AI output only. Remove any guest details before pasting <span class="tag">Recommendation</span></p>
+      <ul class="checks" id="draft1-out" aria-live="polite"></ul>
+      <p class="hint">This is a pattern check against your fact sheet, not proof. A person still reads every line.</p>
+    </details>
+  </section>
+
+  <section class="card" aria-labelledby="step2">
+    <h2 id="step2">Step 2 · The same facts on every channel</h2>
+    <p>Paste this in the same chat, after you have checked the numbered fact list from Step 1.</p>
+    <form data-builder="step2" autocomplete="off">
+      <fieldset>
+        <legend>Versions to write</legend>
+        <label class="chk-ver"><input type="checkbox" name="ver" value="gbp" checked> Google Business Profile</label>
+        <label class="chk-ver"><input type="checkbox" name="ver" value="ta" checked> TripAdvisor</label>
+        <label class="chk-ver"><input type="checkbox" name="ver" value="viator" checked> Viator</label>
+        <label class="chk-ver"><input type="checkbox" name="ver" value="web"> Your own website</label>
+        <label class="chk-ver"><input type="checkbox" name="ver" value="desk"> Hotel desk card</label>
+        <label for="f-otherver">Another channel and its format <small>optional</small></label>
+        <input type="text" id="f-otherver" name="other" placeholder="e.g. DMO member page: 80 words">
+      </fieldset>
+    </form>
+    <div class="output">
+      <p class="label">Step 2 prompt</p>
+      <pre id="out-step2"></pre>
+    </div>
+    <div>
+      <div class="btns">
+        <button type="button" data-gcopy="out-step2">Copy prompt</button>
+        <button type="button" class="secondary" data-download="1a-step2-prompt.txt" data-from="out-step2">Save as .txt</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <p class="hint">Google's business description limit is 750 characters; check yours in the profile editor.</p>
+    <p><strong>Then</strong> <span class="tag">Recommendation</span> Fill every [FILL] from your records, publish all versions the same day, and fix your website to match. Channel mismatches are what fictional review 6 complains about: "Booked through a third party and the pickup instructions conflicted with the email from the company."</p>
+  </section>
+
+  <section class="card" aria-labelledby="check">
+    <h2 id="check">Check every channel</h2>
+    <p>Paste what each channel says today, or the versions the AI wrote in Step 2. The page compares each one with your fact sheet and with the others, right here in your browser. Rename the channels to match yours.</p>
+    <p class="privacy">Listing text only. No guest names, emails, phone numbers or other guest details <span class="tag">Recommendation</span></p>
+    <form data-builder="channels" autocomplete="off">
+      <div class="btns">
+        <button type="button" class="secondary" data-fill="channels" data-example="ex-good">Load a matching example</button>
+        <button type="button" class="secondary" data-fill="channels" data-example="ex-drift">Load a drifted example</button>
+        <button type="button" class="ghost" data-reset="channels">Clear</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+      <div class="grid chan-grid">
+        <div class="chanslot">
+          <label for="c1name">Channel 1 name</label>
+          <input type="text" id="c1name" name="c1name" value="Google Business Profile">
+          <label for="c1text">Text on channel 1</label>
+          <textarea id="c1text" name="c1text"></textarea>
+        </div>
+        <div class="chanslot">
+          <label for="c2name">Channel 2 name</label>
+          <input type="text" id="c2name" name="c2name" value="TripAdvisor">
+          <label for="c2text">Text on channel 2</label>
+          <textarea id="c2text" name="c2text"></textarea>
+        </div>
+        <div class="chanslot">
+          <label for="c3name">Channel 3 name</label>
+          <input type="text" id="c3name" name="c3name" value="Viator">
+          <label for="c3text">Text on channel 3</label>
+          <textarea id="c3text" name="c3text"></textarea>
+        </div>
+        <div class="chanslot">
+          <label for="c4name">Channel 4 name <small>optional</small></label>
+          <input type="text" id="c4name" name="c4name" value="Your website">
+          <label for="c4text">Text on channel 4</label>
+          <textarea id="c4text" name="c4text"></textarea>
+        </div>
+      </div>
+    </form>
+    <h3>Results</h3>
+    <p id="chk-summary" role="status" aria-live="polite"></p>
+    <div id="chk-out"></div>
+    <div>
+      <div class="btns">
+        <button type="button" class="secondary" id="chk-save">Save the report as .txt</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <details>
+      <summary>What this checker can and cannot do</summary>
+      <p>It looks for the numbers, times, dates, prices, ages and group sizes in each fact, plus its key words. It treats "9 am" and "9:00", or "48 hours" and "2 days", as the same. It can miss a fact that is reworded, and it can flag a harmless difference. Treat every flag as a question for a person, not a verdict.</p>
+      <p><span class="st st-ok">Yes</span> present · <span class="st st-part">Part</span> partly there · <span class="st st-diff">Diff</span> a different number or wording · <span class="st st-miss">No</span> missing · <span class="st st-fill">Open</span> not supplied in your fact sheet</p>
+    </details>
+  </section>
+
+  <section class="card teal" aria-labelledby="listing-test">
+    <h2 id="listing-test">The one-listing test</h2>
+    <p class="kicker">Monday tool · Pains 1 and 2 · about an hour</p>
+    <p>Five yes-or-no checks: does your busiest page prove what your marketing promises? One point per Yes. Keep the score and rescore in 30 days.</p>
+    <form data-builder="olt" autocomplete="off">
+      <fieldset class="olt-q">
+        <legend>1. Does the page match the post?</legend>
+        <p>Same promise, season and photo style as what sent them here.</p>
+        <div class="yn-opts"><label><input type="radio" name="q1" value="y"> Yes</label><label><input type="radio" name="q1" value="n"> No</label></div>
+      </fieldset>
+      <fieldset class="olt-q">
+        <legend>2. Three proofs above the fold?</legend>
+        <p>A dated review, a real photo, a named person.</p>
+        <div class="yn-opts"><label><input type="radio" name="q2" value="y"> Yes</label><label><input type="radio" name="q2" value="n"> No</label></div>
+      </fieldset>
+      <fieldset class="olt-q">
+        <legend>3. One soft next step?</legend>
+        <p>"Check dates", "Ask a question" or "Save this trip", not only "Book now".</p>
+        <div class="yn-opts"><label><input type="radio" name="q3" value="y"> Yes</label><label><input type="radio" name="q3" value="n"> No</label></div>
+      </fieldset>
+      <fieldset class="olt-q">
+        <legend>4. Same facts everywhere?</legend>
+        <p>Price, hours, meeting point and terms match Google and your OTAs. The <a href="#check">channel checker</a> above helps.</p>
+        <div class="yn-opts"><label><input type="radio" name="q4" value="y"> Yes</label><label><input type="radio" name="q4" value="n"> No</label></div>
+      </fieldset>
+      <fieldset class="olt-q">
+        <legend>5. Can you measure progression?</legend>
+        <p>Saves, repeat visits or questions asked: count at least one.</p>
+        <div class="yn-opts"><label><input type="radio" name="q5" value="y"> Yes</label><label><input type="radio" name="q5" value="n"> No</label></div>
+      </fieldset>
+
+      <div class="scorebox">
+        <span>Your score</span>
+        <span class="score" id="olt-score">0 / 5</span>
+        <span class="hint" id="olt-answered">0 of 5 answered</span>
+      </div>
+      <div id="olt-advice" aria-live="polite"></div>
+      <div>
+        <div class="btns">
+          <button type="button" id="olt-save">Save today's score</button>
+          <button type="button" class="secondary" id="olt-ics">Download a 30-day reminder (.ics)</button>
+        </div>
+        <p class="status" role="status" aria-live="polite"></p>
+      </div>
+      <h3>Your scores in this browser</h3>
+      <ul class="history" id="olt-history"></ul>
+
+      <h3>Get the AI's second opinion</h3>
+      <p>You need a context block (ten lines on what you sell, where, to whom, season, prices, policies), your busiest listing and your last three reviews.</p>
+      <label for="f-context">Context block</label>
+      <textarea id="f-context" name="context" class="tall"></textarea>
+      <div>
+        <div class="btns"><button type="button" class="ghost" id="olt-usefacts">Use my fact sheet as the context block</button></div>
+        <p class="status" role="status" aria-live="polite"></p>
+      </div>
+      <label for="f-olisting">Your busiest listing or page</label>
+      <textarea id="f-olisting" name="olisting"></textarea>
+      <label for="f-reviews">Your last three reviews <small>guest names and personal details removed</small></label>
+      <textarea id="f-reviews" name="reviews"></textarea>
+      <p class="privacy">Remove guest names before you paste. Never paste emails, phone numbers, card numbers, IDs or health details <span class="tag">Recommendation</span></p>
+      <p class="pii" id="reviews-pii" role="alert"></p>
+      <div>
+        <div class="btns">
+          <button type="button" class="secondary" data-fill="olt" data-example="ex-olt">Load the fictional example</button>
+          <button type="button" class="ghost" data-reset="olt">Clear answers and text</button>
+        </div>
+        <p class="status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+    <div class="output">
+      <p class="label">One-listing test prompt</p>
+      <pre id="out-olt" data-render="tpl-olt" data-builder-src="olt"></pre>
+    </div>
+    <div>
+      <div class="btns">
+        <button type="button" data-gcopy="out-olt">Copy prompt</button>
+        <button type="button" class="secondary" data-download="1a-one-listing-test-prompt.txt" data-from="out-olt">Save as .txt</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+    <p>It will be wrong about something; reading it is the point. <strong>Feeds Number 2 · direct share of bookings:</strong> a page that proves its promises is the trust lever, measured.</p>
+  </section>
+
+  <section class="card note" aria-labelledby="measure">
+    <h2 id="measure">How you will know it worked</h2>
+    <h3>Number 1 · AI visibility score: the Appear and Described checks</h3>
+    <p>Before you publish, run the <a href="../audit/">AI visibility audit</a> in three AI tools and write down two of its four checks for each answer. <strong>Appear:</strong> are you in the answer at all? <strong>Described:</strong> right category, place and promise? Each scores 0, 1 or 2, so five prompts give up to 20 per tool for these two checks. Rescore quarterly.</p>
+    <p>Expect no change for weeks: AI tools recrawl on their own schedule, and one week's answers are noise. Report trends over a quarter, not a single answer <span class="tag">Recommendation</span></p>
+    <h3>Number 2 · Direct share of bookings</h3>
+    <p>Bookings on your own site or by phone, divided by all bookings. Count it monthly, starting before you change anything, so you have a baseline.</p>
+    <form data-builder="share" autocomplete="off">
+      <div class="inline-fields">
+        <div><label for="f-own">Direct bookings this month <small>own site and phone</small></label><input type="number" id="f-own" name="own" min="0" step="1" inputmode="numeric"></div>
+        <div><label for="f-all">All bookings this month <small>every channel</small></label><input type="number" id="f-all" name="all" min="0" step="1" inputmode="numeric"></div>
+      </div>
+      <p class="share-out" id="share-out" role="status" aria-live="polite"></p>
+    </form>
+    <p class="hint">Counts only, no guest details. This page keeps them in this browser. A rewrite is not proof of more bookings: look for a trend over a season <span class="tag">Recommendation</span></p>
+  </section>
+
+  <section class="card" aria-labelledby="next">
+    <h2 id="next">Next rung: 1.b Your own curated ten</h2>
+    <p>Three picks per traveler type, each with the reason it made the cut, built from this fact sheet and two partners'. Paid tier, about $20 a month, a week of evenings. In the survey, 63% would pick a site showing ten curated options over one with 500 options and filters (30%) or one AI plan (7%).</p>
+    <p class="hint">Skift Research + McKinsey, Sept 2026, n = 1,015 US travelers, data as of June 2026. Effort and cost are estimates.</p>
+    <div class="btns"><a class="button" href="../1b/">Go to 1.b</a> <a class="button secondary" href="../">All nine tools</a></div>
+  </section>
+
+  <section class="card" aria-labelledby="files">
+    <h2 id="files">Download</h2>
+    <ul class="files">
+      <li><a href="fact-sheet-template.md" download>fact-sheet-template.md</a> <span class="hint">Blank fact sheet with the fictional example beside each line, a where-published grid and a words-to-replace list. Opens in any text editor or Word.</span></li>
+      <li><a href="../Prompt-Kit-3x3.html#s1a">Prompt-Kit-3x3.html, section 1.a</a> <span class="hint">The printable prompt kit with the original Step 1 and Step 2 prompts.</span></li>
+    </ul>
+    <p class="hint">Your own fact sheet, prompts and channel report each have a Save button next to them.</p>
+  </section>
+
+  <section class="card warn" aria-labelledby="safe">
+    <h2 id="safe">Before you use it</h2>
+    <p><strong>AI drafts. You approve.</strong> Every prompt here asks the AI to mark its output DRAFT - PENDING OWNER REVIEW. A person who knows the operation checks every fact against your records before anything is published. Asking the AI to check its own work is not verification.</p>
+    <ul class="rules">
+      <li><span class="tag legal">Legal mandate</span> Claims in a listing may not be deceptive (FTC Act Section 5, 15 U.S.C. 45). A checkable fact has to be true on the day a traveler reads it. Accessibility, safety and "guaranteed" claims carry the most risk: describe what you have measured.</li>
+      <li><span class="tag legal">Legal mandate</span> Lodging only: the price you show has to be the total price, including mandatory fees (FTC Rule on Unfair or Deceptive Fees, 16 CFR Part 464, in effect since May 12, 2025). The rule covers short-term lodging and live-event tickets, not tours.</li>
+      <li><span class="tag legal">Legal mandate</span> No fake reviews or testimonials, including AI-written ones (FTC Rule on Consumer Reviews and Testimonials, 16 CFR Part 465). Quote real reviews only as written.</li>
+      <li><span class="tag legal">Legal mandate</span> Guide licensing and registration are yours and cannot be delegated, to staff or to an AI tool (AS 08.54 for big game guides; ADF&amp;G registration for sport fishing guides and businesses).</li>
+      <li><span class="tag contract">Contractual</span> Before you change a price or terms on one channel, check your Viator supplier agreement and any other OTA, reseller or cruise line contract for rate parity and for how each platform displays cancellation terms.</li>
+      <li><span class="tag policy">Policy choice</span> Your weather, cancellation and refund terms are your decisions. The AI words them; it does not set them.</li>
+      <li><span class="tag">Recommendation</span> Safety-critical wording (weather go/no-go, sea state, glacier, wildlife) is drafted by AI and owned by your captain or operations lead. Do not promise wildlife, weather or views.</li>
+      <li><span class="tag">Recommendation</span> No guest names, emails, phone numbers, card numbers, IDs or medical information in any box here or in any AI tool. Check the AI tool's data-use setting before you paste business material.</li>
+      <li><span class="tag">Recommendation</span> Publish all versions the same day, keep the dated fact sheet, and recheck it every season. If a listing mentions a license or permit, show it exactly as issued.</li>
+    </ul>
+    <p>This page keeps what you type in this browser only, so you can close it and come back. Nothing is sent anywhere.</p>
+    <div>
+      <div class="btns"><button type="button" class="danger" id="clear-all">Clear my data on this page</button></div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+</main>
+
+<footer class="kit">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates.</p>
+  <p><a href="../">All nine tools</a> · <a href="../Prompt-Kit-3x3.html">Printable prompt kit</a></p>
+</footer>
+
+<!-- Prompt templates: {{field|[FALLBACK]}} is filled from the forms on this page. -->
+<template id="tpl-step1">Here is our current listing:
+{{listing|[PASTE YOUR CURRENT LISTING]}}
+
+{{factsheet}}
+
+Generic words a checker found in the listing: {{flagged|none found, but check anyway}}
+
+Delete every adjective or claim a competitor could also make. Replace each with a fact a traveler could check: duration, departure times, season, price, capacity, minimum age, what is included and what is not, what happens in rain, walking distance from where guests arrive, cancellation terms. Use only the approved facts above. Where a fact shows [FILL] or is not supplied, write [FILL] rather than guessing. Do not invent prices, availability, awards, ratings, reviews, wildlife sightings or guarantees.
+
+Output, in this order:
+1. A numbered fact list, one checkable fact per line, in the fact sheet's own wording and numbers.
+2. One paragraph under 120 words that uses only those numbered facts.
+3. Questions for the owner: one line for every [FILL] still open.
+
+Mark the output DRAFT - PENDING OWNER REVIEW.</template>
+
+<template id="tpl-step2">Using only the numbered fact list I approved above, write one version for each channel:
+{{versions|[CHOOSE AT LEAST ONE CHANNEL]}}
+
+Do not add, drop or change a fact between versions. Keep every number, time, date and price exactly as written in the fact list. Keep [FILL] wherever a fact is still open. Use no adjective or claim a competitor could also make.
+
+After the versions, list any fact that appears in one version and not the others, and any [FILL] still open.
+
+Mark each version DRAFT - PENDING OWNER REVIEW.</template>
+
+<template id="tpl-olt">Here is my context block, my listing and my last three reviews.
+
+CONTEXT BLOCK
+{{context|[PASTE YOUR CONTEXT BLOCK: ten lines on what you sell, where, to whom, season, prices, policies]}}
+
+LISTING (our busiest page)
+{{olisting|[PASTE YOUR BUSIEST LISTING OR PAGE]}}
+
+LAST THREE REVIEWS (guest names and personal details removed)
+{{reviews|[PASTE YOUR LAST THREE REVIEWS, DE-IDENTIFIED]}}
+
+Compare what my marketing promises with what this page proves. List every promise with no proof next to it, then propose the proof I already have: a fact from the context block or a line from a review. Use only these three texts. Do not invent reviews, photos, awards, numbers or guarantees, and do not write new reviews.
+
+Then answer these five checks Yes or No, with one line of reason each. If a check cannot be judged from text alone (photos, the post that sent visitors, analytics), write "Owner to check".
+1. Does the page match the post? Same promise, season and photo style as what sent them here.
+2. Three proofs above the fold? A dated review, a real photo, a named person.
+3. One soft next step? "Check dates", "Ask a question" or "Save this trip", not only "Book now".
+4. Same facts everywhere? Price, hours, meeting point and terms match Google and your OTAs.
+5. Can you measure progression? Saves, repeat visits or questions asked: count at least one.
+
+Mark the output DRAFT - PENDING OWNER REVIEW.</template>
+
+<!-- Fictional teaching data (Bay Light Day Cruises, Seward). Same facts as Prompt-Kit-3x3.html section 0. -->
+<script type="application/json" id="ex-facts">{"business":"Bay Light Day Cruises, Seward (FICTIONAL TEACHING BUSINESS)","checked":"2026-10-10",
+"offer":"Wildlife and glacier cruise from Seward","ns_offer":"",
+"duration":"4 hours","ns_duration":"",
+"departures":"9:00 and 14:00","ns_departures":"",
+"season":"May 15 to September 15","ns_season":"",
+"price":"","ns_price":"1",
+"capacity":"40 guests","ns_capacity":"",
+"minage":"4","ns_minage":"",
+"included":"Heated enclosed cabin, two restrooms, hot drinks","ns_included":"",
+"notincluded":"Lunch","ns_notincluded":"",
+"meeting":"Small-boat harbor, a 12-minute walk from the cruise ship dock","ns_meeting":"",
+"weather":"Runs in rain. Cancels only for a marine warning, with a full refund.","ns_weather":"",
+"cancel":"Free cancellation until 48 hours before departure; inside 48 hours, no refund.","ns_cancel":"",
+"access":"","ns_access":"1",
+"channels":"Own website, Viator, Google Business Profile, two hotel desks","ns_channels":"",
+"other":"","open":"Group discounts, private charters, pet policy"}</script>
+<script type="application/json" id="ex-listing">{"listing":"Unforgettable scenery, friendly crew, perfect for families. Alaska's best half-day cruise!"}</script>
+<script type="application/json" id="ex-good">{"c1name":"Google Business Profile","c1text":"4-hour wildlife and glacier cruise from Seward\nDeparts 9:00 and 14:00, May 15 to September 15\nUp to 40 guests; minimum age 4\nHeated, enclosed cabin with two restrooms\nHot drinks included; lunch not included\nMeet at the small-boat harbor, a 12-minute walk from the cruise ship dock\nRuns in rain\nCancels only for a marine warning, with a full refund\nFree cancellation until 48 hours before departure; inside 48 hours, no refund\nPrice: [FILL]",
+"c2name":"TripAdvisor","c2text":"Bay Light Day Cruises runs a 4-hour wildlife and glacier cruise from Seward between May 15 and September 15, with departures at 9:00 and 14:00. Each sailing takes up to 40 guests, and the minimum age is 4. The cabin is heated and enclosed, with two restrooms on board. Hot drinks are included. Lunch is not included, so plan to eat before or after. We meet at the small-boat harbor, a 12-minute walk from the cruise ship dock. The cruise runs in rain; it cancels only for a marine warning, and then you get a full refund. You can cancel free until 48 hours before departure; inside 48 hours there is no refund. Price: [FILL]. Vessel access: [FILL].",
+"c3name":"Viator","c3text":"4-hour wildlife and glacier cruise from Seward, departing 9:00 and 14:00 from May 15 to September 15. Up to 40 guests, minimum age 4; heated enclosed cabin, two restrooms, hot drinks included, lunch not included.\nMeet at the small-boat harbor, a 12-minute walk from the cruise ship dock. Runs in rain; cancels only for a marine warning, with a full refund.\nFree cancellation until 48 hours before departure; inside 48 hours, no refund. Price: [FILL].",
+"c4name":"Your website","c4text":""}</script>
+<script type="application/json" id="ex-drift">{"c1name":"Google Business Profile","c1text":"4-hour wildlife and glacier cruise from Seward\nDeparts 9:00 and 14:00, May 15 to September 15\nUp to 40 guests; minimum age 4\nHeated, enclosed cabin with two restrooms\nHot drinks included; lunch not included\nMeet at the small-boat harbor, a 12-minute walk from the cruise ship dock\nRuns in rain\nCancels only for a marine warning, with a full refund\nFree cancellation until 48 hours before departure; inside 48 hours, no refund\nPrice: [FILL]",
+"c2name":"TripAdvisor","c2text":"Unforgettable 3-hour wildlife and glacier cruise from Seward, May 15 to September 15, departing 9:00 and 14:00. Perfect for families: kids from age 6 welcome. Heated cabin with restrooms, hot drinks and lunch included. Meet at the harbor, an easy walk from the cruise ship dock. Free cancellation up to 24 hours before departure. From $99.",
+"c3name":"Viator","c3text":"Wildlife and glacier cruise from Seward, 4 hours, departs 9:30 and 14:00 daily in summer. Up to 40 guests, minimum age 4. Heated enclosed cabin, two restrooms, hot drinks included, lunch not included.\nMeet at the small-boat harbor, a 15-minute walk from the cruise ship dock. Runs in rain.\nCancellation: see booking confirmation.",
+"c4name":"Your website","c4text":""}</script>
+<script type="application/json" id="ex-olt">{"context":"FICTIONAL TEACHING BUSINESS: Bay Light Day Cruises, Seward\nOffer: 4-hour wildlife and glacier cruise. Departs 9:00 and 14:00, May 15 to September 15. Capacity 40. Minimum age 4. Heated enclosed cabin, two restrooms, hot drinks included, lunch not included. Meeting point: small-boat harbor, a 12-minute walk from the cruise ship dock. Runs in rain. Cancels only for a marine warning, with a full refund. Free cancellation until 48 hours before departure; inside 48 hours, no refund.\nChannels: own website, Viator, Google Business Profile, two hotel desks.\nNot supplied (ask the owner): group discounts, private charters, pet policy, accessibility of the vessel.",
+"olisting":"Unforgettable scenery, friendly crew, perfect for families. Alaska's best half-day cruise!",
+"reviews":"4. (4 stars) The walk from the cruise ship was longer than we expected with a stroller.\n5. (5 stars) Rained the whole time and we still saw otters and puffins. Bring a real rain jacket.\n6. (2 stars) Booked through a third party and the pickup instructions conflicted with the email from the company."}</script>
+
+<script>
+/* Tool 1.a page logic. Everything runs in this browser: no network requests, nothing is sent anywhere.
+   Uses the shared helpers in ../assets/kit.js (KIT.formValues, KIT.render, KIT.copy, KIT.download, KIT.say, KIT.store). */
+(function () {
+  "use strict";
+  var PAGE = "atiakit:1a";
+  var F = {};
+  var lastReport = "";
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); }
+  function hashes(s) { return new Array(s.length + 1).join("#"); }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function today() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function uniq(a) { var s = {}, o = []; a.forEach(function (x) { if (!s[x]) { s[x] = 1; o.push(x); } }); return o; }
+  function plural(n, one, many) { return n + " " + (n === 1 ? one : many); }
+  function debounce(fn, ms) { var t; return function () { clearTimeout(t); t = setTimeout(fn, ms); }; }
+  function sayKeep(fromEl, msg) {
+    var box = null, n = fromEl;
+    while (n && !box) { box = n.querySelector && n.querySelector(".status"); n = n.parentElement; }
+    if (box) { clearTimeout(box._t); box.textContent = msg; }
+  }
+
+  /* ---------------- fact sheet fields ---------------- */
+  var FIELDS = [
+    ["offer", "Offer"], ["duration", "Duration"], ["departures", "Departures"], ["season", "Season"],
+    ["price", "Price"], ["capacity", "Capacity"], ["minage", "Minimum age"], ["included", "Included"],
+    ["notincluded", "Not included"], ["meeting", "Meeting point and distance"], ["weather", "Weather policy"],
+    ["cancel", "Cancellation terms"], ["access", "Accessibility"], ["channels", "Channels"]
+  ];
+
+  /* ---------------- numbers, times, dates and prices ---------------- */
+  var ONES = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19 };
+  var TENS = { twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
+  var NUMW2 = "(?:twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)(?:-(?:one|two|three|four|five|six|seven|eight|nine))?|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|two|three|four|five|six|seven|eight|nine|ten";
+  var NUM = "(\\d+(?:\\.\\d+)?|" + NUMW2 + "|one)";
+  var MONS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var MONRE = "(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sept?(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)";
+  var TYPE_LABEL = { phone: "phone number", price: "price", time: "time", date: "date", duration: "duration", nights: "nights", age: "age", count: "group size", pct: "percent", distance: "distance", number: "number" };
+
+  function toNum(s) {
+    s = String(s).toLowerCase();
+    if (/^\d/.test(s)) return parseFloat(s);
+    var n = 0;
+    s.split("-").forEach(function (w) { if (TENS[w]) n += TENS[w]; else if (ONES[w]) n += ONES[w]; });
+    return n;
+  }
+  function mon(s) { return MONS[["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(String(s).slice(0, 3).toLowerCase())]; }
+  function trimNum(n) { return String(Math.round(n * 100) / 100); }
+
+  function day(d) { d = +d; return d >= 1 && d <= 31 ? d : null; }
+  /* Lowercase "may" is usually the verb ("groups may 15"), so only "May" or "MAY" counts as the month. */
+  function monOk(s) { return String(s) !== "may"; }
+
+  var PATTERNS = [
+    { type: "phone", re: /(?:\+?1[\s.-]?)?\(?\b([2-9]\d{2})\)?[\s.-]?([2-9]\d{2})[\s.-]?(\d{4})\b/g, val: function (m) { return m[1] + "-" + m[2] + "-" + m[3]; } },
+    { type: "price", re: /(?:\$|\bUSD\s?)\s?(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d{1,2}))?/gi,
+      val: function (m) { var c = m[2] && +m[2] ? "." + (m[2] + "0").slice(0, 2) : ""; return m[1].replace(/,/g, "") + c; } },
+    { type: "price", re: /\b(\d+(?:\.\d{1,2})?)\s*(?:dollars|usd)\b/gi, val: function (m) { return trimNum(+m[1]); } },
+    { type: "time", re: /\b(\d{1,2})(?::([0-5]\d))?\s?([ap])\.?\s?m\b\.?/gi,
+      val: function (m) { var h = +m[1]; if (h < 1 || h > 12) return null; var ap = m[3].toLowerCase(); if (ap === "p" && h < 12) h += 12; if (ap === "a" && h === 12) h = 0; return h + ":" + (m[2] || "00"); } },
+    { type: "time", re: /\b([01]?\d|2[0-3]):([0-5]\d)\b/g, val: function (m) { return (+m[1]) + ":" + m[2]; } },
+    { type: "time", re: /\bnoon\b/gi, val: function () { return "12:00"; } },
+    { type: "date", re: /\b(\d{4})-(\d{2})-(\d{2})\b/g, val: function (m) { var i = +m[2] - 1; return i >= 0 && i < 12 ? MONS[i] + " " + (+m[3]) : null; } },
+    { type: "date", re: new RegExp("\\b" + MONRE + "\\.?\\s+(\\d{1,2})(?:st|nd|rd|th)?\\b", "gi"), val: function (m) { var d = day(m[2]); return d && monOk(m[1]) ? mon(m[1]) + " " + d : null; } },
+    { type: "date", re: new RegExp("\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+(?:of\\s+)?" + MONRE + "\\b", "gi"), val: function (m) { var d = day(m[1]); return d && monOk(m[2]) ? mon(m[2]) + " " + d : null; } },
+    { type: "date", re: /\b(1[0-2]|0?[1-9])\/(3[01]|[12]\d|0?[1-9])(?:\/(?:\d{4}|\d{2}))?\b/g, val: function (m) { return MONS[+m[1] - 1] + " " + (+m[2]); } },
+    { type: "duration", re: /\bhalf(?:-|\s+an?\s+)hour\b/gi, val: function () { return "30"; } },
+    { type: "duration", re: /\ban\s+hour\b/gi, val: function () { return "60"; } },
+    { type: "duration", re: new RegExp("\\b" + NUM + "\\s*-?\\s*(hours?|hrs?|h|minutes?|mins?|days?)\\b", "gi"),
+      val: function (m) { var u = m[2].toLowerCase(), mult = u.charAt(0) === "h" ? 60 : u.charAt(0) === "m" ? 1 : 1440; return trimNum(toNum(m[1]) * mult); } },
+    { type: "nights", re: new RegExp("\\b" + NUM + "\\s*-?\\s*nights?\\b", "gi"), val: function (m) { return trimNum(toNum(m[1])); } },
+    { type: "age", re: new RegExp("\\b(?:minimum age|min\\.? age|ages?|aged)\\s*(?:is\\s*)?[:\\-]?\\s*(?:of\\s*)?" + NUM + "\\b", "gi"), val: function (m) { return trimNum(toNum(m[1])); } },
+    { type: "age", re: new RegExp("\\b" + NUM + "\\s*(?:\\+|-?\\s*years?[- ]old\\b|-?\\s*year-olds?\\b|(?:\\s*years?)?\\s*(?:and|&)\\s*(?:up|older|over)\\b)", "gi"), val: function (m) { return trimNum(toNum(m[1])); } },
+    { type: "count", re: new RegExp("\\b(?:capacity|up to|max(?:imum)?|limit(?:ed)? to|groups? of|holds|seats)\\s*(?:of\\s*)?[:\\-]?\\s*" + NUM + "\\b", "gi"), val: function (m) { return trimNum(toNum(m[1])); } },
+    { type: "count", re: new RegExp("\\b" + NUM + "\\s+(?:guests?|people|persons?|passengers?|travell?ers?|seats?|riders?|paddlers?|anglers?|participants?|pax)\\b", "gi"), val: function (m) { return trimNum(toNum(m[1])); } },
+    { type: "pct", re: new RegExp("\\b" + NUM + "\\s*(?:%|percent\\b)", "gi"), val: function (m) { return trimNum(toNum(m[1])); } },
+    { type: "distance", re: new RegExp("\\b" + NUM + "\\s*-?\\s*(miles?|mi|km|kilomet(?:er|re)s?|feet|ft|met(?:er|re)s?|yards?|yd)\\b", "gi"),
+      val: function (m) { var u = m[2].toLowerCase(); u = /^mi/.test(u) ? "mi" : /^k/.test(u) ? "km" : /^f/.test(u) ? "ft" : /^y/.test(u) ? "yd" : "m"; return trimNum(toNum(m[1])) + " " + u; } },
+    { type: "number", re: /\b\d+(?:\.\d+)?\b/g, val: function (m) { return trimNum(+m[0]); } },
+    { type: "number", re: new RegExp("\\b(" + NUMW2 + ")\\s+(?=[a-z]{3,})", "gi"), val: function (m) { return trimNum(toNum(m[1])); } }
+  ];
+
+  /* Hide [FILL] placeholders, list markers and the DRAFT line without changing text length, so positions still match. */
+  function maskNoise(t) {
+    return String(t || "")
+      .replace(/\[[^\]\n]{0,60}\]/g, hashes)
+      .replace(/^([ \t]*)((?:[-*•]|\(?\d{1,2}[.)]|\(?[a-hA-H][.)])[ \t]+)/gm, function (_, a, b) { return a + hashes(b); })
+      .replace(/DRAFT\s*-\s*PENDING\s+(?:OWNER|STAFF)\s+REVIEW/gi, hashes);
+  }
+
+  function tokenize(text) {
+    text = String(text || "");
+    var work = maskNoise(text), out = [];
+    PATTERNS.forEach(function (p) {
+      p.re.lastIndex = 0;
+      var m;
+      while ((m = p.re.exec(work))) {
+        if (!m[0]) { p.re.lastIndex++; continue; }
+        var v = p.val(m);
+        if (v === null || v === undefined || v === "" || v === "NaN") continue;
+        var lead = m[0].length - m[0].replace(/^\s+/, "").length, raw = m[0].trim();
+        out.push({ type: p.type, val: String(v), key: p.type + ":" + v, raw: text.substr(m.index + lead, raw.length), index: m.index + lead, len: raw.length });
+        work = work.slice(0, m.index) + hashes(m[0]) + work.slice(m.index + m[0].length);
+        p.re.lastIndex = m.index + m[0].length;
+      }
+    });
+    return out.sort(function (a, b) { return a.index - b.index; });
+  }
+  function uniqTokens(toks) { var s = {}; return toks.filter(function (t) { if (s[t.key]) return false; s[t.key] = 1; return true; }); }
+  /* A token is present if the same key is there, or if a plain number matches a group size or an age. */
+  function hasTok(t, keys) {
+    if (keys[t.key]) return true;
+    if (t.type === "count" || t.type === "age") return !!keys["number:" + t.val];
+    if (t.type === "number") return !!(keys["count:" + t.val] || keys["age:" + t.val]);
+    return false;
+  }
+
+  /* ---------------- key words ---------------- */
+  var STOP = {};
+  ("the and a an of to in on for with from at by our your you we us is are be or as it its this that only full until inside before after per each any all into than then also not no can will may has have was were but if so do does there here who what when where which hour hours minute minutes day days am pm").split(" ").forEach(function (w) { STOP[w] = 1; });
+  function kwKey(w) { if (w.length === 4 && /s$/.test(w) && !/ss$/.test(w)) w = w.slice(0, 3); return w.length >= 5 ? w.slice(0, 5) : w; }
+  function keywords(t) {
+    var seen = {}, out = [];
+    (String(t || "").toLowerCase().match(/[a-z]+/g) || []).forEach(function (w) {
+      if (w.length < 3 || STOP[w]) return;
+      var k = kwKey(w);
+      if (!seen[k]) { seen[k] = 1; out.push(k); }
+    });
+    return out;
+  }
+
+  /* ---------------- generic words and promises ---------------- */
+  var GEN = [
+    { p: "once[- ]in[- ]a[- ]lifetime|(?:experience|trip|adventure|journey) of a lifetime|bucket[- ]list", kind: "gen", why: "Every competitor can say it.", tryi: "Say what guests do and for how long.", fields: ["offer", "duration"] },
+    { p: "perfect for (?:families|kids|children|all ages|everyone)|family[- ]friendly|kid[- ]friendly|child[- ]friendly|great for (?:families|kids)|fun for (?:the whole family|all ages)|all ages", kind: "gen", why: "A parent cannot check it.", tryi: "Give the minimum age, restrooms, heated space and walking distance.", fields: ["minage", "included", "meeting"] },
+    { p: "affordable|great value|best value|good value|cheap|budget[- ]friendly|unbeatable prices?|competitively priced", kind: "gen", why: "Value claims invite comparisons you cannot control.", tryi: "Give the price and what it includes.", fields: ["price", "included"] },
+    { p: "fully accessible|wheelchair[- ]accessible|accessible (?:to|for) (?:all|everyone)|ada[- ](?:compliant|accessible)", kind: "promise", why: "A legal-risk claim unless it is exactly true.", tryi: "Describe what you have measured (steps, ramp, restroom door width) and have a qualified person check it.", fields: ["access"] },
+    { p: "no experience (?:needed|necessary|required)|suitable for (?:everyone|all)|anyone can", kind: "promise", why: "Sets an expectation you may not meet.", tryi: "State the real limits: minimum age, mobility, weather.", fields: ["minage", "access"] },
+    { p: "conveniently located|convenient|centrally located|easy to (?:find|reach|get to)|easy walk|easy access|nearby|close by", kind: "gen", why: "Convenient from where?", tryi: "Give the meeting point and the walking time or distance.", fields: ["meeting"] },
+    { p: "unique|one[- ]of[- ]a[- ]kind|authentic|hidden gem|off the beaten path|must[- ]see|must[- ]do|iconic|ultimate|unparalleled|unrivall?ed|exceptional|outstanding|extraordinary|incomparable|legendary|renowned|famous|unbeatable", kind: "gen", why: "Claims a difference without showing it.", tryi: "Say the specific thing only you do, as a fact a traveler could check.", fields: ["offer"] },
+    { p: "world[- ]class|best[- ]in[- ]class|award[- ]winning|top[- ]rated|top[- ]notch|highly rated|number one|best|finest|premier", kind: "gen", why: "A ranking claim with nothing behind it.", tryi: "Use a checkable fact instead. If you cite ratings or awards, name the source, count and date.", fields: ["capacity", "departures", "included"] },
+    { p: "unforgettable|memorable|remarkable", kind: "gen", why: "Every competitor can say it.", tryi: "Name what guests see and do, and for how long.", fields: ["offer", "duration"] },
+    { p: "breathtaking|stunning|spectacular|amazing|incredible|awesome|gorgeous|majestic|magical|jaw[- ]dropping|awe[- ]inspiring|beautiful|picturesque|pristine|scenic|epic", kind: "gen", why: "Describes a feeling, not the trip.", tryi: "Name what is there (the glacier or bay by name), without promising wildlife or weather.", fields: ["offer"] },
+    { p: "perfect|ideal", kind: "gen", why: "Perfect for whom?", tryi: "Say who it fits: minimum age, capacity, duration.", fields: ["minage", "capacity", "duration"] },
+    { p: "friendly|knowledgeable|experienced|expert|professional|passionate|attentive|welcoming", kind: "gen", why: "Every listing says it about its crew.", tryi: "Name a checkable credential (license, certification, years operating) or what the crew does. Add it under Other checkable facts once you have checked it.", fields: [] },
+    { p: "luxur(?:y|ious)|premium|deluxe|upscale|comfortable|cozy|cosy", kind: "gen", why: "Comfort is a list of facts.", tryi: "List them: heated cabin, restrooms, seating, hot drinks.", fields: ["included"] },
+    { p: "guarantee[ds]?|guaranteeing", kind: "promise", why: "A promise you may have to honor.", tryi: "Remove it unless a written policy says exactly this. Wildlife, weather and views cannot be guaranteed.", fields: ["weather", "cancel"] },
+    { p: "(?:100% |completely |perfectly )?safe(?:st)?", kind: "promise", why: "Safety claims belong to a qualified person.", tryi: "State licenses and procedures as approved by your captain or lead guide.", fields: [] },
+    { p: "always", kind: "promise", why: "Is it true every single day?", tryi: "Check it against the whole season, or remove it.", fields: [] }
+  ];
+  GEN.forEach(function (g) { g.re = new RegExp("\\b(?:" + g.p + ")\\b", "gi"); });
+
+  function detect(text) {
+    text = String(text || "");
+    var work = maskNoise(text), hits = [];
+    GEN.forEach(function (g, gi) {
+      g.re.lastIndex = 0;
+      var m;
+      while ((m = g.re.exec(work))) {
+        hits.push({ start: m.index, end: m.index + m[0].length, raw: text.substr(m.index, m[0].length), g: gi });
+        work = work.slice(0, m.index) + hashes(m[0]) + work.slice(m.index + m[0].length);
+        g.re.lastIndex = m.index + m[0].length;
+      }
+    });
+    return hits.sort(function (a, b) { return a.start - b.start; });
+  }
+
+  /* Marked-up HTML: generic words, promises, checkable numbers and [FILL]. */
+  function markup(text) {
+    text = String(text || "");
+    var spans = [];
+    detect(text).forEach(function (h) { var g = GEN[h.g]; spans.push({ s: h.start, e: h.end, tag: "mark", cls: g.kind === "promise" ? "promise" : "gen", title: g.tryi }); });
+    tokenize(text).forEach(function (t) { spans.push({ s: t.index, e: t.index + t.len, tag: "span", cls: "fact", title: "Checkable " + TYPE_LABEL[t.type] }); });
+    var re = /\[FILL[^\]]*\]/gi, m;
+    while ((m = re.exec(text))) spans.push({ s: m.index, e: m.index + m[0].length, tag: "span", cls: "fillmark", title: "Not supplied yet" });
+    spans.sort(function (a, b) { return a.s - b.s || b.e - a.e; });
+    var html = "", pos = 0;
+    spans.forEach(function (sp) {
+      if (sp.s < pos) return;
+      html += esc(text.slice(pos, sp.s)) + "<" + sp.tag + ' class="' + sp.cls + '" title="' + esc(sp.title) + '">' + esc(text.slice(sp.s, sp.e)) + "</" + sp.tag + ">";
+      pos = sp.e;
+    });
+    return html + esc(text.slice(pos));
+  }
+
+  /* ---------------- personal data guard ---------------- */
+  function luhn(d) { var s = 0, alt = false; for (var i = d.length - 1; i >= 0; i--) { var n = +d.charAt(i); if (alt) { n *= 2; if (n > 9) n -= 9; } s += n; alt = !alt; } return s % 10 === 0; }
+  function piiScan(t) {
+    t = String(t || "");
+    var hits = [], m, re = /\b(?:\d[ -]?){12,18}\d\b/g;
+    if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(t)) hits.push("an email address");
+    if (/(?:\+?1[\s.-]?)?\(?\b[2-9]\d{2}\)?[\s.-]?[2-9]\d{2}[\s.-]?\d{4}\b/.test(t)) hits.push("a phone number");
+    while ((m = re.exec(t))) { if (luhn(m[0].replace(/\D/g, ""))) { hits.push("a card number"); break; } }
+    if (/\b\d{1,5}\s+(?:[A-Z][a-z]+\s+){1,3}(?:St|Street|Ave|Avenue|Rd|Road|Blvd|Boulevard|Dr|Drive|Ln|Lane|Way|Ct|Court|Hwy|Highway|Loop|Circle)\b/.test(t)) hits.push("a street address");
+    return hits;
+  }
+
+  /* ---------------- fact sheet model ---------------- */
+  function factModel() {
+    var v = KIT.formValues(F.facts), facts = [], open = [], empty = [], ns = [], by = {}, n = 0;
+    FIELDS.forEach(function (f) {
+      var k = f[0], isNs = v["ns_" + k] === "1", val = String(v[k] || "").replace(/\s+/g, " ").trim(), fill = isNs || !val;
+      if (fill) { open.push(f[1]); (isNs ? ns : empty).push(f[1]); }
+      var row = { k: k, label: f[1], value: fill ? "[FILL]" : val, fill: fill, numbered: k !== "channels" };
+      if (row.numbered) row.n = ++n;
+      facts.push(row); by[k] = row;
+    });
+    String(v.other || "").split(/\n/).forEach(function (line) {
+      line = line.replace(/^\s*(?:[-*•]|\d{1,2}[.)])\s*/, "").trim();
+      if (line) facts.push({ k: "other", label: "", value: line, fill: false, numbered: true, n: ++n });
+    });
+    String(v.open || "").split(/[\n,;]+/).forEach(function (x) { x = x.trim(); if (x) open.push(x); });
+    return { business: String(v.business || "").trim(), checked: String(v.checked || "").trim(), facts: facts, by: by, open: uniq(open), empty: empty, ns: ns };
+  }
+  function factSheetText(m) {
+    var L = ["APPROVED FACTS", "Business: " + (m.business || "[YOUR BUSINESS NAME AND TOWN]")];
+    if (m.checked) L.push("Facts last checked: " + m.checked);
+    L.push("");
+    m.facts.forEach(function (f) { if (f.numbered) L.push(f.n + ". " + (f.label ? f.label + ": " : "") + f.value); });
+    L.push("");
+    L.push("Channels: " + m.by.channels.value);
+    L.push("Not supplied (ask the owner): " + (m.open.length ? m.open.join(", ") : "none listed"));
+    return L.join("\n");
+  }
+  function factRows(m) {
+    return m.facts.filter(function (f) { return f.numbered; }).map(function (f) {
+      var line = (f.label ? f.label + ": " : "") + f.value;
+      return { n: f.n, k: f.k, label: f.label || "Other", value: f.value, fill: f.fill,
+        tokens: f.fill ? [] : uniqTokens(tokenize(line)), kws: f.fill ? [] : keywords(f.value), ctx: f.fill ? [] : keywords(line) };
+    });
+  }
+  function factKeys(rows) { var k = {}; rows.forEach(function (r) { r.tokens.forEach(function (t) { k[t.key] = 1; }); }); return k; }
+
+  /* ---------------- channel comparison ---------------- */
+  var NEG = /\b(?:not|no|without|excluded?|excludes|extra|bring|own|purchase|buy|separately)\b|n't/i;
+  function timeMin(v) { var p = String(v).split(":"); return (+p[0]) * 60 + (+p[1] || 0); }
+  function pairScore(f, mt, ft, text) {
+    var s = 0, win = text.slice(Math.max(0, ft.index - 60), ft.index + ft.len + 60);
+    keywords(win).forEach(function (k) { if (f.ctx.indexOf(k) >= 0) s += 1; });
+    if (mt.type === "time") { if (Math.abs(timeMin(mt.val) - timeMin(ft.val)) <= 120) s += 3; }
+    else if (mt.type === "date") { if (mt.val.slice(0, 3) === ft.val.slice(0, 3)) s += 3; }
+    else if (mt.type === "age") s += 2;
+    else { var a = parseFloat(mt.val), b = parseFloat(ft.val); if (a > 0 && b > 0) { var q = Math.max(a, b) / Math.min(a, b); if (q <= 2) s += 3; else if (q <= 4) s += 1; } }
+    return s;
+  }
+  function notIncluded(r, text) {
+    var items = r.f.value.split(/,|;|\band\b|\bor\b/i).map(function (s) { return s.trim(); }).filter(Boolean), ok = 0, bad = 0, miss = 0;
+    items.forEach(function (it) {
+      var kws = keywords(it);
+      if (!kws.length) return;
+      var re = new RegExp("\\b" + kws[0] + "[a-z]*", "gi"), m, seen = false, neg = false;
+      while ((m = re.exec(text))) { seen = true; if (NEG.test(text.slice(Math.max(0, m.index - 35), m.index + m[0].length + 25))) neg = true; }
+      if (!seen) miss++;
+      else if (neg) ok++;
+      else { bad++; r.notes.push('mentions "' + it + '" without saying it is not included'); }
+    });
+    var total = ok + bad + miss;
+    r.status = bad ? "diff" : (!total || ok === total) ? "ok" : ok ? "part" : "miss";
+  }
+  function analyzeVersion(c, rows, fkeys) {
+    var text = c.text, masked = maskNoise(text), toks = tokenize(text), vk = {}, vw = {}, seenF = {}, foreign = [];
+    toks.forEach(function (t) { vk[t.key] = 1; });
+    keywords(masked).forEach(function (k) { vw[k] = 1; });
+    toks.forEach(function (t) { if (hasTok(t, fkeys) || seenF[t.key]) return; seenF[t.key] = 1; foreign.push(t); });
+    var res = rows.map(function (f) { return { f: f, found: [], missing: [], diffs: [], notes: [], kw: 0, status: "" }; });
+    var triples = [];
+    res.forEach(function (r) {
+      var f = r.f;
+      if (f.fill) { r.status = "fill"; return; }
+      f.tokens.forEach(function (t) { (hasTok(t, vk) ? r.found : r.missing).push(t); });
+      r.kw = f.kws.length ? f.kws.filter(function (k) { return vw[k]; }).length / f.kws.length : 0;
+      r.missing.forEach(function (mt) {
+        if (mt.type === "number") return;
+        foreign.forEach(function (ft) { if (ft.type === mt.type) triples.push({ r: r, mt: mt, ft: ft, s: pairScore(f, mt, ft, masked) }); });
+      });
+    });
+    triples.sort(function (a, b) { return b.s - a.s; });
+    var usedF = {}, usedM = [];
+    triples.forEach(function (t) {
+      if (usedF[t.ft.key] || usedM.indexOf(t.mt) >= 0) return;
+      usedF[t.ft.key] = 1; usedM.push(t.mt);
+      t.r.diffs.push({ was: t.mt.raw, now: t.ft.raw });
+    });
+    res.forEach(function (r) {
+      var f = r.f;
+      if (r.status === "fill") return;
+      if (f.k === "notincluded") { notIncluded(r, masked); return; }
+      if (f.tokens.length) {
+        if (!r.missing.length) r.status = "ok";
+        else if (r.diffs.length) r.status = "diff";
+        else if (r.found.length || r.kw >= 0.5) r.status = "part";
+        else r.status = "miss";
+      } else r.status = r.kw >= 0.6 ? "ok" : r.kw >= 0.3 ? "part" : "miss";
+    });
+    return {
+      name: c.name, text: text, res: res, toks: toks,
+      extra: foreign.filter(function (t) { return !usedF[t.key]; }),
+      fills: (text.match(/\[FILL/gi) || []).length,
+      gen: detect(text), pii: piiScan(text),
+      words: (text.trim().match(/\S+/g) || []).length, chars: text.trim().length
+    };
+  }
+
+  var ST = { ok: ["st-ok", "Yes", "present"], part: ["st-part", "Part", "partly there"], diff: ["st-diff", "Diff", "different"], miss: ["st-miss", "No", "missing"], fill: ["st-fill", "Open", "not supplied in your fact sheet"] };
+  function pillHtml(s) { var x = ST[s]; return '<span class="st ' + x[0] + '" title="' + x[2] + '">' + x[1] + '<span class="visually-hidden"> (' + x[2] + ")</span></span>"; }
+  function factName(f) { return f.n + ". " + f.label + (f.value && !f.fill ? ": " + (f.value.length > 48 ? f.value.slice(0, 46) + "..." : f.value) : ""); }
+
+  function runCheck() {
+    var out = $("chk-out"), sum = $("chk-summary");
+    if (!out || !F.channels) return;
+    var m = factModel(), rows = factRows(m), fkeys = factKeys(rows), v = KIT.formValues(F.channels), chans = [];
+    for (var i = 1; i <= 4; i++) {
+      var t = String(v["c" + i + "text"] || "");
+      if (t.trim()) chans.push({ name: String(v["c" + i + "name"] || "").trim() || "Channel " + i, text: t });
+    }
+    if (!chans.length) { out.innerHTML = ""; sum.textContent = "Paste at least one version above to check it."; lastReport = ""; return; }
+    var active = rows.filter(function (r) { return !r.fill; });
+    var R = chans.map(function (c) { return analyzeVersion(c, rows, fkeys); });
+    var report = ["CHANNEL CHECK, " + today(), "Pattern check run in the browser against your fact sheet. A person makes the final call.", "Fact sheet: " + plural(active.length, "fact", "facts") + " supplied, " + (rows.length - active.length) + " open ([FILL]).", ""];
+    var html = "", summary = [];
+    R.forEach(function (a) {
+      var miss = [], part = [], diff = [], notes = [], okc = 0;
+      a.res.forEach(function (r) {
+        if (r.status === "ok") okc++;
+        else if (r.status === "miss") miss.push(factName(r.f));
+        else if (r.status === "part") part.push(factName(r.f) + (r.missing.length ? " (missing " + r.missing.map(function (t) { return t.raw; }).join(", ") + ")" : ""));
+        else if (r.status === "diff") {
+          if (r.diffs.length) r.diffs.forEach(function (d) { diff.push(r.f.n + ". " + r.f.label + ': fact sheet "' + d.was + '", this version "' + d.now + '"'); });
+          r.notes.forEach(function (n) { diff.push(r.f.n + ". " + r.f.label + ": " + n); });
+        }
+      });
+      var extra = a.extra.map(function (t) { return t.raw + " (" + TYPE_LABEL[t.type] + ")"; });
+      var gens = uniq(a.gen.map(function (h) { return h.raw.toLowerCase(); }));
+      if (/google|gbp|business profile/i.test(a.name) && a.chars > 750) notes.push("Over 750 characters, Google's description limit (" + a.chars + ").");
+      if (a.pii.length) notes.push("Possible personal data: " + a.pii.join(", ") + ". Remove guest details.");
+      var issues = miss.length + part.length + diff.length + extra.length;
+      summary.push(a.name + ": " + (issues ? plural(issues, "issue", "issues") : "matches your fact sheet") + (a.fills ? ", " + a.fills + " [FILL] open" : ""));
+      html += '<div class="chan' + (issues ? "" : " okk") + '"><h4>' + esc(a.name) + ' <span class="hint">· ' + plural(a.chars, "character", "characters") + " · " + plural(a.words, "word", "words") + "</span></h4>";
+      html += "<p>" + pillHtml(issues ? (miss.length ? "miss" : "diff") : "ok") + " " + okc + " of " + active.length + " supplied facts fully present.</p><ul>";
+      function li(label, list) { if (list.length) html += "<li><b>" + label + ":</b> " + list.map(esc).join("; ") + "</li>"; }
+      li("Missing", miss); li("Different", diff); li("Partly there", part); li("Not in your fact sheet", extra);
+      if (a.fills) html += "<li><b>[FILL] still open:</b> " + a.fills + ". Fill from your records before publishing.</li>";
+      li("Generic words", gens); li("Note", notes);
+      if (!issues && !a.fills && !gens.length && !notes.length) html += "<li>Every supplied fact is here and nothing extra was found.</li>";
+      html += "</ul></div>";
+      report.push("== " + a.name + " (" + a.chars + " characters, " + a.words + " words)");
+      report.push("Fully present: " + okc + " of " + active.length);
+      [["Missing", miss], ["Different", diff], ["Partly there", part], ["Not in your fact sheet", extra], ["Generic words", gens], ["Note", notes]].forEach(function (p) { if (p[1].length) report.push(p[0] + ": " + p[1].join("; ")); });
+      if (a.fills) report.push("[FILL] still open: " + a.fills);
+      report.push("");
+    });
+
+    /* fact-by-channel table */
+    var head = "<tr><th scope=\"col\">Fact</th>" + R.map(function (a) { return '<th scope="col" class="c">' + esc(a.name) + "</th>"; }).join("") + "</tr>";
+    var body = "", uneven = [];
+    rows.forEach(function (f, i) {
+      var sts = R.map(function (a) { return a.res[i].status; }), allSame = sts.every(function (s) { return s === sts[0]; });
+      if (!f.fill && !allSame && sts.some(function (s) { return s === "ok"; })) uneven.push(f.n);
+      body += '<tr class="' + (f.fill || sts.every(function (s) { return s === "ok"; }) ? "" : "bad") + '"><td>' + esc(factName(f)) + "</td>" + sts.map(function (s) { return '<td class="c">' + pillHtml(s) + "</td>"; }).join("") + "</tr>";
+    });
+    /* numbers table */
+    var groups = {}, order = [];
+    function gk(t) { if (t.type === "number" && (fkeys["count:" + t.val] || fkeys["age:" + t.val])) return fkeys["count:" + t.val] ? "count:" + t.val : "age:" + t.val; if ((t.type === "count" || t.type === "age") && fkeys["number:" + t.val]) return "number:" + t.val; return t.key; }
+    function add(t, col) { var k = gk(t); if (!groups[k]) { groups[k] = { raw: t.raw, type: t.type, cols: {} }; order.push(k); } groups[k].cols[col] = 1; }
+    rows.forEach(function (r) { r.tokens.forEach(function (t) { add(t, "sheet"); }); });
+    R.forEach(function (a, ci) { a.toks.forEach(function (t) { add(t, ci); }); });
+    var nb = "";
+    order.forEach(function (k) {
+      var g = groups[k], cells = ["sheet"].concat(R.map(function (_, ci) { return ci; })), all = cells.every(function (c) { return g.cols[c]; });
+      nb += '<tr class="' + (all ? "" : "bad") + '"><td>' + esc(g.raw) + ' <span class="hint">' + TYPE_LABEL[g.type] + "</span></td>" + cells.map(function (c) { return '<td class="c">' + (g.cols[c] ? pillHtml("ok") : '<span class="hint">no</span>') + "</td>"; }).join("") + "</tr>";
+    });
+    var hint = R.length > 1 ? '<p class="hint scroll-hint">On a phone, swipe the table sideways to see every channel.</p>' : "";
+    html += '<h4>Fact by channel</h4>' + hint + '<div class="tablewrap" role="region" aria-label="Fact by channel table" tabindex="0"><table class="matrix"><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>";
+    if (order.length) html += '<h4>Numbers, times, dates and prices</h4>' + hint + '<div class="tablewrap" role="region" aria-label="Numbers by channel table" tabindex="0"><table class="matrix"><thead><tr><th scope="col">Found</th><th scope="col" class="c">Fact sheet</th>' + R.map(function (a) { return '<th scope="col" class="c">' + esc(a.name) + "</th>"; }).join("") + "</tr></thead><tbody>" + nb + "</tbody></table></div>";
+    out.innerHTML = html;
+    sum.textContent = "Checked " + plural(R.length, "version", "versions") + " against " + plural(active.length, "supplied fact", "supplied facts") + ". " + summary.join(". ") + "." + (uneven.length ? " Facts in some versions but not others: " + uneven.join(", ") + "." : "");
+    if (uneven.length) report.push("Facts in some versions but not others: " + uneven.join(", "));
+    lastReport = report.join("\n");
+  }
+  var scheduleCheck = debounce(runCheck, 350);
+
+  /* ---------------- Step 1 listing check ---------------- */
+  function updateListing(m) {
+    var t = String(KIT.formValues(F.listing).listing || ""), hits = detect(t), toks = tokenize(t);
+    var gen = hits.filter(function (h) { return GEN[h.g].kind === "gen"; }).length, pr = hits.length - gen;
+    $("listing-counts").innerHTML = t.trim() ? "<li>" + plural(gen, "generic word", "generic words") + "</li><li>" + plural(pr, "promise to check", "promises to check") + "</li><li>" + plural(toks.length, "checkable number, time or date", "checkable numbers, times or dates") + "</li>" : "";
+    $("listing-hl").innerHTML = t.trim() ? markup(t) : '<span class="hint">Paste your listing above to see it marked up here.</span>';
+    var groups = {}, order = [];
+    hits.forEach(function (h) { if (!groups[h.g]) { groups[h.g] = []; order.push(h.g); } groups[h.g].push(h.raw.toLowerCase()); });
+    $("listing-sugg").innerHTML = order.map(function (gi) {
+      var g = GEN[gi], from = g.fields.map(function (k) { var f = m.by[k]; return f ? f.label + ": " + f.value : ""; }).filter(Boolean).join(" · ");
+      return '<li><mark class="' + (g.kind === "promise" ? "promise" : "gen") + '">' + esc(uniq(groups[gi]).join(", ")) + "</mark> " + esc(g.why) + " <b>Try:</b> " + esc(g.tryi) + (from ? '<span class="from">From your fact sheet: ' + esc(from) + "</span>" : "") + "</li>";
+    }).join("") || (t.trim() ? "<li>No generic words from the list. Read it once more for claims a competitor could also make.</li>" : "");
+    var pii = piiScan(t);
+    $("listing-pii").textContent = pii.length ? "Possible personal data: " + pii.join(", ") + ". If it is your business's public contact, you can ignore this; otherwise remove it." : "";
+    return uniq(hits.map(function (h) { return h.raw.toLowerCase(); }));
+  }
+
+  var VERS = {
+    gbp: "Google Business Profile: ten short lines, under 750 characters in total.",
+    ta: "TripAdvisor: about 150 words.",
+    viator: "Viator: three lines for the product description.",
+    web: "Our own website: one paragraph under 120 words, then the numbered fact list.",
+    desk: "Hotel desk card: under 60 words, meeting point and departure times first."
+  };
+  function versionsText() {
+    var v = KIT.formValues(F.step2), picked = String(v.ver || "").split("\n"), L = [];
+    ["gbp", "ta", "viator", "web", "desk"].forEach(function (k) { if (picked.indexOf(k) >= 0) L.push(VERS[k]); });
+    var other = String(v.other || "").trim();
+    if (other) L.push(other.replace(/[.\s]*$/, "."));
+    return L.map(function (x, i) { return "(" + "abcdefg".charAt(i) + ") " + x; }).join("\n");
+  }
+
+  function syncNs() {
+    FIELDS.forEach(function (f) {
+      var inp = F.facts.elements[f[0]], cb = F.facts.elements["ns_" + f[0]];
+      if (!inp || !cb) return;
+      inp.disabled = cb.checked;
+      var box = inp.closest(".field");
+      if (box) box.classList.toggle("is-ns", cb.checked);
+    });
+  }
+
+  function updateAll() {
+    if (!F.facts || !F.listing || !F.step2) return;
+    var m = factModel(), sheet = factSheetText(m);
+    $("out-facts").textContent = sheet;
+    var gaps = [];
+    if (m.ns.length) gaps.push(plural(m.ns.length, "fact is", "facts are") + " marked Not supplied: " + m.ns.join(", ") + ".");
+    if (m.empty.length) gaps.push(plural(m.empty.length, "field is", "fields are") + " empty and will show as [FILL]: " + m.empty.join(", ") + ".");
+    $("facts-gaps").textContent = gaps.join(" ") || "Every field is filled. Check each one against your records before you use the sheet.";
+    var flagged = updateListing(m);
+    var lv = KIT.formValues(F.listing);
+    $("out-step1").textContent = KIT.render(KIT.tplText("tpl-step1"), { listing: lv.listing, factsheet: sheet, flagged: flagged.join(", ") });
+    $("out-step2").textContent = KIT.render(KIT.tplText("tpl-step2"), { versions: versionsText() });
+    scheduleCheck();
+    checkDraft();
+  }
+
+  /* ---------------- check the AI's answer ---------------- */
+  function checkDraft() {
+    var box = $("draft1"), out = $("draft1-out");
+    if (!box || !F.facts) return;
+    var t = box.value;
+    if (!t.trim()) { out.innerHTML = ""; return; }
+    var m = factModel(), rows = factRows(m), fkeys = factKeys(rows), seen = {}, extra = [];
+    tokenize(t).forEach(function (x) { if (hasTok(x, fkeys) || seen[x.key]) return; seen[x.key] = 1; extra.push(x.raw); });
+    var fills = (t.match(/\[FILL[^\]]*\]/gi) || []).length, openRows = rows.filter(function (r) { return r.fill; }).length;
+    var gens = uniq(detect(t).map(function (h) { return h.raw.toLowerCase(); })), pii = piiScan(t), items = [];
+    var DP = { ok: ["st-ok", "OK"], diff: ["st-diff", "Check"], miss: ["st-miss", "Fix"] };
+    function item(s, msg) { items.push('<li><span class="st ' + DP[s][0] + '">' + DP[s][1] + "</span> " + esc(msg) + "</li>"); }
+    if (/DRAFT\s*-\s*PENDING\s+(?:OWNER|STAFF)\s+REVIEW/i.test(t)) item("ok", "DRAFT marker is there. Keep it until a person has checked every line.");
+    else item("miss", "No DRAFT - PENDING OWNER REVIEW marker. Treat this text as unapproved.");
+    if (fills) item("diff", fills + " [FILL] still open. Fill each one from your records before publishing.");
+    else if (openRows) item("miss", "Your fact sheet has " + plural(openRows, "open fact", "open facts") + ", but this answer has no [FILL]. The AI may have guessed. Check those lines.");
+    else item("ok", "No [FILL] left, and none open in your fact sheet.");
+    if (extra.length) item("diff", "Numbers, times, dates or prices not in your fact sheet: " + extra.join(", ") + ". Check each one or remove it.");
+    else item("ok", "Every number, time, date and price is in your fact sheet.");
+    if (gens.length) item("diff", "Generic words or promises still there: " + gens.join(", ") + ".");
+    else item("ok", "No generic words from the list.");
+    if (pii.length) item("miss", "Possible personal data: " + pii.join(", ") + ". Remove it.");
+    out.innerHTML = items.join("");
+  }
+
+  /* ---------------- one-listing test ---------------- */
+  var OLT_TIPS = {
+    1: "Match the page to the post that sends people there: same promise, same season, same photo style.",
+    2: "Put three proofs where people land: a dated review, a real photo, a named person (for example your captain). Real reviews only (Legal mandate: 16 CFR Part 465 bans fake reviews, including AI-written ones).",
+    3: "Add one soft next step beside Book now: Check dates, Ask a question or Save this trip.",
+    4: "Run the fact sheet, Step 2 and the channel checker on this page until every channel matches.",
+    5: "Start counting one thing each month: saves, repeat visits or questions asked."
+  };
+  function oltState() {
+    var v = KIT.formValues(F.olt), yes = 0, ans = 0, nos = [];
+    for (var i = 1; i <= 5; i++) { var a = v["q" + i]; if (a) ans++; if (a === "y") yes++; if (a === "n") nos.push(i); }
+    return { yes: yes, ans: ans, nos: nos };
+  }
+  function oltScore() {
+    if (!F.olt) return;
+    var s = oltState();
+    $("olt-score").textContent = s.yes + " / 5";
+    $("olt-answered").textContent = s.ans + " of 5 answered";
+    var head = s.ans < 5 ? "Answer all five to get your score." : s.yes === 5 ? "Five of five. Keep the page as it is and rescore in 30 days." : s.yes >= 3 ? "Close. Fix the No checks first:" : "Start with the No checks:";
+    $("olt-advice").innerHTML = "<p>" + esc(head) + "</p>" + (s.nos.length ? "<ul>" + s.nos.map(function (i) { return "<li>" + esc(i + ". " + OLT_TIPS[i]) + "</li>"; }).join("") + "</ul>" : "");
+    var pii = piiScan((KIT.formValues(F.olt).reviews || "") + "\n" + (KIT.formValues(F.olt).olisting || ""));
+    $("reviews-pii").textContent = pii.length ? "Possible personal data in the reviews or listing: " + pii.join(", ") + ". Remove guest details before you copy the prompt." : "";
+  }
+  var HKEY = PAGE + ":olt-history";
+  function renderHistory() {
+    var h = KIT.store.get(HKEY) || [];
+    $("olt-history").innerHTML = h.length ? h.map(function (x) { return "<li>" + esc(x.date + " · " + x.yes + " / 5") + "</li>"; }).join("") : '<li class="hint">No saved scores yet.</li>';
+  }
+  function fold(line) { var out = []; while (line.length > 73) { out.push(line.slice(0, 73)); line = " " + line.slice(73); } out.push(line); return out.join("\r\n"); }
+  function icsText(s) {
+    var d = new Date(); d.setDate(d.getDate() + 30);
+    var e = new Date(d.getTime()); e.setDate(e.getDate() + 1);
+    var ymd = function (x) { return x.getFullYear() + pad(x.getMonth() + 1) + pad(x.getDate()); };
+    var n = new Date(), stamp = n.getUTCFullYear() + pad(n.getUTCMonth() + 1) + pad(n.getUTCDate()) + "T" + pad(n.getUTCHours()) + pad(n.getUTCMinutes()) + pad(n.getUTCSeconds()) + "Z";
+    var desc = (s.ans === 5 ? "Last score " + s.yes + " of 5 on " + today() + ". " : "") + "Rerun the five checks at https://preig.github.io/atiakit/1a/#listing-test";
+    return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//ATIA AI Take-Home Kit//One-listing test//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "BEGIN:VEVENT",
+      "UID:olt-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8) + "@atiakit", "DTSTAMP:" + stamp,
+      "DTSTART;VALUE=DATE:" + ymd(d), "DTEND;VALUE=DATE:" + ymd(e), "SUMMARY:Rescore the one-listing test", fold("DESCRIPTION:" + desc),
+      "END:VEVENT", "END:VCALENDAR"].join("\r\n") + "\r\n";
+  }
+
+  function updateShare() {
+    if (!F.share) return;
+    var v = KIT.formValues(F.share), own = parseFloat(v.own), all = parseFloat(v.all), o = $("share-out");
+    var ok = false;
+    if (isNaN(own) || isNaN(all) || all <= 0) o.textContent = "Enter both counts for one month.";
+    else if (own < 0 || own > all) o.textContent = "Direct bookings cannot be more than all bookings.";
+    else { o.textContent = "Direct share: " + (Math.round(own / all * 1000) / 10) + "% (" + own + " of " + all + ")"; ok = true; }
+    o.classList.toggle("empty", !ok);
+  }
+
+  function renderBA() {
+    [["ba-before", "ba-before-c"], ["ba-after", "ba-after-c"]].forEach(function (p) {
+      var el = $(p[0]), t = el.textContent, hits = detect(t), toks = tokenize(t);
+      el.innerHTML = markup(t);
+      $(p[1]).innerHTML = "<li>" + plural(hits.length, "generic word or promise", "generic words or promises") + "</li><li>" + plural(toks.length, "checkable number, time or date", "checkable numbers, times or dates") + "</li>";
+    });
+  }
+
+  /* Copy with a personal-data check: the first press warns, a second press copies anyway. */
+  function guardedCopy(e) {
+    var b = e.target.closest && e.target.closest("button[data-gcopy]");
+    if (!b) return;
+    e.preventDefault();
+    var text = KIT.textOf($(b.getAttribute("data-gcopy"))), hits = piiScan(text);
+    if (hits.length && b.getAttribute("data-armed") !== "1") {
+      b.setAttribute("data-armed", "1");
+      setTimeout(function () { b.removeAttribute("data-armed"); }, 20000);
+      sayKeep(b, "Check before you copy: this prompt may contain " + hits.join(", ") + ". Remove guest details. If it is your business's public contact or fictional, press Copy again.");
+      return;
+    }
+    b.removeAttribute("data-armed");
+    KIT.copy(text, b);
+  }
+
+  /* Exposed for testing in the browser console. */
+  window.ONEA = { tokenize: tokenize, detect: detect, piiScan: piiScan, analyzeVersion: analyzeVersion, factModel: factModel, factRows: factRows, factKeys: factKeys, factSheetText: factSheetText, runCheck: runCheck, icsText: icsText, oltState: oltState };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    ["facts", "listing", "step2", "channels", "olt", "share"].forEach(function (k) { F[k] = document.querySelector('form[data-builder="' + k + '"]'); });
+    F.facts.addEventListener("kit:change", function () { syncNs(); updateAll(); });
+    F.listing.addEventListener("kit:change", updateAll);
+    F.step2.addEventListener("kit:change", updateAll);
+    F.channels.addEventListener("kit:change", scheduleCheck);
+    F.olt.addEventListener("kit:change", oltScore);
+    F.share.addEventListener("kit:change", updateShare);
+    $("draft1").addEventListener("input", debounce(checkDraft, 250));
+    document.addEventListener("click", guardedCopy);
+
+    $("chk-save").addEventListener("click", function () {
+      runCheck();
+      if (!lastReport) { KIT.say(this, "Paste at least one version first."); return; }
+      KIT.download("1a-channel-check.txt", lastReport);
+      KIT.say(this, "Saved 1a-channel-check.txt to your downloads.");
+    });
+    $("olt-save").addEventListener("click", function () {
+      var s = oltState();
+      if (s.ans < 5) { KIT.say(this, "Answer all five checks first."); return; }
+      var h = KIT.store.get(HKEY) || [];
+      h.unshift({ date: today(), yes: s.yes });
+      KIT.store.set(HKEY, h.slice(0, 12));
+      renderHistory();
+      KIT.say(this, "Saved " + s.yes + " / 5 for " + today() + " in this browser.");
+    });
+    $("olt-ics").addEventListener("click", function () {
+      KIT.download("rescore-one-listing-test.ics", icsText(oltState()), "text/calendar");
+      KIT.say(this, "Saved a calendar reminder for 30 days from today. Open it to add it to your calendar.");
+    });
+    $("olt-usefacts").addEventListener("click", function () {
+      F.olt.elements.context.value = factSheetText(factModel());
+      if (KIT.builders.olt) KIT.builders.olt.refresh();
+      KIT.say(this, "Fact sheet copied into the context block. Add who you sell to if it is missing.");
+    });
+    $("clear-all").addEventListener("click", function () {
+      Object.keys(KIT.builders).forEach(function (k) { var b = KIT.builders[k]; b.form.reset(); b.refresh(); });
+      try {
+        var keys = [];
+        for (var i = 0; i < window.localStorage.length; i++) { var k = window.localStorage.key(i); if (k && k.indexOf(PAGE + ":") === 0) keys.push(k); }
+        keys.forEach(function (k) { window.localStorage.removeItem(k); });
+      } catch (err) { }
+      $("draft1").value = "";
+      syncNs(); updateAll(); renderHistory(); oltScore(); updateShare(); runCheck();
+      sayKeep(this, "Cleared everything this page saved in this browser.");
+    });
+
+    renderBA();
+    renderHistory();
+    setTimeout(function () { syncNs(); updateAll(); runCheck(); oltScore(); updateShare(); }, 0);
+  });
+})();
+</script>
+</body>
+</html>

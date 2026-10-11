@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; frame-src 'none'">
+<title>3.a The AI trip kit · ATIA AI Take-Home Kit</title>
+<meta name="description" content="From one booking, AI drafts a one-page trip plan with partner options, what to wear and a weather plan B. The page checks ages and time clashes first, checks the draft after, and schedules five post-booking messages. Free tier, no code.">
+<link rel="stylesheet" href="../assets/kit.css">
+<script src="../assets/kit.js" defer></script>
+<script src="tripkit-core.js" defer></script>
+<script src="tripkit.js" defer></script>
+<style>
+/* Page-specific styles for tool 3.a. Shared styles live in ../assets/kit.css. */
+.onpage{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;margin:10px 0 0;padding:0;list-style:none}
+.onpage a{color:var(--teal-d)}
+.fgrid{display:grid;gap:0 18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
+.fgrid>div{min-width:0;display:flex;flex-direction:column;justify-content:flex-end}
+[hidden]{display:none!important}
+.card>h2:first-child{margin-top:0}
+.output pre.scroll{max-height:34em;overflow:auto}
+input[type=time],input[type=email]{width:100%;font:16px/1.45 Arial,sans-serif;padding:9px 11px;border:1px solid #b8beb4;border-radius:4px;background:#fff;color:var(--ink)}
+.privacy{font-size:14px;color:#8a2a2a;margin:4px 0 0}
+.pii{font-size:14px;font-weight:bold;color:var(--red);margin:6px 0 0}
+.pii:empty{display:none}
+.piiok{display:flex;gap:8px;align-items:flex-start;font-weight:normal;font-size:14px;margin:6px 0}
+.piiok input,.chk input,.radios input{width:18px;height:18px;margin:3px 0 0;flex:none}
+.chk{display:flex;gap:8px;align-items:flex-start;font-weight:normal;font-size:15px;margin:10px 0 0}
+.partner{border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:4px;padding:2px 14px 12px;margin:12px 0;background:#fbfcfa}
+.partner .ph{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 0}
+.partner .ph h4{margin:0;font-size:16px;color:var(--teal-d)}
+.partner details{margin:12px 0 0;background:#fff}
+.partner .chk{font-size:14px}
+button.small{font-size:14px;padding:6px 12px}
+label.filebtn{margin:0;cursor:pointer;color:var(--green)}
+label.filebtn:focus-within{outline:3px solid var(--teal);outline-offset:2px}
+.checklist{list-style:none;padding:0;margin:8px 0}
+.checklist li{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line);font-size:15px;line-height:1.45}
+.checklist li .pill{flex:0 0 7.6em;text-align:center}
+.checklist li span.d{display:block;color:var(--slate-m);font-size:14px}
+.pill.grey{background:#eef1ec;color:var(--slate)}
+.hl{white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;border:1px solid var(--line);border-radius:4px;padding:12px 14px;margin:8px 0;min-height:3em;font:15px/1.6 Consolas,"Courier New",monospace}
+.hl:empty{display:none}
+mark{border-radius:2px;padding:0 2px}
+mark.m-price,mark.m-time,mark.m-excl,mark.m-pii{background:#f9c9c9;color:#7a1010}
+mark.m-num{background:#ffe08a;color:#3a2a00}
+mark.m-word{background:#fff0c2;color:#3a2a00}
+mark.m-fill{background:#eef1ec;color:var(--slate);border:1px dashed var(--slate-m)}
+.legend{font-size:14px;color:var(--slate-m);display:flex;flex-wrap:wrap;gap:6px 14px;margin:6px 0}
+.cal-msgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:10px;list-style:none;padding:0;margin:12px 0}
+.cal-msgs li{background:#fff;border:1px solid var(--line);border-top:4px solid var(--teal);border-radius:4px;padding:10px 12px;font-size:15px;line-height:1.45}
+.cal-msgs li b{display:block;color:var(--teal-d);font-size:17px}
+.radios{border:1px solid var(--line);border-radius:4px;padding:6px 14px 10px;margin:14px 0}
+.radios label{display:flex;gap:8px;align-items:flex-start;font-weight:normal;font-size:15px;margin:8px 0;color:var(--ink)}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0}
+table.sched td:nth-child(2){white-space:nowrap}
+.obl{list-style:none;padding:0;margin:10px 0}
+.obl li{padding:8px 0;border-top:1px solid var(--line)}
+.calc{display:grid;gap:0 16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+.files li{flex-wrap:wrap;gap:4px 12px}
+.src li{margin:6px 0}
+.myread{font-size:15px;color:var(--slate)}
+@media (max-width:640px){fieldset{padding:8px 10px 12px}.partner{padding:2px 10px 10px}.checklist li .pill{flex-basis:6.6em}
+  table.sched thead{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+  table.sched,table.sched tbody,table.sched tr,table.sched td{display:block;width:100%}
+  table.sched{background:none}
+  table.sched tr{border:1px solid #ccd2c8;border-radius:4px;margin:0 0 8px;background:#fff;padding:4px 0}
+  table.sched td,table.sched td.num{border:0;padding:3px 10px;text-align:left;white-space:normal}
+  table.sched td[data-label]::before{content:attr(data-label) ": ";font-weight:bold;color:var(--green-d)}}
+@media print{.privacy,.pii,.piiok{display:none}}
+</style>
+</head>
+<body data-page="3a">
+<div class="band" aria-hidden="true"></div>
+<header class="kit">
+  <p class="crumbs"><a href="../">ATIA AI Take-Home Kit</a> › Pain 3 · Coordinating the trip</p>
+  <p class="kicker"><span class="rung r1" aria-hidden="true"><i></i><i></i><i></i></span>Basic rung · Tool 3.a</p>
+  <h1>The AI trip kit</h1>
+  <p class="lede">From one booking, AI drafts a one-page plan for your guest: your trip anchored, partner options for open half-days, what to wear that month and a weather plan B. This page checks ages and time clashes before the AI sees anything, and checks the draft after. A person approves it before it goes out.</p>
+  <ul class="meta">
+    <li><b>Time</b> about 1 hour to set up, then minutes per booking</li><li><b>Cost</b> free tier</li><li><b>Skill</b> no code</li><li><b>Needs</b> 1.a facts and a partner list</li><li><b>Feeds</b> 3.b, 3.c</li>
+  </ul>
+  <nav class="tool-nav" data-toolnav="3a" aria-label="All tools"></nav>
+  <ul class="onpage" aria-label="On this page">
+    <li><a href="#build">Build the prompt</a></li><li><a href="#check">Check the draft</a></li><li><a href="#template">Kit template</a></li><li><a href="#calendar">Post-booking calendar</a></li><li><a href="#measure">Measure</a></li><li><a href="#safe">Before you use it</a></li>
+  </ul>
+</header>
+
+<main class="kit">
+  <section class="card teal" aria-labelledby="why">
+    <h2 id="why">The pain it fixes</h2>
+    <div class="grid two">
+      <div>
+        <h3>For the traveler</h3>
+        <p><span class="score">39%</span> of US travelers name coordinating the different parts of a trip as a frustrating moment in planning.</p>
+        <p>In the diary study behind the same report, the handoffs between platforms were the most frequent source of negative sentiment. And planning does not stop at booking: 78% keep planning after they book, and 68% research restaurants and activities.</p>
+      </div>
+      <div>
+        <h3>For your business</h3>
+        <p>An Alaska trip is a flight, a car or train, a lodge, two tours and gear rental: several businesses, several handoffs. Each handoff brings repeat questions and missed add-ons.</p>
+        <p>A one-page kit puts your trip, two trusted partners and a weather plan B in one place. It answers questions once and sends guests to people you know.</p>
+        <p class="myread"><span class="pill grey">My read</span> This pain is probably larger in Alaska than the national 39%, because trips here involve several businesses by default. Nobody has measured it.</p>
+      </div>
+    </div>
+    <p class="hint">Source: Skift Research + McKinsey, <em>Winning Hearts in an Age of Infinite Travel Choices</em>, Sept 2026 · survey of 1,015 US travelers, data as of June 2026 (39%: Exhibit 6; 78% and 68%: p26) · diary study of 26 travelers and 211 sessions, July 2026, directional (handoffs: p18) · US travelers, not Alaska visitors. Figures last verified 2026-10-10.</p>
+  </section>
+
+  <section class="card" aria-labelledby="how">
+    <h2 id="how">How to use it</h2>
+    <ol class="steps">
+      <li><b>Once:</b> enter your approved facts (from <a href="../1a/">1.a</a>), your partners and a month note. This browser remembers them. Nothing is sent anywhere.</li>
+      <li><b>Per booking:</b> dates, party size, children's ages, what they booked and when. No names, emails or phone numbers.</li>
+      <li><b>Read the pre-checks.</b> The page has already written them into the prompt as rules: who is too young for which partner, which departures clash, which facts are missing.</li>
+      <li><b>Copy the prompt</b> into <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>, <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a> or <a href="https://gemini.google.com" target="_blank" rel="noopener">Gemini</a>. A free tier works. Check the tool's data-use setting first.</li>
+      <li><b>Paste the draft back</b> into "Check the draft" and fix every flag.</li>
+      <li><b>A person approves it,</b> drops it into the kit template, saves it as a PDF and sends it with the confirmation.</li>
+    </ol>
+  </section>
+
+  <section class="card" aria-labelledby="build">
+    <h2 id="build">Build your trip-kit prompt</h2>
+    <p class="hint">The boxes start with the fictional teaching business, Bay Light Day Cruises in Seward, and its two fictional partners. Replace them with your own approved facts.</p>
+    <form data-builder="kit" id="kit-form" novalidate>
+      <fieldset>
+        <legend>Your business (set up once)</legend>
+        <label for="f-business">Business name, as guests know it</label>
+        <input type="text" id="f-business" name="business" value="Bay Light Day Cruises (fictional)" autocomplete="off">
+        <label for="f-facts">Approved facts <small>(your fact sheet from 1.a)</small></label>
+        <textarea id="f-facts" name="facts" class="tall">FICTIONAL TEACHING BUSINESS: Bay Light Day Cruises, Seward
+Offer: 4-hour wildlife and glacier cruise. Departs 9:00 and 14:00, May 15 to September 15. Capacity 40. Minimum age 4. Heated enclosed cabin, two restrooms, hot drinks included, lunch not included. Meeting point: small-boat harbor, a 12-minute walk from the cruise ship dock. Runs in rain. Cancels only for a marine warning, with a full refund. Free cancellation until 48 hours before departure; inside 48 hours, no refund.
+Channels: own website, Viator, Google Business Profile, two hotel desks.
+Not supplied (ask the owner): group discounts, private charters, pet policy, accessibility of the vessel.</textarea>
+        <label for="f-months">Month notes <small>(one line per month, starting with the month name)</small></label>
+        <textarea id="f-months" name="months">July: 50 to 65 F, rain on about half of days, about 18 hours of daylight, afternoon wind common in the bay.</textarea>
+        <p class="hint">Only July is filled in for the demo. Any other month becomes [FILL] in the prompt, and the AI is told not to describe weather for it. Write notes from a source you trust and have the owner approve them.</p>
+        <label for="f-buffer">Minimum gap between activities, in minutes <small>(Policy choice; drive time is added on top)</small></label>
+        <input type="number" id="f-buffer" name="buffer" value="30" min="0" max="240" inputmode="numeric">
+      </fieldset>
+
+      <fieldset>
+        <legend>Your partners (set up once)</legend>
+        <p class="hint">One block per partner. Leave a box empty when you do not know: the page writes [FILL] there and tells the AI not to guess. List a partner only after they have confirmed their facts with you.</p>
+        <div id="partners" aria-live="off"></div>
+        <div class="btns">
+          <button type="button" class="secondary" id="add-partner">Add a partner</button>
+          <label class="button secondary filebtn" for="import-partners">Import a partners CSV<input type="file" id="import-partners" accept=".csv,text/csv" class="visually-hidden"></label>
+          <button type="button" class="ghost" id="export-partners">Save partner list as CSV</button>
+        </div>
+        <p class="status" role="status" aria-live="polite" id="st-partners"></p>
+      </fieldset>
+
+      <fieldset>
+        <legend>This booking, de-identified</legend>
+        <p class="privacy">No guest names, emails, phone numbers, card numbers, ID numbers or medical details. Dates, ages and the product are enough.</p>
+        <div class="fgrid">
+          <div><label for="f-arrival">Arrives in town</label><input type="date" id="f-arrival" name="arrival" value="2027-07-14"></div>
+          <div><label for="f-departure">Leaves town</label><input type="date" id="f-departure" name="departure" value="2027-07-16"></div>
+          <div><label for="f-arrive-time">Arrival time <small>(optional)</small></label><input type="time" id="f-arrive-time" name="arrive_time" value=""></div>
+          <div><label for="f-leave-time">Departure time <small>(optional)</small></label><input type="time" id="f-leave-time" name="leave_time" value=""></div>
+          <div><label for="f-adults">Adults</label><input type="number" id="f-adults" name="adults" value="2" min="0" max="99" inputmode="numeric"></div>
+          <div><label for="f-kids">Children's ages <small>(for example 6, 9)</small></label><input type="text" id="f-kids" name="child_ages" value="6, 9" autocomplete="off" inputmode="numeric"></div>
+        </div>
+        <label for="f-product">What they booked with you</label>
+        <input type="text" id="f-product" name="product" value="4-hour wildlife and glacier cruise" autocomplete="off">
+        <div class="fgrid">
+          <div><label for="f-pdate">Date of the trip</label><input type="date" id="f-pdate" name="product_date" value="2027-07-15"></div>
+          <div><label for="f-start">Start time</label><input type="time" id="f-start" name="start" value="09:00"></div>
+          <div><label for="f-duration">Length in minutes</label><input type="number" id="f-duration" name="duration" value="240" min="0" max="1440" inputmode="numeric"></div>
+          <div><label for="f-pmin">Your minimum age</label><input type="number" id="f-pmin" name="product_min_age" value="4" min="0" max="99" inputmode="numeric"></div>
+        </div>
+        <label for="f-other">Other fixed plans the guest mentioned <small>(optional, for example "train arrives 11:05 on July 14")</small></label>
+        <textarea id="f-other" name="other_plans" style="min-height:70px"></textarea>
+      </fieldset>
+      <div>
+        <div class="btns">
+          <button type="button" class="secondary" id="load-demo">Load the fictional example</button>
+          <button type="button" class="ghost" id="clear-kit">Clear all boxes</button>
+        </div>
+        <p class="status" role="status" aria-live="polite" id="st-kit"></p>
+      </div>
+    </form>
+
+    <h3 id="pre-h">Pre-checks <span class="hint">(worked out on this page, no AI)</span></h3>
+    <ul class="checklist" id="pre" aria-labelledby="pre-h"></ul>
+
+    <div class="output">
+      <p class="label">Your prompt</p>
+      <pre id="out-kit" class="scroll" tabindex="0" aria-label="Your trip-kit prompt"></pre>
+    </div>
+    <p class="pii" id="pii-kit" aria-live="polite"></p>
+    <label class="piiok" id="piiok-kit-wrap" hidden><input type="checkbox" id="piiok-kit"> These are fictional, or my business's own contact details, not guest data.</label>
+    <div>
+      <div class="btns">
+        <button type="button" id="copy-kit">Copy prompt</button>
+        <button type="button" class="secondary" id="save-kit">Save as .txt</button>
+      </div>
+      <p class="status" role="status" aria-live="polite" id="st-copy-kit"></p>
+    </div>
+    <template id="tpl-kit">Act as the pre-arrival drafting assistant for {{business|[FILL: business name]}}. You draft; the owner checks and approves.
+
+APPROVED FACTS (use only these):
+{{facts|[PASTE YOUR APPROVED FACT SHEET FROM 1.A]}}
+
+PARTNER LIST ([FILL] means not supplied):
+{{partners|No partners listed. Do not suggest other businesses.}}
+
+MONTH AND TYPICAL CONDITIONS:
+{{months|[FILL: month note]}}
+
+BOOKING, DE-IDENTIFIED (no names, emails or phone numbers):
+{{booking|[FILL: dates, party size and ages, what was booked]}}
+
+DAY FRAME (worked out from the booking; keep these dates and times):
+{{dayframe|[FILL: stay dates]}}
+
+RULES FROM OUR PRE-CHECKS (follow them exactly):
+{{rules|None.}}
+
+TASK
+Draft a one-page trip kit for the guest, under 400 words, plain text with short headings and no tables:
+1. Day by day, following the day frame, with our booking anchored.
+2. For each open half-day, up to two partner options, with the drive time from our meeting point and a one-line reason that cites a fact from the partner list (minimum age, duration, runs in rain). Give each partner's referral code exactly as written.
+3. What to wear this month, from the month note only.
+4. A weather plan B for every outdoor item, under the heading "Weather plan B (operator confirms on the day)".
+5. Three things first-time visitors often get wrong here (for example daylight hours, fuel stops, phone coverage), only where the facts or the month note support them.
+
+Do not promise partner availability, prices, wildlife or weather. Do not add any number, time, price, distance or phone number that is not written above. Give no medical or safety advice beyond the facts. Where a fact is missing, write [FILL] in the kit and list it in a final section headed "Questions for the owner".
+Put this on the first line: DRAFT - PENDING OWNER REVIEW</template>
+  </section>
+
+  <section class="card teal" aria-labelledby="check">
+    <h2 id="check">Check the draft</h2>
+    <p>Paste what the AI wrote. This page compares it with your inputs, here in your browser. It flags numbers, times and prices that are not in your inputs, partners the pre-checks excluded, a missing DRAFT marker, open [FILL] items and promise words.</p>
+    <label for="draft-kind">Which prompt was it?</label>
+    <select id="draft-kind">
+      <option value="kit">The trip kit (above)</option>
+      <option value="cal">The post-booking messages (below)</option>
+    </select>
+    <label for="draft">The AI draft</label>
+    <p class="privacy" id="draft-note">Paste the draft only. If it picked up a guest name or contact detail, delete it here and in your AI chat.</p>
+    <textarea id="draft" class="tall" aria-describedby="draft-note" spellcheck="false"></textarea>
+    <div>
+      <div class="btns">
+        <button type="button" id="check-btn">Check the draft</button>
+        <button type="button" class="secondary" id="sample-draft">Load a fictional sample draft with planted mistakes</button>
+        <button type="button" class="ghost" id="clear-draft">Clear</button>
+      </div>
+      <p class="status" role="status" aria-live="polite" id="st-check"></p>
+    </div>
+    <div id="check-out">
+      <ul class="checklist" id="check-list"></ul>
+    </div>
+    <p class="legend" id="hl-legend" hidden><span><mark class="m-price">red</mark> price, time, excluded partner or personal data</span><span><mark class="m-num">yellow</mark> number not in your inputs</span><span><mark class="m-word">light</mark> promise or money word</span><span><mark class="m-fill">[FILL]</mark> open item</span></p>
+    <div class="hl" id="draft-hl" aria-label="The draft with flagged items highlighted"></div>
+    <p class="hint">This is a first pass. It cannot tell whether a fact is true or used in the right place. A person still reads every line against the fact sheet and partner list. Asking the AI to check its own draft is not a check.</p>
+  </section>
+
+  <section class="card" aria-labelledby="template">
+    <h2 id="template">The kit template</h2>
+    <p>A one-page Letter layout for the approved kit. Paste the text, check the preview, then print and choose "Save as PDF". The page keeps a DRAFT stamp until a staff member signs off and every [FILL] is answered. It leaves the owner questions off the printed page.</p>
+    <div>
+      <div class="btns">
+        <button type="button" id="to-template">Open my draft in the kit template</button>
+        <a class="button secondary" href="kit-template.html">Open the template</a>
+      </div>
+      <p class="status" role="status" aria-live="polite" id="st-template"></p>
+    </div>
+    <p class="hint">"Open my draft" passes the text through this browser's storage, never through the web address.</p>
+  </section>
+
+  <section class="card" aria-labelledby="calendar" id="calendar-sec">
+    <h2 id="calendar">The post-booking calendar</h2>
+    <p class="lede" style="font-size:17px">Five messages from confirmation to review, one job each, drafted by AI and read by a person before anything is scheduled.</p>
+    <ul class="meta">
+      <li><b>Time</b> two to three hours, once a season</li><li><b>You need</b> your facts and one partner</li><li><b>You get</b> five approved messages and a decided price-drop stance</li><li><b>Feeds</b> Number 4, in-window changes</li>
+    </ul>
+    <ol class="cal-msgs">
+      <li><b>Confirmation</b>The fact sheet: what to wear, where to meet, weather terms. Attach the trip kit.</li>
+      <li><b>T-30</b>Fill the gaps: your add-on or a partner's offer.</li>
+      <li><b>T-7</b>Weather plan B; if flexible, your price-drop stance.</li>
+      <li><b>T-1</b>Meeting point, live conditions, a named person and phone.</li>
+      <li><b>After</b>Ask for the dated review that becomes next season's proof.</li>
+    </ol>
+    <p class="hint">Why: 78% of US travelers keep planning after they book. 41% watch the price of a booking they hold, and about 4 in 10 have changed a booked stay after seeing a better option. Source: Skift Research + McKinsey, Sept 2026, n = 1,015 US travelers, p26.</p>
+
+    <form data-builder="cal" id="cal-form" novalidate>
+      <h3>When each message goes out</h3>
+      <p class="hint">Deterministic rules from the session. Flexible and booked 30 or more days out: all five. Non-refundable, or booked under 7 days out: Confirmation, T-1 and After only. Flexible and 7 to 29 days out: no T-30, because its date comes before the booking.</p>
+      <div class="fgrid">
+        <div><label for="c-booked">Booking date</label><input type="date" id="c-booked" name="booking_date" value="2027-02-15"></div>
+        <div><label for="c-trip">Trip date</label><input type="date" id="c-trip" name="trip_date" value="2027-07-15"></div>
+        <div><label for="c-end">Last day <small>(optional, multi-day trips)</small></label><input type="date" id="c-end" name="trip_end" value=""></div>
+        <div><label for="c-after">Review request, days after the trip <small>(Policy choice)</small></label><input type="number" id="c-after" name="after_days" value="1" min="0" max="60" inputmode="numeric"></div>
+      </div>
+      <fieldset class="radios">
+        <legend>Rate type</legend>
+        <label><input type="radio" name="rate" value="flexible" checked> Flexible (free cancellation window)</label>
+        <label><input type="radio" name="rate" value="nonref"> Non-refundable</label>
+      </fieldset>
+      <div>
+        <div class="btns">
+          <button type="button" class="secondary" id="use-kit-date">Use the trip date from the trip kit</button>
+        </div>
+        <p class="status" role="status" aria-live="polite" id="st-sched"></p>
+      </div>
+      <div id="sched-out"></div>
+
+      <h3>Your price-drop stance <span class="pill amber">Policy choice</span></h3>
+      <p>Decide one thing before the season: what you do when a guest finds a lower price inside your free-cancellation window. Any decided answer beats improvising. This is a business policy choice, not a requirement. It goes only in the T-7 message for flexible bookings.</p>
+      <fieldset class="radios">
+        <legend>Our stance</legend>
+        <label><input type="radio" name="stance" value="match"> Match the lower price</label>
+        <label><input type="radio" name="stance" value="credit"> Keep the booking, give a credit</label>
+        <label><input type="radio" name="stance" value="addon"> Keep the price, add something</label>
+        <label><input type="radio" name="stance" value="explain" checked> Explain what the price includes</label>
+        <label><input type="radio" name="stance" value="custom"> Write my own</label>
+        <label><input type="radio" name="stance" value="undecided"> Not decided yet</label>
+      </fieldset>
+      <label for="c-stance">The stance, in the words guests will read</label>
+      <textarea id="c-stance" name="stance_text" style="min-height:90px">Our price includes a heated enclosed cabin and hot drinks, and the cruise runs in rain. If your plans change, cancellation is free until 48 hours before departure.</textarea>
+      <p class="hint"><span class="pill">Contractual</span> If you sell through Viator or another OTA, check your supplier agreement for price and rate rules before you offer a match. <span class="pill red">Legal mandate</span> Lodges quoting a short-term lodging price show the total price, mandatory fees included (FTC rule 16 CFR Part 464).</p>
+
+      <h3>The calendar prompt</h3>
+      <label for="c-partner">One partner for the T-30 message</label>
+      <select id="c-partner"></select>
+      <div>
+        <div class="btns">
+          <button type="button" class="secondary" id="cal-demo">Load the fictional example</button>
+          <button type="button" class="ghost" id="cal-clear">Clear the calendar boxes</button>
+        </div>
+        <p class="status" role="status" aria-live="polite" id="st-cal"></p>
+      </div>
+    </form>
+    <div class="output">
+      <p class="label">Calendar prompt</p>
+      <pre id="out-cal" class="scroll" tabindex="0" aria-label="Calendar prompt"></pre>
+    </div>
+    <p class="pii" id="pii-cal" aria-live="polite"></p>
+    <label class="piiok" id="piiok-cal-wrap" hidden><input type="checkbox" id="piiok-cal"> These are fictional, or my business's own contact details, not guest data.</label>
+    <div>
+      <div class="btns">
+        <button type="button" id="copy-cal">Copy prompt</button>
+        <button type="button" class="secondary" id="save-cal">Save as .txt</button>
+      </div>
+      <p class="status" role="status" aria-live="polite" id="st-copy-cal"></p>
+    </div>
+    <template id="tpl-cal">Here is my approved fact sheet for {{business|[FILL: business name]}}.
+
+APPROVED FACTS (use only these):
+{{facts|[PASTE YOUR APPROVED FACT SHEET]}}
+
+ONE PARTNER (they agreed to be included):
+{{partner|No partner offer this season. Use our own add-on only, from the facts.}}
+
+OUR PRICE-DROP STANCE (Policy choice, decided by the owner):
+{{stance|[FILL: what we do when a guest finds a lower price inside the free-cancellation window]}}
+
+Draft five short guest messages, one job each. They are templates I will reuse all season:
+1. Confirmation (sent at booking): the fact sheet: what to wear, where to meet, weather terms. Say the one-page trip kit is attached.
+2. T-30 (30 days before the trip; flexible bookings made 30 or more days out): fill the gaps: our add-on or the partner's offer, with the referral code exactly as written. This one promotes an offer, so end it with [FILL: business postal address] and a one-line way to opt out of offers.
+3. T-7 (7 days before; flexible bookings only): the weather plan B, then our price-drop stance in the words above.
+4. T-1 (the day before): the meeting point, [FILL ON THE DAY: conditions from the captain], and a named person to call: [FILL: staff first name and business phone].
+5. After ({{after_label|1 day after the trip}}): ask for an honest review. Ask every guest the same way and offer nothing in return.
+
+Rules:
+- Under 120 words per message, each with a subject line.
+- Use only the facts above. No price I have not given you. Do not promise weather, wildlife or partner availability.
+- Use the placeholders [GUEST FIRST NAME], [TRIP DATE] and [START TIME]. I merge real details in my booking platform, never in this chat.
+- Where a fact is missing, write [FILL] and list it at the end under "Questions for the owner".
+- Put DRAFT - PENDING OWNER REVIEW at the top of each message.</template>
+
+    <h3>Export for your booking platform</h3>
+    <p>One row per scheduled message for this booking: <code>message</code>, <code>send_date</code>, <code>offset_days</code>, <code>rule</code>, <code>subject</code>, <code>body</code>, <code>approved_by</code>. Paste the approved subject and body into each row; the person who approved them fills <code>approved_by</code>. Nothing here sends anything.</p>
+    <div>
+      <div class="btns">
+        <button type="button" id="save-cal-csv">Save calendar CSV</button>
+      </div>
+      <p class="status" role="status" aria-live="polite" id="st-csv"></p>
+    </div>
+    <details>
+      <summary>Preview the CSV</summary>
+      <pre class="prompt" id="cal-csv"></pre>
+    </details>
+  </section>
+
+  <section class="card note" aria-labelledby="measure">
+    <h2 id="measure">How you will know it worked</h2>
+    <ul>
+      <li><b>Partner referrals and add-ons per booking:</b> referrals counted by code, plus add-ons sold, divided by bookings. Monthly.</li>
+      <li><b>Repeat questions per booking (Number 3):</b> guest questions already answered in the kit, the fact sheet or the confirmation, divided by bookings. Monthly. If the kit works, this falls.</li>
+      <li><b>In-window changes and cancellations (Number 4):</b> bookings changed or canceled inside the free-cancellation window, divided by bookings. Monthly in season; count flexible and non-refundable bookings separately.</li>
+    </ul>
+    <p>Count a baseline for a month before you send the first kit, or there is nothing to compare. Weather, prices and ships in port move these numbers too, so do not credit a change to the kit alone.</p>
+    <h3>Quick calculator <span class="hint">(saved in this browser only)</span></h3>
+    <form id="m-form" class="calc" novalidate>
+      <fieldset><legend>This month</legend>
+        <label for="m-bk">Bookings</label><input type="number" id="m-bk" min="0" inputmode="numeric">
+        <label for="m-ref">Partner referrals (by code)</label><input type="number" id="m-ref" min="0" inputmode="numeric">
+        <label for="m-add">Add-ons sold</label><input type="number" id="m-add" min="0" inputmode="numeric">
+      </fieldset>
+      <fieldset><legend>Number 3</legend>
+        <label for="m-q">Repeat questions</label><input type="number" id="m-q" min="0" inputmode="numeric">
+      </fieldset>
+      <fieldset><legend>Number 4, flexible bookings</legend>
+        <label for="m-flex">Flexible bookings</label><input type="number" id="m-flex" min="0" inputmode="numeric">
+        <label for="m-win">Changed or canceled in the window</label><input type="number" id="m-win" min="0" inputmode="numeric">
+      </fieldset>
+    </form>
+    <div class="output"><p class="label">Your numbers</p><pre id="m-out" aria-live="polite"></pre></div>
+    <div>
+      <div class="btns"><button type="button" class="secondary" data-copy="m-out">Copy these numbers</button></div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="files">
+    <h2 id="files">Download</h2>
+    <ul class="files">
+      <li><a href="partners.csv" download>partners.csv</a> <span class="hint">The two fictional partners in the format this page imports. Open it in a spreadsheet, replace the rows with your partners, then use "Import a partners CSV".</span></li>
+      <li><a href="kit-template.html">kit-template.html</a> <span class="hint">The one-page print-to-PDF layout. It works offline once opened.</span></li>
+      <li><span>Your prompt, your partner list and the calendar CSV</span> <span class="hint">Use the Save buttons above. Files are made in your browser.</span></li>
+    </ul>
+  </section>
+
+  <section class="card warn" aria-labelledby="safe">
+    <h2 id="safe">Before you use it</h2>
+    <p><strong>AI drafts. You approve.</strong> Every draft carries DRAFT - PENDING OWNER REVIEW until a person has checked it against your fact sheet and partner list. Asking the AI to check its own work is not a check.</p>
+    <ul class="obl">
+      <li><span class="pill red">Legal mandate</span> Guide licensing is yours and your partners' to hold, and it cannot be delegated. A partner who guides big game hunts holds a license under Alaska Statutes Title 8, Chapter 54 (AS 08.54); a sport-fishing guide and guide business hold a current ADF&amp;G registration, renewed each year. Your kit cannot stand in for either, and an AI cannot check them. Verify them yourself before you list the partner.</li>
+      <li><span class="pill teal">Recommendation</span> Weather, water, glacier and wildlife calls belong to your captain or another qualified person. The AI drafts the plan B text; that person approves it and makes the go or no-go call on the day. Do not promise weather or wildlife.</li>
+      <li><span class="pill teal">Recommendation</span> Keep guest names, emails, phone numbers, card numbers, ID numbers and medical details out of AI tools. Ages, dates and the product are enough. Check your AI tool's data-use setting. This page's privacy check is a first pass only.</li>
+      <li><span class="pill">Contractual</span> Check your referral agreement with each partner before you list them: who confirms their times and terms, how codes are counted, who answers guest questions about their trip. <span class="pill teal">Recommendation</span> If you have no written agreement yet, put one in writing first.</li>
+      <li><span class="pill">Contractual</span> For guests who booked through Viator or another OTA, check your OTA supplier agreement before you send your own messages or partner offers outside the platform.</li>
+      <li><span class="pill red">Legal mandate</span> The T-30 message promotes an offer, so treat it as commercial email under CAN-SPAM (15 U.S.C. 7701 to 7713; FTC rule <a href="https://www.law.cornell.edu/cfr/text/16/part-316" target="_blank" rel="noopener">16 CFR Part 316</a>): include your postal address and a working way to opt out. Marketing texts sent through an automated texting platform need the guest's prior express written consent under the TCPA (47 U.S.C. 227; FCC rule <a href="https://www.law.cornell.edu/cfr/text/47/64.1200" target="_blank" rel="noopener">47 CFR 64.1200</a>).</li>
+      <li><span class="pill red">Legal mandate</span> In the After message, offer nothing in exchange for a review that depends on what it says (FTC rule <a href="https://www.law.cornell.edu/cfr/text/16/part-465" target="_blank" rel="noopener">16 CFR 465.4</a>). <span class="pill">Contractual</span> Review sites add their own rules; Google's review policy, for example, bars asking only happy customers. Check each platform's policy.</li>
+      <li><span class="pill red">Legal mandate</span> Lodges: a message that shows a short-term lodging price shows the total price, mandatory fees included (FTC rule <a href="https://www.law.cornell.edu/cfr/text/16/part-464" target="_blank" rel="noopener">16 CFR Part 464</a>, in effect since May 12, 2025). The rule does not cover tours.</li>
+      <li><span class="pill amber">Policy choice</span> Your price-drop stance, the gap between activities, and how many days after the trip you ask for a review.</li>
+      <li><span class="pill teal">Recommendation</span> Nothing on this page sends, books, holds or changes anything. A person sends the kit and schedules the messages.</li>
+    </ul>
+  </section>
+
+  <section class="card teal" aria-labelledby="next">
+    <h2 id="next">Next rung: 3.b A partner circle with shared facts</h2>
+    <p><a href="../3b/"><b>3.b</b></a>: three to five operators who complete each other's trips share one fact sheet, and a no-code automation drafts this kit for every booking a month out, with partner codes. A person still approves each one. Your partner list ("Save partner list as CSV") is the start of that shared sheet.</p>
+    <p>The kit is also the first draft of the trip record in <a href="../3c/">3.c An agent-ready trip record</a>.</p>
+  </section>
+
+  <section class="card note" aria-labelledby="sources">
+    <h2 id="sources">Sources</h2>
+    <ul class="src">
+      <li>Skift Research and McKinsey &amp; Company, <a href="https://www.mckinsey.com/industries/travel/our-insights/winning-hearts-in-an-age-of-infinite-travel-choices" target="_blank" rel="noopener"><i>Winning Hearts in an Age of Infinite Travel Choices</i></a>, September 2026. Survey of 1,015 US travelers, data as of June 2026: 39% find coordinating the different parts of a trip frustrating (Exhibit 6, p19); 78% keep planning after booking and 68% research restaurants and activities (p26); 41% watch the price of a booking they hold, and about 4 in 10 have changed a booked stay after seeing a better option (p26). Skift Research Booking Journey Diary Study 2026, 26 travelers and 211 sessions, July 2026, directional: the handoffs between platforms are the most frequent source of negative sentiment (p18).</li>
+      <li>US rules cited above: FTC <a href="https://www.law.cornell.edu/cfr/text/16/part-316" target="_blank" rel="noopener">16 CFR Part 316</a> (CAN-SPAM), FCC <a href="https://www.law.cornell.edu/cfr/text/47/64.1200" target="_blank" rel="noopener">47 CFR 64.1200</a> (TCPA), FTC <a href="https://www.law.cornell.edu/cfr/text/16/part-465" target="_blank" rel="noopener">16 CFR Part 465</a> (reviews), FTC <a href="https://www.law.cornell.edu/cfr/text/16/part-464" target="_blank" rel="noopener">16 CFR Part 464</a> (fees). Alaska: AS 08.54 (Big Game Commercial Services Board); ADF&amp;G sport-fishing guide and business registration. This page is not legal advice.</li>
+      <li>Facts on this page last checked 2026-10-10. Internet is needed for these links only; the tool itself works offline once loaded.</li>
+    </ul>
+    <div>
+      <div class="btns no-print">
+        <button type="button" class="ghost" id="forget">Clear everything this page saved in this browser</button>
+      </div>
+      <p class="status" role="status" aria-live="polite" id="st-forget"></p>
+    </div>
+  </section>
+</main>
+
+<footer class="kit">
+  <p>ATIA 2026 Annual Convention · Small Business Focus: Leveraging AI Solutions · Pascual Reig-Munoz, Alaska SBDC. Bay Light Day Cruises is a fictional teaching business. Use your own approved facts, terms and responsible review. Effort, cost and time figures are estimates.</p>
+  <p><a href="../">All nine tools</a> · <a href="../Prompt-Kit-3x3.html">Printable prompt kit</a></p>
+</footer>
+</body>
+</html>

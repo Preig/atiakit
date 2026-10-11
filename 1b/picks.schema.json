@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://preig.github.io/atiakit/1b/picks.schema.json",
+  "title": "Curated picks per traveler type (ATIA AI Take-Home Kit, tool 1.b)",
+  "description": "The JSON block the 1.b run prompt asks the AI for: one object per traveler type, each with up to three picks from the operator's inventory. Each product_id refers to a row of the inventory (inventory-template.csv). Each cited_fact is copied word for word from that row. The checker at preig.github.io/atiakit/1b/ also tests what a schema cannot: that product_id exists in the inventory, that cited_fact appears in that row, and that no number appears that the inventory does not contain. Output from an AI is a DRAFT - PENDING OWNER REVIEW until each business approves its own lines.",
+  "type": "array",
+  "minItems": 1,
+  "items": { "$ref": "#/$defs/travelerTypePicks" },
+  "$defs": {
+    "travelerTypePicks": {
+      "type": "object",
+      "required": ["traveler_type", "picks", "note_if_fewer_than_three"],
+      "additionalProperties": false,
+      "properties": {
+        "traveler_type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Copied exactly from the operator's list of traveler types, for example \"Family with children under 10\"."
+        },
+        "picks": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 3,
+          "description": "Up to three trips, strongest first. Fewer is fine; padding is not.",
+          "items": { "$ref": "#/$defs/pick" }
+        },
+        "note_if_fewer_than_three": {
+          "type": "string",
+          "description": "Why fewer than three trips fit, in plain words. Empty string when there are three picks."
+        }
+      }
+    },
+    "pick": {
+      "type": "object",
+      "required": ["product_id", "business", "reason", "cited_fact"],
+      "additionalProperties": false,
+      "properties": {
+        "product_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The product_id of a row in the inventory, for example \"BL-CRUISE-4H\"."
+        },
+        "business": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The business named in that row."
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 320,
+          "description": "One or two sentences a traveler could check. No prices, availability, discounts, reviews, ratings, awards or superlatives."
+        },
+        "cited_fact": {
+          "type": "string",
+          "minLength": 1,
+          "description": "One fact copied word for word from that row, optionally starting with the column name, for example \"Minimum age 4\" or \"15 minutes by car from the harbor\"."
+        }
+      }
+    }
+  },
+  "examples": [
+    [
+      {
+        "traveler_type": "Family with children under 10",
+        "picks": [
+          {
+            "product_id": "MK-CART-90",
+            "business": "Mile 12 Kennel",
+            "reason": "Children aged 2 and up can ride, and the ride takes 90 minutes. It runs in rain, so a wet day does not cancel the plan.",
+            "cited_fact": "Minimum age 2"
+          }
+        ],
+        "note_if_fewer_than_three": "Fictional example, shortened to one pick."
+      }
+    ]
+  ]
+}
